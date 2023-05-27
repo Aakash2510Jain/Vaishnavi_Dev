@@ -22,8 +22,19 @@ public class LeadTriggerHandler {
         List<Lead__c> existingLeadsList = new List<Lead__c>();
         List<Lead__c> existingLeadWithPhones = new List<Lead__c>();
         List<Lead__c> existingLeadWithEmails = new List<Lead__c>();
+        List<Campaign> campaignList = new List<Campaign>();
         Map<String,Lead__c> leadRecByPhoneMap = new Map<String, Lead__c>();
         Map<String,Lead__c> leadRecByEmailMap = new Map<String, Lead__c>();
+        Map<string, Campaign> campaignSourceByCampaignRecMap = new map<String, Campaign>();
+        
+        Date todayDate = system.today();
+        campaignList = [Select id,Lead_Source_Type__c,Lead_Sub_Source__c,Lead_Source__c,IsActive,StartDate,EndDate From Campaign where IsActive = true And StartDate <= : todayDate and EndDate >= : todayDate and Lead_Source_Type__c != null];
+        system.debug('campaignList--->'+campaignList);
+        if(!campaignList.isEmpty()){
+            for(Campaign campaignRec : campaignList){
+                campaignSourceByCampaignRecMap.put(campaignRec.Lead_Source_Type__c, campaignRec);
+            }
+        }
         
         for(Lead__c leadRec : newLeadList){
             if(leadRec.Phone__c != null){
@@ -34,10 +45,14 @@ public class LeadTriggerHandler {
             {
                 emailsSet.add(leadRec.Email__c);
             }
+            if(leadRec.Lead_Source_Type__c != null){
+                if(campaignSourceByCampaignRecMap.containsKey(leadRec.Lead_Source_Type__c))
+                    leadRec.Campaign__c = campaignSourceByCampaignRecMap.get(leadRec.Lead_Source_Type__c).Id;
+            }
         }
         
         if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
-            existingLeadsList = [Select Id,Phone__c,Email__c From Lead__c where Phone__c In : phonesSet or Email__c In : emailsSet];
+            existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet ) AND isConverted__c = false];
             system.debug('existingLeadsList-->'+existingLeadsList);
             
             if(!existingLeadsList.isEmpty()){
@@ -59,26 +74,42 @@ public class LeadTriggerHandler {
                         if(leadRec.Phone__c != null){
                             system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
-                                leadRec.To_Be_Deleted__c = true;
-                                existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);
+                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                    
+                                }else{
+                                    leadRec.To_Be_Deleted__c = true;
+                                    existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
+                                }
                             }else if(leadRec.Email__c != null){
                                 system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                    leadRec.To_Be_Deleted__c = true;
-                                    existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id, leadRec);
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                        
+                                    }else{
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id, leadRec);
+                                    }
                                 }
                             }
                         }
                         else if(leadRec.Email__c != null){
                             system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
-                                leadRec.To_Be_Deleted__c = true;
-                                existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id,leadRec);
+                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                    
+                                }else{
+                                    leadRec.To_Be_Deleted__c = true;
+                                    existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id,leadRec);
+                                }
                             }else if(leadRec.Email__c != null){
                                 system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                    leadRec.To_Be_Deleted__c = true;
-                                    existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                        
+                                    }else{
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
+                                    }
                                 }
                             }
                         }
@@ -96,5 +127,47 @@ public class LeadTriggerHandler {
     }
     
     public void afteInsert(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
+        List<Task> taskListToInsert = new List<Task>();
+
+        for(Id leadId : newLeadMap.keyset()){
+            Task taskRecToInsert = new Task();
+            taskRecToInsert.whatId = leadId;
+            taskRecToInsert.Subject = ConstantClass.TaskSubjectForMarketingNewLead;
+            taskListToInsert.add(taskRecToInsert);
+        }
+        system.debug('taskListToInsert-->'+taskListToInsert);
+        if(!taskListToInsert.isEmpty()){
+            insert taskListToInsert;
+        }
     }
+    public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
+        List<Task> taskListToInsertforFollowup = new List<Task>();
+
+        for(Lead__c leadRec : newLeadMap.values()){
+           if(leadRec.Next_Followup_Date_Time__c != oldLeadMap.get(leadRec.Id).Next_Followup_Date_Time__c && leadRec.Next_Followup_Date_Time__c != null){
+                if(leadRec.Next_Followup_Date_Time__c < system.now()){
+                    leadRec.addError(ConstantClass.errorForPastFollowUpDate);
+                }
+                else{
+                    Task taskRecToInsert = new Task();
+                    taskRecToInsert.whatId = leadRec.Id;
+                    taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
+                    taskRecToInsert.Follow_Up_Date_Time__c = leadRec.Next_Followup_Date_Time__c;
+                    taskListToInsertforFollowup.add(taskRecToInsert);
+                }
+           }
+           if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Lead_Substage__c != null){
+            if(leadRec.Lead_Substage__c == 'Not Interested' || leadRec.Lead_Substage__c == 'Not a relevant call' || 
+                leadRec.Lead_Substage__c == 'Junk lead'|| leadRec.Lead_Substage__c == 'Just Enquiry'|| 
+                leadRec.Lead_Substage__c == 'Did not Show up for site visit'|| leadRec.Lead_Substage__c == 'Not Interested in Property'
+            ){ 
+                leadRec.Lead_Stage__c = 'Drop';
+            }
+           }
+        }
+        if(!taskListToInsertforFollowup.isEmpty()){
+            insert taskListToInsertforFollowup;
+        }
+    }
+    
 }

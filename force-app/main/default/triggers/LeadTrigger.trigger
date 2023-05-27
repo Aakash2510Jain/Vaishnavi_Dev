@@ -1,4 +1,4 @@
-trigger LeadTrigger on Lead__c (before insert, after insert) {
+trigger LeadTrigger on Lead__c (before insert, after insert, before update,after update) {
  SObject_Trigger_Control__mdt triggerConfig = SObject_Trigger_Control__mdt.getInstance('Lead');
     system.debug('triggerConfig:: ' + triggerConfig);
     
@@ -9,9 +9,13 @@ trigger LeadTrigger on Lead__c (before insert, after insert) {
             handlerInstance.beforeInsert(trigger.new);
         }
         if(trigger.isAfter && trigger.isInsert){
+            system.debug('After lead Insert');
             handlerInstance.afteInsert(trigger.newMap, trigger.oldMap);
             BatchToDeleteDuplicateLeads batchInstance = new BatchToDeleteDuplicateLeads();
             database.executeBatch(batchInstance);
+        }
+        if(trigger.isBefore && trigger.isUpdate){
+            handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
         }
     }
 }

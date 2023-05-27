@@ -23,9 +23,8 @@
                                 <th class="slds-text-title_caps" scope="col">
                                     <div class="slds-truncate" title="lead Name">Name</div>
                                 </th>
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="lead CIN">Phone</div>
-                                </th>
+                                
+                                
                                 <th class="slds-text-title_caps" scope="col">
                                     <div class="slds-truncate" title="Owner">Source</div>
                                 </th>
@@ -35,29 +34,32 @@
                                 <th class="slds-text-title_caps" scope="col">
                                     <div class="slds-truncate" title="Rating">Sub Source</div>
                                 </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div class="slds-truncate" title="lead CIN">Phone</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div class="slds-truncate" title="lead CIN">Email</div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             <aura:iteration items="{! v.leadListWithsimDomain }" var="lead">
                                 <tr>
-                                    <td>
+                                    <td class="slds-grow slds-cell-wrap">
                                         <a target="_blank" href="{!$Site.CurrentSiteUrl+'/lightning/r/Lead__c/'+lead.Id+'/view'}" tabindex="-1">
-
+                                            
                                             <lightning:badge label="{!lead.Name__c}"/>
                                         </a> 
                                         
                                     </td>
-                                    <td>
-                                        <b>
-                                            {!lead.Phone__c}
-                                        </b>
-                                    </td>
-                                    <td class="slds-cell_action-mode" role="gridcell">
+                                    
+                                    
+                                    <td class="slds-cell_action-mode slds-grow slds-cell-wrap" role="gridcell">
                                         <b>
                                             {!lead.Lead_Source__c}
                                         </b> 
                                     </td>
-                                    <td> 
+                                    <td class="slds-grow slds-cell-wrap"> 
                                         <b>
                                             {!lead.Lead_Source_Type__c}
                                         </b> 
@@ -66,6 +68,16 @@
                                         <b>
                                             {!lead.Lead_Sub_Source__c}
                                         </b> 
+                                    </td>
+                                    <td class="slds-grow slds-cell-wrap">
+                                        <b>
+                                            {!lead.Phone__c}
+                                        </b>
+                                    </td>
+                                    <td class="slds-grow slds-cell-wrap">
+                                        <b>
+                                            {!lead.Email__c}
+                                        </b>
                                     </td>
                                 </tr>	
                             </aura:iteration>
