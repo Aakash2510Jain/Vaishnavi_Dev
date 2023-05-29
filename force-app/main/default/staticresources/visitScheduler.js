@@ -65,6 +65,8 @@ $(document).ready(function () {
                                 repVisits[i].start = event.start._d.getTime();
                             }
                             console.log(repVisits[i]);
+                            updateVisitRecord(repVisits[i].id,repVisits[i].start);
+
                         });
                     }
                 },
@@ -84,7 +86,6 @@ $(document).ready(function () {
                     for (var i = 0; i < repVisits.length; i++) {
                         currentAccount = repVisits[i].accountId;
                     }
-                    // callVisitCreateRecordMethod();
                     callGeolocationMethod();
                     // is the "remove after drop" checkbox checked?
                     if ($('#drop-remove').is(':checked')) {
@@ -103,7 +104,7 @@ $(document).ready(function () {
     }, { escape: false });
 
 
-    function callGeolocationMethod() {
+   /* function callGeolocationMethod() {
         // let apexDate = visiteDateToApex.toISOString();
         debugger;
         VisitSchedulerController.getleadGeolocation(currentAccount, function (result, event) {
@@ -130,6 +131,32 @@ $(document).ready(function () {
 
         }, { escape: false });
 
+    } */
+
+    function callGeolocationMethod() {
+        debugger;
+        VisitSchedulerController.getTestRecord(currentAccount, function (result, event) {
+            debugger;
+            console.log('--- result Object :' + result);
+            if (result) {
+                for (var key in result) {
+                    if (key == "Geolocation__Longitude__s") {
+                        Leadgeolatitude = result.Geolocation__Latitude__s;
+                        Leadgeolongitude = result.Geolocation__Longitude__s;
+                        callVisitCreateRecordMethod();
+                       console.log("Lead Found Lead Method Called")
+                        break;
+                    }
+                    else if (key == "Geo_Location__Latitude__s") {
+                       AccountLatitude = result.Geo_Location__Latitude__s;
+                          AccountLongitude = result.Geo_Location__Longitude__s;
+                        callVisitAccountCreateRecordMethod();
+                        console.log("Account Found Account Method Called")
+                        break;
+                    }
+                }
+            }
+        }, { escape: false });
     }
 
     function callVisitCreateRecordMethod() {
@@ -311,42 +338,54 @@ $(document).ready(function () {
                     '<option value="' + result[i].Id + '">' + result[i].Name + '</option>' + '<br>'
                 );
             });
+            
 
         }, { escape: false });
     }
 
     // New First
-
-    function getUserFirstDetails() {
-        selectedUser = $('#user-selectUser :selected').text();
-        if (selectedUser != null && firstLocation != null && selectedObject == 'Account') {
+    function updateVisitRecord(visitId,startdate) {
+        VisitSchedulerController.updateVisit(visitId, startdate, function (result, event) {
             debugger;
-            VisitSchedulerController.getRepAccounts(selectedUser, firstLocation, function (accountList, event) {
-                if (event.status) {
-                    if (accountList && accountList.length == 0) {
-                        alert('No Records found.');
+            if (event.status) {
+             
+            } else {
+                console.log(result);
+                alert('Something went wrong');
+            }
+            $("#spinner").hide();
+        });
+    }
+
+    function getUserFirstDetails(selectedUserId) {
+            debugger;
+            selectedUser = $('#user-selectUser :selected').text();
+            if (selectedUser != null && firstLocation != null && selectedObject == 'Opportunity') {
+                debugger;
+                VisitSchedulerController.getRepAccounts(selectedUser, firstLocation, function (accountList, event) {
+                    if (event.status) {
+                        if (accountList && accountList.length == 0) {
+                            alert('No Records found.');
+                        } else {
+                            $("#event-container").empty();
+                            $(accountList).each(function (i, e) {
+                                $("#event-container").append(
+                                    '<div class="fc-event" data-accid="' + accountList[i].Id + '">' + accountList[i].Name + '</div>'
+                                );
+                            });
+                            setEventDraggable();
+                        }
                     } else {
-                        $("#event-container").empty();
-                        $(accountList).each(function (i, e) {
-                            $("#event-container").append(
-                                '<div class="fc-event" data-accid="' + accountList[i].Id + '">' + accountList[i].Name + '</div>'
-                            );
-                        });
-                        setEventDraggable();
+                        console.log(result);
+                        alert('Something went wrong');
                     }
-
-                } else {
-                    console.log(result);
-                    alert('Something went wrong');
-                }
-                $("#spinner").hide();
-            });
-        } else if (selectedUser != null && firstLocation != null && selectedObject == 'Lead') {
-            debugger;
-            VisitSchedulerController.getRepLeads(selectedUser, firstLocation, function (accountList, event) {
+                    $("#spinner").hide();
+                });
+            } else if (selectedUser != null && firstLocation != null && selectedObject == 'Lead') {
+            VisitSchedulerController.getRepLeads(selectedUserId, firstLocation, function (accountList, event) {
                 debugger;
                 if (event.status) {
-                    if (accountList.length == 0 && selectedUser != 'Select...') {
+                    if (accountList.length == 0  && selectedUser != 'Select...') {
                         $("#event-container").empty();
                         alert('No Records found !');
                     } else {
@@ -457,7 +496,7 @@ $(document).ready(function () {
                     });
                 }
                 console.log("User Record ::" + result);
-                getUserFirstDetails();
+                getUserFirstDetails(selectedUserId);
             }
             else {
                 alert("Something went wrong !")
@@ -531,7 +570,7 @@ $(document).ready(function () {
                     for (let i = 0; i < result.visitList.length; i++) {
                         let calVisit = {};
                         calVisit.id = result.visitList[i].Id;
-                        calVisit.title = result.visitList[i].Account__r.Name;
+                        calVisit.title = result.visitList[i].Lead__r.Name;
                         calVisit.start = result.visitList[i].Planned_visit_date__c;
                         calVisit.end = result.visitList[i].Planned_visit_date__c;
                         repVisits.push(calVisit);

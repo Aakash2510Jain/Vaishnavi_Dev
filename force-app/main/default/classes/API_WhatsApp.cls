@@ -1,5 +1,5 @@
 public without sharing class API_WhatsApp {
-    public static void sendWhatsAppMessage(){
+    public static void sendWhatsAppMessage(string phoneNo, string message){
         // Create an instance of the HttpRequest class
         HttpRequest httpRequest = new HttpRequest();
         
@@ -15,12 +15,14 @@ public without sharing class API_WhatsApp {
         requestParams.put('userid', '2000212725');
         
         requestParams.put('password', 'BTmHHaeBc');
-        requestParams.put('send_to', '7042458620');
+        requestParams.put('send_to', phoneNo);
+        //requestParams.put('send_to', '7042458620');
         requestParams.put('v', '1.1');
         requestParams.put('format', 'json');
         requestParams.put('msg_type', 'TEXT');
         requestParams.put('method', 'SENDMESSAGE');
-        requestParams.put('msg', 'It was a pleasure talking to you! I will be happy to connect with you further and take you through our delightfully designed residential projects that may suit your requirement and is within your expectations.Feel free to reach us on {{1}} regarding any queries that you may have!Here is the link to the brochure - {{2}} Warm Regards, Team Vaishnavi https://www.vaishnavigroup.com/');
+        requestParams.put('msg',message);
+        //requestParams.put('msg', 'It was a pleasure talking to you! I will be happy to connect with you further and take you through our delightfully designed residential projects that may suit your requirement and is within your expectations.\nFeel free to reach us on {{1}} regarding any queries that you may have!\nHere is the link to the brochure - {{2}}\n\nWarm Regards,\nTeam Vaishnavi\nhttps://www.vaishnavigroup.com/');
         
         // Build the query string with parameters
         String queryString = '';

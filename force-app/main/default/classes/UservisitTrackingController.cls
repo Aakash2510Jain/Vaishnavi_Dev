@@ -10,6 +10,7 @@ global class UservisitTrackingController {
     global UservisitTrackingController(){
         userId = UserInfo.getUserId();
         userName = UserInfo.getName();
+        system.debug('userId-----'+userId);
     }
     
     @RemoteAction
@@ -31,7 +32,7 @@ global class UservisitTrackingController {
         Map<String,Object> mapuser=new Map<String,Object>();
         List<Map<String,Object>> markerLocationsList = new List<Map<String,Object>>();
         
-        if(currentPosLat != null && currentPosLng != null)
+        if(currentPosLat != 0 && currentPosLng != 0)
             visitByDateList = [SELECT id, Status__c, City__c, Country__c, State__c, Street__c, Postal_Code__c, Geo_Location__latitude__s, Geo_Location__longitude__s, Lead__c, Lead__r.Name ,Account__r.Name,Account__r.Phone,Planned_visit_date__c,Visit_Plan__c,CheckIn__c,Check_Out__c,Visit_Plan__r.End_Location__Latitude__s FROM Visit__c WHERE Assigned_User__c =: usrId AND Planned_visit_date__c = :newDate ORDER BY DISTANCE(Geo_Location__c, GEOLOCATION(:currentPosLat,:currentPosLng), 'mi') NULLS Last];
         else
             visitByDateList = [SELECT id, Status__c, City__c, Country__c, State__c, Street__c, Postal_Code__c, Geo_Location__latitude__s, Geo_Location__longitude__s, Lead__c, Lead__r.Name ,Account__r.Name,Account__r.Phone,Planned_visit_date__c,Visit_Plan__c,CheckIn__c,Check_Out__c,Visit_Plan__r.End_Location__Latitude__s FROM Visit__c WHERE Assigned_User__c =: usrId AND Planned_visit_date__c = :newDate];

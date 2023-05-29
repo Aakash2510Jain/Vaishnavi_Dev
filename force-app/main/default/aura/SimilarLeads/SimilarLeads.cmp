@@ -47,10 +47,8 @@
                                 <tr>
                                     <td class="slds-grow slds-cell-wrap">
                                         <a target="_blank" href="{!$Site.CurrentSiteUrl+'/lightning/r/Lead__c/'+lead.Id+'/view'}" tabindex="-1">
-                                            
-                                            <lightning:badge label="{!lead.Name__c}"/>
+                                            {!lead.Name__c}
                                         </a> 
-                                        
                                     </td>
                                     
                                     

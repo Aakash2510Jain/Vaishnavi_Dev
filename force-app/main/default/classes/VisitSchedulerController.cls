@@ -43,7 +43,7 @@ public class VisitSchedulerController {
     @RemoteAction
     public Static List<String> getAccountleadList(){
         try{
-            List<String> recordList = new List<String>{'Account','Lead'};
+            List<String> recordList = new List<String>{'Opportunity','Lead'};
                 System.debug('recordList :'+recordList);
             return recordList;
         }catch(Exception e){
@@ -65,7 +65,7 @@ public class VisitSchedulerController {
     public Static List<Lead__c> getSelectedObjectRecord(String objectName, String location){
         List<Lead__c> ledList = new List<Lead__c>();
         if(objectName == 'Lead__c'){
-            ledList =[ SELECT Id,Name,Location__c FROM Lead__c Where   Location__c =: location];
+            ledList =[ SELECT Id,Name,Location__c  FROM Lead__c  Where   Location__c =: location];
         }
         System.debug('ledList Size ::'+ledList.Size()); 
         System.debug('ledList Record ::'+ledList);
@@ -79,11 +79,11 @@ public class VisitSchedulerController {
     
     // Show Record of Account Based on Object & Location
     @RemoteAction
-    public Static List<Account> getSelectedAccountRecords(String objectName, string location){
+    public Static List<Opportunity__c> getSelectedAccountRecords(String objectName, string location){
         System.debug('location ::'+location);
-        List<Account> accList = new List<Account>();
-        if(objectName == 'Account'){
-            accList= [SELECT Id,Name,Location__r.Name FROM Account WHERE Location__r.Name =:  location];
+        List<Opportunity__c> accList = new List<Opportunity__c>();
+        if(objectName == 'Opportunity__c'){
+            accList= [SELECT Id,Name,Location__r.Name FROM Opportunity__c WHERE Location__r.Name =:  location];
             System.debug('Account size :'+accList.size());
             System.debug('Account Record :'+accList);
         }
@@ -104,10 +104,11 @@ public class VisitSchedulerController {
     
     @RemoteAction
     public static Map<String,Object> getUserVisits(String userId) {
+        System.debug('userId===='+userId);
         Map<String, Object> pageData = new Map<String,Object>();
         if(!String.isBlank(userId)) {
-            pageData.put('accountList', [SELECT Id,Name FROM Account WHERE OwnerId = :userId LIMIT 15]);//Parent_Visit__c
-            pageData.put('visitList', [Select Id, Name, Account__c, Account__r.Name, Planned_visit_date__c, CheckIn__c, Check_Out__c FROM Visit__c WHERE Account__c != null AND Assigned_User__c = :userId AND Actual_Visit_Date__c = null]);
+            pageData.put('accountList', [SELECT Id,Name FROM Lead__c WHERE OwnerId = :userId LIMIT 15]);//Parent_Visit__c
+            pageData.put('visitList', [Select Id, Name, Lead__c, Lead__r.Name, Planned_visit_date__c, CheckIn__c, Check_Out__c FROM Visit__c WHERE Lead__c != null AND /*Assigned_User__c = :userId AND*/ Actual_Visit_Date__c = null]);
         }
         System.debug('User Data ::'+pageData);
         return pageData;
@@ -121,12 +122,12 @@ public class VisitSchedulerController {
     
     // Get Search Result as Account
     @RemoteAction
-    public static List<Account> getRepAccounts(String repId, String location) {
-        List<Account> accList = new List<Account>();
+    public static List<Opportunity__c> getRepAccounts(String repId, String location) {
+        List<Opportunity__c> accList = new List<Opportunity__c>();
         System.debug('repId ::'+repId);
         //System.debug('searchString ::'+searchString);
         //  String searchPattern = '%'+String.escapeSingleQuotes(searchString)+'%';
-        accList = [SELECT Id, Name,Location__r.Name,owner.name FROM Account WHERE owner.name = :repId AND  Location__r.Name =: location LIMIT 15];
+        accList = [SELECT Id, Name,Location__r.Name,owner.name FROM Opportunity__c WHERE owner.name = :repId AND  Location__r.Name =: location LIMIT 15];
         System.debug('accList ::'+accList);
         return accList;
     }
@@ -139,7 +140,7 @@ public class VisitSchedulerController {
         System.debug('location ::'+location);
         List<Lead__c> ledList = new List<Lead__c>();
         //  String searchPattern = '%'+String.escapeSingleQuotes(searchString)+'%';
-        ledList = [SELECT Id,Name,Location__c,owner.Name FROM Lead__c WHERE owner.Name =: repId AND Location__c =:location  LIMIT 10];
+        ledList = [SELECT Id,Name,Location__c,owner.Name FROM Lead__c WHERE ownerId =: repId AND Location__r.Name =:location LIMIT 10];
         System.debug('Lead__cList ::'+ledList);
         return ledList;
     }
@@ -163,9 +164,9 @@ public class VisitSchedulerController {
             insert vs;
             System.debug('Visit Record  for Lead__c ::'+vs);
             
-        }else if(sObjName == 'Account'){
+        }else if(sObjName == 'Opportunity__c'){
             Visit__c vs = new Visit__c();
-            vs.Account__c = SobjectId;
+            vs.Opportunity__c = SobjectId;
             vs.Assigned_User__c = AssignedUserId;
             vs.Planned_visit_date__c = Date.valueOf(datestring);
             vs.Geo_Location__Latitude__s = Decimal.valueOf(geolatitude);
@@ -175,6 +176,17 @@ public class VisitSchedulerController {
         }       
         return 'SUCCESS';
     }
+
+    @RemoteAction
+    Public static string updateVisit(string visitId, string startDate){
+        if(!string.isBlank(visitId) && !string.isBlank(startDate)){
+            dateTime plannedDateTime = DateTime.newinstance(long.valueOf(startDate));
+            update New Visit__c(Id=visitId,Planned_visit_date__c= plannedDateTime.date());
+            return 'success';
+        }else{
+            return 'error';
+        }
+    }
     
     
     static void printError(Exception e) {
@@ -182,9 +194,18 @@ public class VisitSchedulerController {
         System.debug('--- ErrorLineNo :'+e.getMessage());
     }
     
+    @RemoteAction
+    public static Lead__c getTestRecord(string recordId){
+        if(!String.isBlank(recordId)){
+            Lead__c led = [SELECT Id,Name,Geolocation__Latitude__s,Geolocation__Longitude__s FROM Lead__c WHERE Id =: recordId];
+            System.debug('Lead__c Record :::'+led);
+            return led;
+        }
+        return null;
+    }
     
     @RemoteAction
-    public static Sobject getLeadGeolocation(String recordId){
+    public static Sobject getLeadGeolocationTest(String recordId ){
         if(!String.isBlank(recordId)){
             Id myId = Id.valueOf(recordId);
             String sObjName = myId.getSObjectType().getDescribe().getName();
@@ -193,9 +214,9 @@ public class VisitSchedulerController {
                 Lead__c led = [SELECT Id,Name,Geolocation__Latitude__s,Geolocation__Longitude__s FROM Lead__c WHERE Id =: recordId];
                 System.debug('Lead__c Record :::'+led);
                 return led;
-            }else if(sObjName == 'Account'){
+            }else if(sObjName == 'Opportunity__c'){
                 System.debug('Account Found'); 
-                Account acc = [SELECT Id,Name,Geo_Location__Latitude__s,Geo_Location__Longitude__s FROM Account WHERE Id =: recordId];
+                Opportunity__c acc = [SELECT Id,Name,Geo_Location__Latitude__s,Geo_Location__Longitude__s FROM Opportunity__c WHERE Id =: recordId];
                 System.debug('Account Record :::'+acc);
                 return acc;
             }
@@ -231,7 +252,7 @@ public class VisitSchedulerController {
   // 
     public Static Map<String,String> getLongandLat(String Addresss){
         System.debug('Addresss :::'+Addresss);
-     /*   if(!String.isBlank(Addresss)){
+        if(!String.isBlank(Addresss)){
             Map<String,String> responseMap = new Map<String,String>();
             String apikey = Label.GoogleApiKey;	 
             String baseURL = Label.GooglemapBaseURL; 
@@ -264,7 +285,7 @@ public class VisitSchedulerController {
             System.debug('responseMap---'+String.valueOf(responseMap));
             
             return responseMap;
-        }*/
+        }
         return null; 
     }
     
