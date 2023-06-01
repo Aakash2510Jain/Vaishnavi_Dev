@@ -10,7 +10,19 @@
     <!--Lightning Card-->
     
     <lightning:card >
-        <div style = "border-style: solid;margin :1%" >
+        <div class="card" style="margin-left: 3%">
+            <div class="card-header">
+                <h3><b>Leads With Similar Domain ⬇️</b></h3>
+            </div>
+            <div class="card-body">
+                <aura:iteration items="{! v.leadListWithsimDomain }" var="lead">
+                    <div class="card">
+                        <h4>{!lead.Name__c}</h4>
+                    </div>
+                </aura:iteration>
+            </div>
+        </div>
+        <!-- <div style = "border-style: solid;margin :1%" >
             <div style = "margin :1%" >
                 <aura:if  isTrue="{!v.leadListWithsimDomain.length > 0}">
                     <div style="margin-bottom: 2%;margin-left: 4%;margin-top: 2%;">
@@ -97,7 +109,7 @@
                     </aura:set>
                 </aura:if> 
             </div>
-        </div>
+        </div> -->
     </lightning:card>
     
     

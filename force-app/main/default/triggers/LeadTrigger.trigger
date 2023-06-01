@@ -17,5 +17,8 @@ trigger LeadTrigger on Lead__c (before insert, after insert, before update,after
         if(trigger.isBefore && trigger.isUpdate){
             handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
         }
+        if(trigger.isAfter && trigger.isUpdate){
+            handlerInstance.afterUpdate(trigger.newMap, trigger.oldMap);
+        }
     }
 }

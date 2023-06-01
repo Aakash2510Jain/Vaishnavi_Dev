@@ -153,10 +153,12 @@ public class LeadTriggerHandler {
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
             }
-            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
-                leadRec.isConverted__c = true;
-                leadRec.OwnerId = ConstantClass.convertedLeadQueue;
-                convertedLeadRecordsList.add(leadRec);
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
+                    leadRec.isConverted__c = true;
+                    leadRec.OwnerId = ConstantClass.convertedLeadQueue;
+                    convertedLeadRecordsList.add(leadRec);
+                }                
             }
             if(leadRec.Next_Followup_Date_Time__c != oldLeadMap.get(leadRec.Id).Next_Followup_Date_Time__c && leadRec.Next_Followup_Date_Time__c != null){
                 if(leadRec.Next_Followup_Date_Time__c < system.now()){
@@ -171,6 +173,7 @@ public class LeadTriggerHandler {
                     taskListToInsertforFollowup.add(taskRecToInsert);
                 }
             }
+            
             if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Lead_Substage__c != null){
                 if(leadRec.Lead_Substage__c == 'Not Interested' || leadRec.Lead_Substage__c == 'Not a relevant call' || 
                    leadRec.Lead_Substage__c == 'Junk lead'|| leadRec.Lead_Substage__c == 'Just Enquiry'|| 
@@ -194,6 +197,13 @@ public class LeadTriggerHandler {
                     leadRec.Next_Followup_Date_Time__c.addError('Specify Follow up Date greater then today');
                 }
             }
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
+                    if(leadRec.Site_Visit_Date__c < system.now() ||leadRec.Site_Visit_Date__c == null){
+                        leadRec.Site_Visit_Date__c.addError('Specify Site visit Date greater then today');
+                    }
+                }
+            }
 			            
         }
         if(!convertedLeadRecordsList.isEmpty()){
@@ -203,5 +213,25 @@ public class LeadTriggerHandler {
             insert taskListToInsertforFollowup;
         }
     }
-    
+    public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
+        Map<Id, Lead__c> leadIdByLeadRecMap = new Map<Id, Lead__c>();
+        List<Visit__c> visitListToInsert = new List<Visit__c>();
+
+        for(Lead__c leadRec : newLeadMap.values()){
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
+                leadIdByLeadRecMap.put(leadRec.Id, leadRec);
+            }
+        }
+        if(!leadIdByLeadRecMap.isEmpty()){
+            for(Lead__c leadRec: leadIdByLeadRecMap.values()){
+                Visit__c visitRecToInsert = new Visit__c();
+                visitRecToInsert.Lead__c = leadRec.id;
+                visitRecToInsert.Planned_visit_date__c = leadRec.Site_Visit_Date__c;
+                visitListToInsert.add(visitRecToInsert);
+            }
+            if(!visitListToInsert.isEmpty()){
+                insert visitListToInsert;
+            }
+        }
+    }
 }

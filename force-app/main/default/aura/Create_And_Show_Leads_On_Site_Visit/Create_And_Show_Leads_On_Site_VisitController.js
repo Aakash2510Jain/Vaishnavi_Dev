@@ -62,10 +62,10 @@
     selectdate : function(component, event, helper){
         debugger;
         var dateselect = component.find('date').get('v.value');
-         var today = new Date().toISOString().split('T')[0];
-        if(dateselect < today){
+         var todaydate = new Date().toISOString().split('T')[0];
+        if(dateselect < todaydate){
              alert('Date should Be Gretar than Today Date');
-             component.set("v.today",today); 
+             component.set("v.today",todaydate); 
         }else{
               
             component.set("v.today",dateselect);  

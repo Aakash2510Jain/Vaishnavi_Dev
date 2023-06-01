@@ -30,3 +30,26 @@
     padding-right: 30px;
     font-size: 15px;
 }
+
+.THIS.circular-data-container {
+    width: 100px; /* Adjust width and height as per your requirements */
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f1f1f1; /* Set your desired background color */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.THIS.circle {
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    padding: 10px;
+    background: #fff;
+    border: 3px solid #000;
+    color: #000;
+    text-align: center;
+    font: 32px Arial, sans-serif;
+}
