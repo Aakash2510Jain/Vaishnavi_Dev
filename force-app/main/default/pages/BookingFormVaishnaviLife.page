@@ -1,12 +1,12 @@
-<apex:page >
+<apex:page controller="BookingFormController" showHeader="false" sidebar="false" standardStylesheets="false">
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"/>
-            <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>       
-    </head>
-    <style>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script> 
+        
+        <style>
         .box-shadow-2{
         box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.11);
         -webkit-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.11);
@@ -52,7 +52,131 @@
         }
         
     </style>
-    <apex:form >
+    </head>
+    
+    <script>
+    
+    
+    var app = angular.module('BookingApp', []);
+    app.controller('BookingCtlr', function ($scope) {
+        debugger;
+        
+        $scope.relList = JSON.parse('{!relationpickValue}');;
+        $scope.citizenStatusList = JSON.parse('{!citizenshipstatuspickValue}');
+        $scope.gpaList = JSON.parse('{!gpapickValue}');
+        $scope.sourceIncomeList = JSON.parse('{!sourceIncomepickValue}');
+        $scope.orgList = JSON.parse('{!orgTypepickValue}');
+        $scope.industryList = JSON.parse('{!industrypickValue}');
+        $scope.workRoleList = JSON.parse('{!workRolepickValue}');
+        $scope.annualIncomeList = JSON.parse('{!annualIncomepickValue}');
+        $scope.modePayList = JSON.parse('{!modeOfPaymentpickValue}');
+        $scope.purposePurchaseList = JSON.parse('{!purposeOfPurchasepickValue}');
+        $scope.comeToKnowList = JSON.parse('{!comeToKnowAboutpickValue}');
+        $scope.bookingList = JSON.parse('{!sourceOfBookingpickValue}');
+        $scope.exitCustList = JSON.parse('{!exitingCustomerpickValue}');
+        $scope.referCustList = JSON.parse('{!referredCustomerpickValue}');
+        $scope.exitEmpList = JSON.parse('{!exitingEmployeepickValue}');
+        $scope.referEmpList = JSON.parse('{!referredEmployeepickValue}');
+        $scope.chkbkFormList = JSON.parse('{!chkListBookingFormpickValue}');
+    
+    $scope.applicantObj = {
+        	Name:"",
+            "Plot_No__c":"",
+            "Date_of_Booking__c":"",
+            "First_Applicant_Relation_With__c":"",
+            "First_Applicant_Name__c":"",
+            "First_Applicant_Date_Of_Birth__c":"",
+            "First_Applicant_Occupation__c":"",
+            "First_Applicant_Designation__c":"",
+            "FA_Citizenship_Status__c":"",
+            "GPA_if_any__c":"",
+            "FA_Permanent_Address__c":"",
+            "FA_Correspondence_Address__c":"",
+            "FA_Mobile__c":"",
+            "FA_Phone__c":"",
+            "FA_Email_Id__c":"",
+            "FA_PAN_Number__c":"",
+            "FA_Aadhaar_Number__c":"",
+            "FA_Source_of_Income__c":"",
+            "FA_Name_of_the_Organization_Business__c":"",
+            "FA_Office_Phone_No__c":"",
+            "FA_Organization_Type__c":"",
+            "FA_Industry_Sector__c":"",
+            "FA_Work_Role__c":"",
+            "FA_Annual_Income_INR__c":"",
+            "Mode_of_Payment_Source__c":"",
+            "Purpose_of_Purchase__c":"",
+            "Phase__c":"",
+            "Plot_Number__c":"",
+            "Plot_Facing__c":"",
+            "Plot_area__c":"",
+            "Total_Rate__c":"",
+            "Total_Rate_in_words__c":"",
+            "Sale_Value__c":"",
+            "Sale_Value_In_words__c":"",
+            "Booking_Amount__c":"",
+            "Booking_Amount_In_words__c":"",
+            "Cheque_DD_Number__c":"",
+            "Cheque_Date__c":"",
+            "Drawn_On__c":"",
+            "Branch__c":"",
+            "Card_Swipe_Transaction_Id__c":"",
+            "Transaction_Date__c":"",
+            "Online_Payment_Transaction_Id__c":"",
+            "Online_Payment_Transaction_Date__c":"",
+            "To_Be_Filled_By_the_Sales_Team_Only__c":"",
+            "How_did_you_come_to_know_about_Vaishnavi__c":"",
+            "Source_Of_Booking__c":"",
+            "CP_Name_Company__c":"",
+            "CP_Mobile_No__c":"",
+            "RERA_Registration_No__c":"",
+            "Existing_Customer_of_Vaishnavi_Group__c":"",
+            "Referred_by_Vaishnavi_Group_Customer__c":"",
+            "Customer_Name__c":"",
+            "Project_Name__c":"",
+            "Unit_Plot_No__c":"",
+            "Customer_Email_Id__c":"",
+            "Customer_Mobile_No__c":"",
+            "An_Existing_Employee_of_Vaisnavi_Group__c":"",
+            "Referred_By_a_Vaishnavi_Group_Employee__c":"",
+            "Employee_Name__c":"",
+            "Employee_ID__c":"",
+            "Employee_Email_ID__c":"",
+            "Employee_Mobile_No__c":"",
+            "Check_List_For_Booking_Form__c":"",
+    }
+        $scope.SaveDetails = function(){
+        debugger;
+            console.log('applicant OBJ ::'+$scope.applicantObj);
+            BookingFormController.SaveapplicantDetails(){ 
+                        debugger;
+                        if(event.status){
+                            swal({
+                                title: "SUCCESS",
+                                text:  'Applicant Details have been Saved Successfully.',
+                                icon: "success"
+                            });
+                            
+                        }else{
+                            swal({
+                                title: "ERROR",
+                                text:  'Something went wrong !.',
+                                icon: "error"
+                            });
+                        }
+                    })  
+                }
+            });
+        }
+        $scope.onChangeFunction = function(){
+            debugger;
+            console.log('Client Details::'+$scope.applicantObj)
+        }
+    });
+     
+    </script>
+    <body ng-app="BookingApp" ng-controller="BookingCtlr">
+    <form >
         <apex:pageBlock title="VAISHNAVI LIFE" mode="edit">
             <div class="flex-container">
                 <div class="flex-child">
@@ -87,15 +211,15 @@
         <div class="row box-shadow-2 mx-3 mt-1">
             <div class="col-md-4 mt-2">
                 <label for="clientId">Client ID:</label>
-                <input type="text" id="clientId" name="clientId"/>
+                <input type="text" id="clientId" name="clientId" ng-model="applicantObj.Name" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="plotNo">Plot No:</label>
-                <input type="text" id="plotNo" name="plotNo"/>
+                <input type="text" id="plotNo" name="plotNo" ng-model="applicantObj.Plot_No__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date"/>
+                <input type="date" id="date" name="date" ng-model="applicantObj.Date_of_Booking__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <br/>
@@ -103,17 +227,22 @@
         <div class="row box-shadow-2 mx-3 mt-2 mb-2">
             <div class="col-md-12 mt-2">
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" size="150"/>     
+                <input type="text" id="name" name="name" size="150" ng-model="applicantObj.First_Applicant_Name__c" ng-change="onChangeFunction()"/>     
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-2">
             <div class="col-md-6 mt-2">
                 <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" name="dob"/> 
+                <input type="date" id="dob" name="dob" ng-model="applicantObj.First_Applicant_Date_Of_Birth__c" ng-change="onChangeFunction()"/> 
             </div>
             <div class="col-md-6 mt-2">
                 <label for="relation">Relation With:</label>
-                <input type="text" id="relation" name="relation"/>
+                <div class="form-check" ng-repeat="val in relList">
+                    <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.First_Applicant_Relation_With__c" ng-change="onChangeFunction()"/>
+                    <label class="form-check-label" for="{{val}}">
+                        <b>{{val}}</b>
+                    </label>
+                </div>
             </div>                           
         </div>
         
@@ -124,50 +253,48 @@
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-4 mt-2">
                         <label for="occupation">Occupation:</label>
-                        <input type="text" id="occupation" name="occupation"/>     
+                        <input type="text" id="occupation" name="occupation" ng-model="applicantObj.First_Applicant_Occupation__c" ng-change="onChangeFunction()"/>     
                     </div>
                     <div class="col-md-4 mt-2">
                         <label for="designation">Designation:</label>
-                        <input type="text" id="designation" name="designation"/>            
+                        <input type="text" id="designation" name="designation" ng-model="applicantObj.First_Applicant_Designation__c" ng-change="onChangeFunction()"/>            
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-4">
                         <label for="cStatus"> Citizenship Status:</label> 
-                        <label for="resident"> Resident</label>
-                        <input type="checkbox" id="resident" name="resident" value="resident"/>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="nri"> NRI</label>  
-                        <input type="checkbox" id="nri" name="nri" value="nri"/>
-                    </div> 
-                    <div class="col-md-4">
-                        <label for="pio"> PIO/OCI</label>  
-                        <input type="checkbox" id="pio" name="pio" value="pio"/>
-                    </div>            
+                        <div class="form-check" ng-repeat="val in citizenStatusList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Citizenship_Status__c" ng-change="onChangeFunction()"/>
+                                <label class="form-check-label" for="{{val}}">
+                                    <b>{{val}}</b>
+                                </label>
+               			</div>
+                    </div>        
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     
                     <div class="col-md-4">
                         <label for="gpa">GPA (if any) :</label>
-                        <label for="yes"> Yes</label>
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
                     </div>
                     <div class="col-md-4">
-                        <label for="no"> No</label>
-                        <input type="checkbox" id="No" name="No" value="No"/>
+                        <div class="form-check" ng-repeat="val in gpaList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.GPA_if_any__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               			 </div>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-8 mt-2">
                         <label for="permanentAdd">Permanent Address:</label>
-                        <textarea id="permanentAdd" name="permanentAdd" rows="2" cols="90"/>
+                        <textarea id="permanentAdd" name="permanentAdd" rows="2" cols="90" ng-model="applicantObj.FA_Permanent_Address__c" ng-change="onChangeFunction()"/>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-8 mt-2">
                         <label for="corresAdd">Correspondence Address:</label>
-                        <textarea id="corresAdd" name="corresAdd" rows="2" cols="80"/>
+                        <textarea id="corresAdd" name="corresAdd" rows="2" cols="80" ng-model="applicantObj.FA_Correspondence_Address__c" ng-change="onChangeFunction()"/>
                     </div>
                 </div>
             </div>
@@ -206,35 +333,39 @@
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4 mt-2">
                 <label for="mobile">Mobile:</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"/>     
+                <input type="tel" id="phone" name="mobile" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" ng-model="applicantObj.FA_Mobile__c" ng-change="onChangeFunction()"/>     
             </div>
             <div class="col-md-4 mt-2">
                 <label for="phone">(R)Phone:</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"/>            
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" ng-model="applicantObj.FA_Phone__c" ng-change="onChangeFunction()"/>            
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4 mt-2">
                 <label for="emailId">Email ID:</label>
-                <input type="email" id="emailId" name="emailId"/>
+                <input type="email" id="emailId" name="emailId" ng-model="applicantObj.FA_Email_Id__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="panNo">PAN No:</label>
-                <input type="number" id="panNo" name="panNo"/>
+                <input type="text" id="panNo" name="panNo" ng-model="applicantObj.FA_PAN_Number__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="aadhaarNo">Aadhaar Number:</label>
-                <input type="number" id="aadhaarNo" name="aadhaarNo"/>
+                <input type="number" id="aadhaarNo" name="aadhaarNo" ng-model="applicantObj.FA_Aadhaar_Number__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <br/>
         <h5 class="ex1" style="margin-top: 60px;padding-top: 50px;"><FONT COLOR="#4CAF50"><b>DETAILS OF THE FIRST APPLICANT</b></FONT></h5>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
-                <input type="checkbox" id="Salaried" name="Salaried" value="Salaried"/>
-                <label for="Salaried"> Salaried</label>
+                <div class="form-check" ng-repeat="val in sourceIncomeList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Source_of_Income__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
             </div>
-            <div class="col-md-3">
+           <!-- <div class="col-md-3">
                 <input type="checkbox" id="selfEmp" name="selfEmp" value="selfEmp"/>
                 <label for="selfEmp"> Self-employed/Business</label>
             </div>
@@ -246,22 +377,22 @@
                 <input type="checkbox" id="others" name="others" value="others"/>
                 <label for="others"> Others, please specify</label> 
                 <input type="text" id="others" name="others"/>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="nameOrg">Name of the Organization/Business:</label>
-                <input type="text" id="nameOrg" name="nameOrg" size="150"/>            
+                <input type="text" id="nameOrg" name="nameOrg" size="150" ng-model="applicantObj.FA_Name_of_the_Organization_Business__c" ng-change="onChangeFunction()"/>            
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="phone">Office Phone No:</label>
-                <input type="tel" id="phone" name="phone"/>            
+                <input type="tel" id="phone" name="phone" ng-model="applicantObj.FA_Office_Phone_No__c" ng-change="onChangeFunction()"/>            
             </div>
             <div class="col-md-6 mt-2">
                 <label for="extn">Extn:</label>
-                <input type="tel" id="extn" name="extn"/>            
+                <input type="tel" id="extn" name="extn" ng-model="applicantObj.FA_Office_Phone_No__c" ng-change="onChangeFunction()"/>            
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -269,9 +400,16 @@
                 <label for="source">Organization Type:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="Pvt Ltd." name="Pvt Ltd." value="Pvt Ltd."/>
+                <div class="form-check" ng-repeat="val in orgList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Organization_Type__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
+             </div>   
+               <!-- <input type="checkbox" id="Pvt Ltd." name="Pvt Ltd." value="Pvt Ltd."/>
                 <label for="Pvt Ltd."> Pvt Ltd.</label>
-            </div>
+            
             <div class="col-md-3">
                 <input type="checkbox" id="Public Ltd." name="Public Ltd." value="Public Ltd."/>
                 <label for="Public Ltd."> Public Ltd.</label>
@@ -286,16 +424,23 @@
                 <input type="checkbox" id="others" name="others" value="others"/>
                 <label for="others"> Others, please specify</label>
                 <input type="text" id="others" name="others"/>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="source">Industry Sector:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="IT" name="IT" value="IT"/>
+                <div class="form-check" ng-repeat="val in industryList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Industry_Sector__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
+             </div>
+                <!--<input type="checkbox" id="IT" name="IT" value="IT"/>
                 <label for="IT"> IT</label>
-            </div>
+           
             <div class="col-md-3">
                 <input type="checkbox" id="Manufacturing" name="Manufacturing" value="Manufacturing"/>
                 <label for="Manufacturing"> Manufacturing</label>
@@ -332,16 +477,23 @@
                 <input type="checkbox" id="others" name="others" value="others"/>
                 <label for="others"> Others, please specify</label> 
                 <input type="text" id="others" name="others"/>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="source">Work Role:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="Software" name="Software" value="Software"/>
+                <div class="form-check" ng-repeat="val in workRoleList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Work_Role__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
+            </div>    
+               <!-- <input type="checkbox" id="Software" name="Software" value="Software"/>
                 <label for="Software"> Software</label>
-            </div>
+            
             <div class="col-md-3">
                 <input type="checkbox" id="Sales and Marketing" name="Sales and Marketing" value="Sales and Marketing"/>
                 <label for="Sales and Marketing"> Sales and Marketing</label>
@@ -374,16 +526,23 @@
                 <input type="checkbox" id="others" name="others" value="others"/>
                 <label for="others"> Others, please specify</label> 
                 <input type="text" id="others" name="others"/>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="source">Annual Income(INR):</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="less than 5 lakh" name="less than 5 lakh" value="less than 5 lakh"/>
+                <div class="form-check" ng-repeat="val in annualIncomeList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.FA_Annual_Income_INR__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
+             </div>   
+                <!--<input type="checkbox" id="less than 5 lakh" name="less than 5 lakh" value="less than 5 lakh"/>
                 <label for="less than 5 lakh"> less than 5 lakh</label>
-            </div>
+            
             <div class="col-md-3">
                 <input type="checkbox" id="5 - 15 lakh" name="5 - 15 lakh" value="5 - 15 lakh"/>
                 <label for="5 - 15 lakh"> 5 - 15 lakh</label>
@@ -406,29 +565,43 @@
                 <input type="checkbox" id="Above 1 Cr" name="Above 1 Cr" value="Above 1 Cr"/>
                 <label for="Above 1 Cr"> Above 1 Cr</label>
                 
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4">
                 <label for="source">Mode of Payment / Source:</label>
             </div> 
             <div class="col-md-4">
-                <input type="checkbox" id="self" name="self" value="self"/>
-                <label for="self"> Self-Funded</label>
+                <div class="form-check" ng-repeat="val in modePayList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Mode_of_Payment_Source__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
             </div> 
+                <!--<input type="checkbox" id="self" name="self" value="self"/>
+                <label for="self"> Self-Funded</label>
+            
             <div class="col-md-4">   
                 <input type="checkbox" id="housing" name="housing" value="housing"/>
                 <label for="housing"> Housing Loan (Preferred Bank /HFI__________________)</label>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="purchase">Purpose of Purchase:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="end" name="end" value="end"/>
+                <div class="form-check" ng-repeat="val in purposePurchaseList">
+                            <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Purpose_of_Purchase__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                   			 </label>
+               	 </div>
+             </div>
+              <!--  <input type="checkbox" id="end" name="end" value="end"/>
                 <label for="end"> End-use</label>
-            </div>
+           
             <div class="col-md-3">   
                 <input type="checkbox" id="investment" name="investment" value="investment"/>
                 <label for="investment"> Investment</label>
@@ -437,9 +610,13 @@
                 <input type="checkbox" id="others" name="others" value="others"/>
                 <label for="others"> Others</label>
                 <input type="text" id="others" name="others"/>
-            </div>
+            </div>-->
         </div>
         <br/>
+        
+        
+        <!----ngmodel value not assigned n declare for co applicant-->
+        
         
         <h5 class="ex1" style="margin-top: 60px;"><FONT COLOR="#4CAF50"><b>CO- APPLICANT DETAILS (SECOND)</b></FONT></h5>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -476,29 +653,26 @@
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-4">
                         <label for="cStatus"> Citizenship Status:</label> 
-                        <label for="resident"> Resident</label>
-                        <input type="checkbox" id="resident" name="resident" value="resident"/>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="nri"> NRI</label>  
-                        <input type="checkbox" id="nri" name="nri" value="nri"/>
-                    </div> 
-                    <div class="col-md-4">
-                        <label for="pio"> PIO/OCI</label>  
-                        <input type="checkbox" id="pio" name="pio" value="pio"/>
-                    </div>            
+                        <div class="form-check" ng-repeat="val in citizenStatusList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                    	</div>
+                	</div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     
                     <div class="col-md-4">
                         <label for="gpa">GPA (if any) :</label>
-                        <label for="yes"> Yes</label>
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
+                        <div class="form-check" ng-repeat="val in gpaList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                    	</div>
                     </div>
-                    <div class="col-md-4">
-                        <label for="no"> No</label>
-                        <input type="checkbox" id="No" name="No" value="No"/>
-                    </div>
+                    
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-2">
                     <div class="col-md-8 mt-2">
@@ -548,11 +722,11 @@
        <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4 mt-2">
                 <label for="mobile">Mobile:</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"/>     
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>     
             </div>
             <div class="col-md-4 mt-2">
                 <label for="phone">(R)Phone:</label>
-                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"/>            
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>            
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -562,7 +736,7 @@
             </div>
             <div class="col-md-4 mt-2">
                 <label for="panNo">PAN No:</label>
-                <input type="number" id="panNo" name="panNo"/>
+                <input type="text" id="panNo" name="panNo"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="aadhaarNo">Aadhaar Number:</label>
@@ -573,22 +747,16 @@
         <h5 class="ex1" style="margin-top: 60px;"><FONT COLOR="#4CAF50"><b>DETAILS OF THE CO - APPLICANT</b></FONT></h5>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
-                <input type="checkbox" id="Salaried" name="Salaried" value="Salaried"/>
                 <label for="Salaried"> Salaried</label>
             </div> 
             <div class="col-md-3">
-                <input type="checkbox" id="selfEmp" name="selfEmp" value="selfEmp"/>
-                <label for="selfEmp"> Self-employed/Business</label>
+                <div class="form-check" ng-repeat="val in sourceIncomeList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                </div>
             </div> 
-            <div class="col-md-3"> 
-                <input type="checkbox" id="Homemaker" name="Homemaker" value="Homemaker"/>
-                <label for="Homemaker"> Homemaker</label>
-            </div> 
-            <div class="col-md-3">            
-                <input type="checkbox" id="others" name="others" value="others"/>
-                <label for="others"> Others, please specify</label>  
-                <input type="text" id="others" name="others"/>
-            </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
@@ -611,23 +779,12 @@
                 <label for="source">Organization Type:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="Pvt Ltd." name="Pvt Ltd." value="Pvt Ltd."/>
-                <label for="Pvt Ltd."> Pvt Ltd.</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Public Ltd." name="Public Ltd." value="Public Ltd."/>
-                <label for="Public Ltd."> Public Ltd.</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Govt. Services" name="Govt. Services" value="Govt. Services"/>
-                <label for="Govt. Services"> Govt. Services</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="others" name="others" value="others"/>
-                <label for="others"> Others, please specify</label> 
-                <input type="text" id="others" name="others"/>
+                <div class="form-check" ng-repeat="val in orgList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                </div>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -635,87 +792,26 @@
                 <label for="source">Industry Sector:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="IT" name="IT" value="IT"/>
-                <label for="IT"> IT</label>
+                <div class="form-check" ng-repeat="val in industryList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                </div>
             </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Manufacturing" name="Manufacturing" value="Manufacturing"/>
-                <label for="Manufacturing"> Manufacturing</label>
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="Financial services" name="Financial services" value="Financial services"/>
-                <label for="Financial services"> Financial services</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="hospitality" name="hospitality" value="hospitality"/>
-                <label for="hospitality"> Hospitality Services</label>
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="medical" name="medical" value="medical"/>
-                <label for="medical"> Medical/Pharmaceutical</label>
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="Media/Entertainment" name="Media/Entertainment" value="Media/Entertainment"/>
-                <label for="Media/Entertainment"> Media/Entertainment</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="Travel/Transport" name="Travel/Transport" value="Travel/Transport"/>
-                <label for="Travel/Transport"> Travel/Transport</label>
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="Real Estate" name="Real Estate" value="Real Estate"/>
-                <label for="Real Estate"> Real Estate</label>
-            </div>
-            <div class="col-md-3">    
-                <input type="checkbox" id="others" name="others" value="others"/>
-                <label for="others"> Others, please specify</label>  
-                <input type="text" id="others" name="others"/>
-            </div>
+           
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="source">Work Role:</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="Software" name="Software" value="Software"/>
-                <label for="Software"> Software</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Sales and Marketing" name="Sales and Marketing" value="Sales and Marketing"/>
-                <label for="Sales and Marketing"> Sales and Marketing</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="HR/Admin" name="HR/Admin" value="HR/Admin"/>
-                <label for="HR/Admin"> HR/Admin</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Finance" name="Finance" value="Finance"/>
-                <label for="Finance"> Finance</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Design" name="Design" value="Design"/>
-                <label for="Design"> Design And Planning</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Legal" name="Legal" value="Legal"/>
-                <label for="Legal"> Legal</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Operations" name="Operations" value="Operations"/>
-                <label for="Operations"> Operations</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="others" name="others" value="others"/>
-                <label for="others"> Others, please specify</label>  
-                <input type="text" id="others" name="others"/>
+                <div class="form-check" ng-repeat="val in workRoleList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                </div>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -723,31 +819,12 @@
                 <label for="source">Annual Income(INR):</label>
             </div>
             <div class="col-md-3">
-                <input type="checkbox" id="less than 5 lakh" name="less than 5 lakh" value="less than 5 lakh"/>
-                <label for="less than 5 lakh"> less than 5 lakh</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="5 - 15 lakh" name="5 - 15 lakh" value="5 - 15 lakh"/>
-                <label for="5 - 15 lakh"> 5 - 15 lakh</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="15 - 25 lakh" name="15 - 25 lakh" value="15 - 25 lakh"/>
-                <label for="15 - 25 lakh"> 15 - 25 lakh</label>
-            </div>
-            <div class="col-md-3">    
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="25 - 50 lakh" name="25 - 50 lakh" value="25 - 50 lakh"/>
-                <label for="25 - 50 lakh"> 25 - 50 lakh</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="50 lakh - 1 Cr" name="50 lakh - 1 Cr" value="50 lakh - 1 Cr"/>
-                <label for="50 lakh - 1 Cr"> 50 lakh - 1 Cr</label>
-            </div>
-            <div class="col-md-3">
-                <input type="checkbox" id="Above 1 Cr" name="Above 1 Cr" value="Above 1 Cr"/>
-                <label for="Above 1 Cr"> Above 1 Cr</label>
-                
+                <div class="form-check" ng-repeat="val in annualIncomeList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                </div>
             </div>
         </div>
         <br/>
@@ -756,45 +833,45 @@
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3 mt-2">
                 <label for="phase">Phase:</label>
-                <input type="text" id="phase" name="phase"/> 
+                <input type="text" id="phase" name="phase" ng-model="applicantObj.Phase__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-3 mt-2">
                 <label for="plotNo">Plot No:</label>
-                <input type="text" id="plotNo" name="plotNo"/>
+                <input type="text" id="plotNo" name="plotNo" ng-model="applicantObj.Plot_Number__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-3 mt-2">
                 <label for="plotFacing">Plot Facing:</label>
-                <input type="text" id="plotFacing" name="plotFacing"/>
+                <input type="text" id="plotFacing" name="plotFacing" ng-model="applicantObj.Plot_Facing__c" ng-change="onChangeFunction()"/>
             </div>       	
             <div class="col-md-3 mt-2">
                 <label for="plotArea">Plot area (sq.ft):</label>
-                <input type="text" id="plotArea" name="plotArea"/>
+                <input type="text" id="plotArea" name="plotArea" ng-model="applicantObj.Plot_area__c" ng-change="onChangeFunction()"/>
             </div>      
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="totalRate"><b>Total Rate: Rs.</b>            </label>
-                <input type="number" id="totalRate" name="totalRate"/>
+                <input type="number" id="totalRate" name="totalRate" ng-model="applicantObj.Total_Rate__c" ng-change="onChangeFunction()"/>
                 <label> /- sq.ft &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Excluding GST and other charges)</label>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="rupees">In words : Rupees           </label>
-                <textarea id="rupees" name="rupees" rows="2" cols="170"/>
+                <textarea id="rupees" name="rupees" rows="2" cols="170" ng-model="applicantObj.Total_Rate_in_words__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="salesValue"><b>Sales Value: Rs.</b>            </label>
-                <input type="number" id="salesValue" name="salesValue"/>
+                <input type="number" id="salesValue" name="salesValue" ng-model="applicantObj.Sale_Value__c" ng-change="onChangeFunction()"/>
                 <label> /- sq.ft &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Including Other chargers and applicable GST and taxes)</label>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="rupees2">In words : Rupees           </label>
-                <textarea id="rupees2" name="rupees2" rows="2" cols="170"/>
+                <textarea id="rupees2" name="rupees2" rows="2" cols="170" ng-model="applicantObj.Sale_Value_In_words__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         
@@ -802,53 +879,53 @@
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="salesValue"><b>Booking Amount: Rs.</b></label>
-                <input type="number" id="salesValue" name="salesValue" size="150"/>
+                <input type="number" id="salesValue" name="salesValue" size="150" ng-model="applicantObj.Booking_Amount__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="rupees2">In words : Rupees</label>
-                <textarea id="rupees2" name="rupees2" rows="2" cols="170"/>
+                <textarea id="rupees2" name="rupees2" rows="2" cols="170" ng-model="applicantObj.Booking_Amount_In_words__c" ng-change="onChangeFunction()"/>
             </div>
         </div> 
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4 mt-2">
                 <label for="cheque">Cheque / DD No:</label>
-                <input type="text" id="cheque" name="cheque"/> 
+                <input type="text" id="cheque" name="cheque" ng-model="applicantObj.Cheque_DD_Number__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date"/>
+                <input type="date" id="date" name="date" ng-model="applicantObj.Cheque_Date__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-4 mt-2">
                 <label for="drawnOn">Drawn On:</label>
-                <input type="text" id="drawnOn" name="drawnOn"/>
+                <input type="text" id="drawnOn" name="drawnOn" ng-model="applicantObj.Drawn_On__c" ng-change="onChangeFunction()"/>
             </div>       	     
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="branch">Branch:</label>
-                <input type="text" id="branch" name="branch"/>
+                <input type="text" id="branch" name="branch" ng-model="applicantObj.Branch__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="tranId">Card swipe transaction Id:</label>
-                <input type="tranId" id="tranId" name="tranId"/>
+                <input type="tranId" id="tranId" name="tranId" ng-model="applicantObj.Card_Swipe_Transaction_Id__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="date mt-2">Date:</label>
-                <input type="date" id="date" name="date"/>
+                <input type="date" id="date" name="date" ng-model="applicantObj.Transaction_Date__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="payId">Online payment transaction Id:</label>
-                <input type="text" id="payId" name="payId"/>
+                <input type="text" id="payId" name="payId" ng-model="applicantObj.Online_Payment_Transaction_Id__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date"/>
+                <input type="date" id="date" name="date" ng-model="applicantObj.Online_Payment_Transaction_Date__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <br/>
@@ -861,7 +938,7 @@
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12">
-                <textarea id="details" name="rupees2" rows="3" cols="195"/>
+                <textarea id="details" name="rupees2" rows="3" cols="195" ng-model="applicantObj.To_Be_Filled_By_the_Sales_Team_Only__c" ng-change="onChangeFunction()"/>
             </div>
         </div> 
         <!---Signatures-->
@@ -882,9 +959,16 @@
         <h5 class="ex1" style="margin-top: 60px;"><FONT COLOR="#4CAF50"><b>HOW DID YOU COME TO KNOW ABOUT</b></FONT></h5>&nbsp;&nbsp;<h3><FONT COLOR="#4CAF50"><b>VAISHNAVI LIFE</b></FONT></h3>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-4">
-                <input type="checkbox" id="newsPaper" name="newsPaper" value="newsPaper"/>
-                <label for="newsPaper"> Newspaper</label>
+                <div class="form-check" ng-repeat="val in comeToKnowList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.How_did_you_come_to_know_about_Vaishnavi__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               	</div>
             </div>
+                <!--<input type="checkbox" id="newsPaper" name="newsPaper" value="newsPaper"/>
+                <label for="newsPaper"> Newspaper</label>
+          
             <div class="col-md-4">
                 <input type="checkbox" id="hoarding" name="hoarding" value="hoarding"/>
                 <label for="hoarding"> Hoarding / Outdoor</label>
@@ -941,13 +1025,19 @@
                 <input type="checkbox" id="other" name="other" value="other"/>
                 <label for="others"> Other, please specify</label>
                 <input type="text" id="others" name="others"/>
-            </div>            
+            </div>-->          
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-3">
                 <label for="soBook"><b>Source Of Booking:</b> </label>
+                <div class="form-check" ng-repeat="val in bookingList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Source_Of_Booking__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               	</div>
             </div>
-            <div class="col-md-3">
+            <!--<div class="col-md-3">
                 <input type="checkbox" id="direct" name="direct" value="direct"/>
                 <label for="direct"> Direct</label>
             </div>
@@ -958,7 +1048,7 @@
             <div class="col-md-3">
                 <input type="checkbox" id="referral" name="referral" value="referral"/>
                 <label for="referral"> Referral</label>
-            </div>
+            </div>-->
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12">
@@ -966,15 +1056,15 @@
             </div>
             <div class="col-md-6">
                 <label for="cpName">CP Name / Company: </label>
-                <input type="text" id="cpName" name="cpName"/>
+                <input type="text" id="cpName" name="cpName" ng-model="applicantObj.CP_Name_Company__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6">
                 <label for="mobile">Mobile No: </label>
-                <input type="tel" id="mobile" name="mobile"/>
+                <input type="tel" id="mobile" name="mobile" ng-model="applicantObj.CP_Mobile_No__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6">
                 <label for="rera">RERA Regn No: </label>
-                <input type="text" id="rera" name="rera"/>
+                <input type="text" id="rera" name="rera" ng-model="applicantObj.RERA_Registration_No__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6">
             </div>
@@ -995,13 +1085,14 @@
                 <label for="existingCust">Are you an existing customer of Vaishnavi Group? </label>
             </div>
             <div class="col-md-4">
-                <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                <label for="Yes"> Yes</label>
+                <div class="form-check" ng-repeat="val in exitCustList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Existing_Customer_of_Vaishnavi_Group__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               </div>
             </div>
-            <div class="col-md-4">
-                <input type="checkbox" id="No" name="No" value="No"/>
-                <label for="No"> No</label>
-            </div>
+            
             
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -1009,39 +1100,40 @@
                 <label for="existingCust">Are you referred by a Vaishnavi Group Customer?</label>
             </div>
             <div class="col-md-4">
-                <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                <label for="Yes"> Yes</label>
+                <div class="form-check" ng-repeat="val in referCustList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Referred_by_Vaishnavi_Group_Customer__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               	</div>
             </div>
-            <div class="col-md-4">
-                <input type="checkbox" id="No" name="No" value="No"/>
-                <label for="No"> No</label>
-            </div>
+            
             
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="custName">Customer Name: </label>
-                <input type="text" id="custName" name="custName"/>
+                <input type="text" id="custName" name="custName" ng-model="applicantObj.Customer_Name__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="projName">Project Name: </label>
-                <input type="text" id="projName" name="projName"/>
+                <input type="text" id="projName" name="projName" ng-model="applicantObj.Project_Name__c" ng-change="onChangeFunction()"/>
             </div>       
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="unit">Unit / Plot No: </label>
-                <input type="text" id="unit" name="unit"/>
+                <input type="text" id="unit" name="unit" ng-model="applicantObj.Unit_Plot_No__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="mobNo">Mobile No: </label>
-                <input type="tel" id="mobNo" name="mobNo"/>
+                <input type="tel" id="mobNo" name="mobNo" ng-model="applicantObj.Customer_Mobile_No__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12 mt-2">
                 <label for="email">Email Id: </label>
-                <input type="text" id="email" name="email"/>
+                <input type="text" id="email" name="email" ng-model="applicantObj.Customer_Email_Id__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -1054,13 +1146,14 @@
                 <label for="existingCust">Are you an existing employee of Vaishnavi Group?</label>
             </div>
             <div class="col-md-4">
-                <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                <label for="Yes"> Yes</label>
+                <div class="form-check" ng-repeat="val in exitEmpList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.An_Existing_Employee_of_Vaisnavi_Group__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               </div>
             </div>
-            <div class="col-md-4">
-                <input type="checkbox" id="No" name="No" value="No"/>
-                <label for="No"> No</label>
-            </div>
+            
             
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
@@ -1068,33 +1161,34 @@
                 <label for="existingCust">Are you referred by a Vaishnavi Group employee? </label>
             </div>
             <div class="col-md-4">
-                <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                <label for="Yes"> Yes</label>
+                <div class="form-check" ng-repeat="val in referEmpList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Referred_By_a_Vaishnavi_Group_Employee__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+               </div>
             </div>
-            <div class="col-md-4">
-                <input type="checkbox" id="No" name="No" value="No"/>
-                <label for="No"> No</label>
-            </div>
+            
             
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="empName">Employee Name: </label>
-                <input type="text" id="empName" name="empName"/>
+                <input type="text" id="empName" name="empName" ng-model="applicantObj.Employee_Name__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="empId">Employee ID: </label>
-                <input type="text" id="empId" name="empId"/>
+                <input type="text" id="empId" name="empId" ng-model="applicantObj.Employee_ID__c" ng-change="onChangeFunction()"/>
             </div>       
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-6 mt-2">
                 <label for="email">Email Id: </label>
-                <input type="text" id="email" name="email"/>
+                <input type="text" id="email" name="email" ng-model="applicantObj.Employee_Email_ID__c" ng-change="onChangeFunction()"/>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="mobNo">Mobile No: </label>
-                <input type="tel" id="mobNo" name="mobNo"/>
+                <input type="tel" id="mobNo" name="mobNo" ng-model="applicantObj.Employee_Mobile_No__c" ng-change="onChangeFunction()"/>
             </div>
         </div>
         <br/>
@@ -1113,11 +1207,16 @@
         </div>
         <div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12">
-                <input type="checkbox" id="form" name="form" value="form"/>
-                <label for="form"> Completely filled and duly signed Booking Form</label>
+                
+                    <div class="form-check" ng-repeat="val in chkbkFormList">
+                        <input class="form-check-input" type="checkbox" id="{{val}}" ng-model="applicantObj.Check_List_For_Booking_Form__c" ng-change="onChangeFunction()"/>
+                            <label class="form-check-label" for="{{val}}">
+                                <b>{{val}}</b>
+                            </label>
+                    </div>
             </div>
         </div>
-        <div class="row box-shadow-2 mx-3 mt-3">
+        <!--<div class="row box-shadow-2 mx-3 mt-3">
             <div class="col-md-12">
                 <input type="checkbox" id="payment" name="payment" value="payment"/>
                 <label for="payment"> Payment schedule / Cost sheet with Customer's Signature</label>
@@ -1152,13 +1251,15 @@
                 <input type="checkbox" id="nri" name="nri" value="nri"/>
                 <label for="nri"> If NRI/PIO: Relevent documents</label>
             </div>
-        </div>
+        </div>-->
         <br/>
         <br/>           
         <div align="center" draggable="false" >
-            <apex:commandButton style="left:0px;position:relative;" value="Save" action="{!saveBookingDetails}"/>
-            <apex:commandButton style="left:80px;position:relative;" value="Cancel" action="{!cancel}"/>
+              <!--<apex:commandButton style="left:0px;position:relative;" value="Save" action="{!saveBookingDetails}"/>-->
+              <button label="Submit" ng-click="SaveDetails()">SUBMIT</button>
+                 <!-- <apex:commandButton style="left:80px;position:relative;" value="Cancel" action="{!cancel}"/>-->
         </div>                                                                                          
         
-    </apex:form>
+    </form>
+    </body>
 </apex:page>

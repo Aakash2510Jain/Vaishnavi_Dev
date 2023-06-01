@@ -16,13 +16,15 @@ $(document).ready(function () {
     let firstLocation;
     let firstUserId;
     let configureCalendar = function () {
-
+        debugger;
         //repVisits = result.eventList;
         $("#calendar").fullCalendar('removeEvents');
         $("#calendar").fullCalendar('addEventSource', repVisits);
         //$('#calendar-card').show();
     }
 
+    updateDefaultRepAccounts();
+    getLocationOnObjectType();
     VisitSchedulerController.getAccountleadList(function (result, event) {
         debugger;
         console.log('--- result Object :' + result);
@@ -34,11 +36,10 @@ $(document).ready(function () {
 
     }, { escape: false });
 
-    VisitSchedulerController.fetchPageData(function (result, event) {
-        console.log('--- result' + result);
-        debugger;
-        //$('#calendar-card').hide();
-        if (event.status) {
+    // VisitSchedulerController.fetchPageData(function (result, event) {
+    //     console.log('--- result' + result);
+    //    debugger;
+    //    if (event.status) {
             $('#calendar').fullCalendar({
                 header: {
                     left: 'prev,next today',
@@ -86,7 +87,7 @@ $(document).ready(function () {
                     for (var i = 0; i < repVisits.length; i++) {
                         currentAccount = repVisits[i].accountId;
                     }
-                    callGeolocationMethod();
+                    //callGeolocationMethod();
                     // is the "remove after drop" checkbox checked?
                     if ($('#drop-remove').is(':checked')) {
                         // if so, remove the element from the "Draggable Events" list
@@ -99,39 +100,10 @@ $(document).ready(function () {
                 }
             });
            
-        }
+       // }
         $("#spinner").hide();
-    }, { escape: false });
+   // }, { escape: false });
 
-
-   /* function callGeolocationMethod() {
-        // let apexDate = visiteDateToApex.toISOString();
-        debugger;
-        VisitSchedulerController.getleadGeolocation(currentAccount, function (result, event) {
-            debugger;
-            console.log('--- result Object :' + result);
-            if (result) {
-                for (var key in result) {
-                    if (key == "Geolocation__Longitude__s") {
-                        Leadgeolatitude = result.Geolocation__Latitude__s;
-                        Leadgeolongitude = result.Geolocation__Longitude__s;
-                        callVisitCreateRecordMethod();
-                       console.log("Lead Found Lead Method Called")
-                        break;
-                    }
-                    else if (key == "Geo_Location__Latitude__s") {
-                       AccountLatitude = result.Geo_Location__Latitude__s;
-                          AccountLongitude = result.Geo_Location__Longitude__s;
-                        callVisitAccountCreateRecordMethod();
-                        console.log("Account Found Account Method Called")
-                        break;
-                    }
-                }
-            }
-
-        }, { escape: false });
-
-    } */
 
     function callGeolocationMethod() {
         debugger;
@@ -261,7 +233,7 @@ $(document).ready(function () {
     $("#clear-dealer").click(function () {
         $('#search-box').val("");
         $("#event-container").empty();
-        updateDefaultRepAccounts($("#user-select option:selected").val());
+    //    updateDefaultRepAccounts($("#user-select option:selected").val());
     });
 
     $("#delete-event").click(function () {
@@ -297,8 +269,8 @@ $(document).ready(function () {
         if (userId == undefined || userId === "" || userId === "Select...")
             $("#upsert-visit").prop('disabled', true);
         $("#event-container").empty();
-        updateDefaultRepAccounts(userId);
-        getLocationOnObjectType();
+        // updateDefaultRepAccounts(userId);
+        // getLocationOnObjectType();
 
     });
 
@@ -548,18 +520,17 @@ $(document).ready(function () {
 
 
 
-    function updateDefaultRepAccounts(userId) {
+    function updateDefaultRepAccounts() {
 
         $("#event-container").hide();
         $("#search-pannel").hide();
         $("#search-account").hide();
         $("#upsert-visit").prop('disabled', true);
         $("#spinner").show();
-        if (userId && userId !== "") {
             $("#event-container").show();
             $("#upsert-visit").prop('disabled', false);
             $("#search-account").show();
-            VisitSchedulerController.getUserVisits(userId, function (result, event) {
+            VisitSchedulerController.getAllLeads( function (result, event) {
                 selectedObject = $('#user-select :selected').text();
 
                // callLeadRecordMethod();
@@ -567,12 +538,16 @@ $(document).ready(function () {
                 if (event.status) {
 
                     repVisits = [];
-                    for (let i = 0; i < result.visitList.length; i++) {
+                    for (let i = 0; i < result.length; i++) {
                         let calVisit = {};
-                        calVisit.id = result.visitList[i].Id;
-                        calVisit.title = result.visitList[i].Lead__r.Name;
-                        calVisit.start = result.visitList[i].Planned_visit_date__c;
-                        calVisit.end = result.visitList[i].Planned_visit_date__c;
+                        calVisit.id = result[i].Id;
+                        if(result[i].Lead__r != undefined){
+                            calVisit.title = result[i].Lead__r.Name__c;
+                        }else{
+                            calVisit.title = result[i].Name;
+                        }
+                        calVisit.start = result[i].Planned_visit_date__c;
+                        calVisit.end = result[i].Planned_visit_date__c;
                         repVisits.push(calVisit);
                     }
                     console.log(repVisits);
@@ -589,7 +564,6 @@ $(document).ready(function () {
                 }
                 $("#spinner").hide();
             });
-        }
     }
 
     function setEventDraggable() {
@@ -608,7 +582,28 @@ $(document).ready(function () {
                 revertDuration: 0  //  original position after the drag
             });
         });
-        /* initialize the calendar
-        -----------------------------------------------------------------*/
+    }
+
+    function getLeadRecords(){
+        VisitSchedulerController.getAllLeads( function (result, event) {
+            if (event.status) {
+                debugger;
+                let visits = [];
+                for (let i = 0; i < result.length; i++) {
+                    visit = {};
+                    visit.id = result[i].id;
+                    //visit.Name = repVisits[i].title;
+                    visit.Account__c = result[i].accountId;
+                    visit.Planned_visit_date__c = result[i].start;
+                    visit.Assigned_User__c = salesRep;
+                    visits.push(visit);
+                }
+                configureCalendar();
+            } else {
+                console.log(result);
+                alert('Something went wrong');
+            }
+            $("#spinner").hide();
+        });
     }
 });

@@ -1,6 +1,6 @@
 public without sharing class ConstantClass {
     public Static Final String TaskSubjectForDuplicateLead = 'ReEnquiry Details';
-    public Static Final String TaskSubjectForFollowUpLead = 'Take Followup with Lead';
+    public Static Final String TaskSubjectForFollowUpLead = 'Make First Call Attempt!!!';
     public Static Final String TaskSubjectForNewLead = 'New Lead Created, Please Reach Out!!!';
     public Static Final String errorForDuplicateLeadByPhone = 'Duplicate Lead by Phone Number!!!';
     public Static Final String errorForDuplicateLeadByEmail = 'Duplicate Lead by Email!!!';
@@ -18,6 +18,8 @@ public without sharing class ConstantClass {
     public Static Final String LeadStageSVPlanned = 'SV Planned';
     public Static Final String LeadStageDrop = 'Drop';
     public Static Final String LeadStageConverted = 'Converted';
-    
+    public Static Final String newEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('New Enquiry').getRecordTypeId();
+    public Static Final String ReEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('ReEnquiry').getRecordTypeId();
+    public Static Final String convertedLeadQueue = [select Id from Group where  Type = 'Queue' AND NAME = 'Converted Leads Queue'].id;
     
 }

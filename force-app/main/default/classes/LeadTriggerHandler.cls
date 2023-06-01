@@ -76,6 +76,7 @@ public class LeadTriggerHandler {
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
                                 if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
                                     leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                    leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                 }else{
                                     leadRec.To_Be_Deleted__c = true;
                                     existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
@@ -85,6 +86,7 @@ public class LeadTriggerHandler {
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
                                     if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
                                         leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id, leadRec);
@@ -97,6 +99,7 @@ public class LeadTriggerHandler {
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
                                 if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
                                     leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                    leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                 }else{
                                     leadRec.To_Be_Deleted__c = true;
                                     existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id,leadRec);
@@ -106,6 +109,7 @@ public class LeadTriggerHandler {
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
                                     if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
                                         leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
@@ -142,8 +146,18 @@ public class LeadTriggerHandler {
     }
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         List<Task> taskListToInsertforFollowup = new List<Task>();
+        List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
+        String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
         
         for(Lead__c leadRec : newLeadMap.values()){
+            if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
+                leadRec.addError('Converted Lead Can not be Edited');
+            }
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
+                leadRec.isConverted__c = true;
+                leadRec.OwnerId = ConstantClass.convertedLeadQueue;
+                convertedLeadRecordsList.add(leadRec);
+            }
             if(leadRec.Next_Followup_Date_Time__c != oldLeadMap.get(leadRec.Id).Next_Followup_Date_Time__c && leadRec.Next_Followup_Date_Time__c != null){
                 if(leadRec.Next_Followup_Date_Time__c < system.now()){
                     leadRec.addError(ConstantClass.errorForPastFollowUpDate);
@@ -153,6 +167,7 @@ public class LeadTriggerHandler {
                     taskRecToInsert.whatId = leadRec.Id;
                     taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
                     taskRecToInsert.Follow_Up_Date_Time__c = leadRec.Next_Followup_Date_Time__c;
+                    taskRecToInsert.Description = 'Provide the Conversation Comments for the Call(Answered/UnAswered)';
                     taskListToInsertforFollowup.add(taskRecToInsert);
                 }
             }
@@ -180,6 +195,9 @@ public class LeadTriggerHandler {
                 }
             }
 			            
+        }
+        if(!convertedLeadRecordsList.isEmpty()){
+            LeadConversionClass.convertLead(convertedLeadRecordsList);
         }
         if(!taskListToInsertforFollowup.isEmpty()){
             insert taskListToInsertforFollowup;

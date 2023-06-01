@@ -1,0 +1,19 @@
+<template>
+    <div class="conversation-window" style="width:100%;">
+        <template for:each={messages} for:item="message">
+            <div key={message.id} class="message-row">
+                <div class={message.classs}>
+                    {message.content}
+                    <div class="message-time">{message.timee}</div>
+                </div>
+            </div>
+        </template>
+
+        <div class="message-input-container">
+            <input class="message-input" type="text" placeholder="Type a message..." />
+            <lightning-button icon-name="utility:insert_template" onclick={handleOpenModal}></lightning-button>
+            <lightning-button label="Send" title="Send Message" icon-name="utility:send" class="send-message-button slds-m-left_x-small" onclick={handleSendMessage} disabled={disableSend}></lightning-button>
+        </div>
+    </div>
+    
+</template>

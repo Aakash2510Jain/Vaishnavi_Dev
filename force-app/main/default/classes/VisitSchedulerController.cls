@@ -289,6 +289,10 @@ public class VisitSchedulerController {
         return null; 
     }
     
-    
+    @RemoteAction
+    public static List<visit__c> getAllLeads(){
+        List<visit__c> leadList = [Select name,id,Planned_visit_date__c,lead__r.Name__c from visit__c];
+        return leadList;
+    }
 
 }

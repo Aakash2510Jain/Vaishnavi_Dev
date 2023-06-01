@@ -21,8 +21,8 @@
  @RESTResource(urlMapping = '/magicBricks/*')
 global class API_MagicBricks {
     @HttpPost
-    global static ResponseClass.ReponseWrapper createLeadFromMagicBricks(){
-        ResponseClass.ReponseWrapper responseData = new ResponseClass.ReponseWrapper();
+    global static ResponseClass.ReponseWrapperforMB createLeadFromMagicBricks(){
+        ResponseClass.ReponseWrapperforMB responseData = new ResponseClass.ReponseWrapperforMB();
         try{
             RestRequest req = RestContext.request;
             RestResponse res = RestContext.response;
