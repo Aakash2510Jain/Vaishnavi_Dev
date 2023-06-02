@@ -1,0 +1,42 @@
+<template>
+    <lightning-quick-action-panel class="field-title" header="Leads With Similar Domain ⬇️">
+        <ul class="dynamic-text">
+            <li class="item">
+                <div class="app slds-p-around_x-large">
+                    <!-- <lightning-layout> -->
+                        <template for:each={recList} for:item="rec">
+                                <lightning-layout-item size="4" padding="around-small" key={rec.Id}>
+                                    <div class="slds-card card-color slds-m-left_small" style="margin-right: 2%; margin-top: 3%; max-width: 500px; margin-left: 6%;">
+                                        <div class="slds-grid" style="margin-left: 3%; margin-top: 3%; margin-bottom: 3%; margin-right: 3%;">
+                                            <div class="slds-col numberCircle slds-align_absolute-center slds-m-right_large">
+                                                <span>{rec.Lead_Source__c}</span>
+                                            </div>
+
+                                            <div class="slds-col" style="margin-left: 4%; margin-top: 3%; margin-bottom: 3%;">
+                                                <b style="color: #00b0f0">{rec.Name__c}</b>
+                                                <p style="color: #00b0f0">{rec.Phone__c}</p>
+                                                <p style="color: #00b0f0">{rec.Email__c}</p>
+                                            </div>
+
+                                            <div class="slds-col" style="margin-top: 3%; margin-bottom: 3%; margin-right: 2%;">
+                                                <b style="color: #00b0f0">{rec.Project_Interested_In__c}</b>
+                                            </div>
+
+                                              <!-- <p class="slds-p-horizontal_small" style="color: #989898;margin-left:10px;"><b>{rec.Name__c}</b></p> -->
+    
+                                              <!-- <div class="slds-col">
+                                                <span>{rec.Name__c}</span>
+                                                <span>{rec.Phone__c}</span>
+                                                <span>{rec.Email__c}</span>
+                                              </div> -->
+                                        </div>
+                                    </div>
+                                </lightning-layout-item>
+                        </template>
+                        
+                    <!-- </lightning-layout> -->
+                </div>
+            </li> 
+        </ul>
+    </lightning-quick-action-panel>
+</template>

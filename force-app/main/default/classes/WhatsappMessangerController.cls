@@ -24,6 +24,7 @@ public without sharing class WhatsappMessangerController {
     @AuraEnabled(cacheable=true)
     public static List<sObject> search(String searchTerm, string myObject, String filter) {
         String myQuery = null;
+        myObject = 'SMS_Template__c';
         if(filter != null && filter != ''){
             myQuery = 'Select Id, Name, Template_Name__c from '+myObject+' Where Name Like  \'%' + searchTerm + '%\' AND '+filter+' LIMIT  5';
         }

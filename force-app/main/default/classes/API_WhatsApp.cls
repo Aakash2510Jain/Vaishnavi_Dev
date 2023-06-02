@@ -1,4 +1,50 @@
 public without sharing class API_WhatsApp {
+
+    private static String whatsapp_baseURL          = 'https://media.smsgupshup.com/GatewayAPI/rest';
+    private static String whatsapp_userid           = '2000212725';
+    private static String whatsapp_password         = 'BTmHHaeBc';
+    final static string success_response            = 'success';
+    final static string error_response              = 'failure';
+
+    // To mark a user as Opt-in
+    Public static String whatsappOptIn(string phoneNoToOpt){
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setMethod('GET');
+        String queryString = '';
+        Map<String, String> requestParams = prepareRequestParams(phoneNoToOpt);
+        for (String param : requestParams.keySet()) {
+            String value = EncodingUtil.urlEncode(requestParams.get(param), 'UTF-8');
+            queryString += '&' + param + '=' + value;
+        }
+        httpRequest.setEndpoint(whatsapp_baseURL + '?' + queryString);
+        httpRequest.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        Http http = new Http();
+        HttpResponse httpResponse = http.send(httpRequest);
+        if (httpResponse.getStatusCode() == 200) {
+            String responseBody = httpResponse.getBody();
+            System.debug('responseBody: ' + responseBody);
+
+            return success_response;
+        } else {
+            System.debug('HTTP request failed with status code: ' + httpResponse.getStatusCode());
+            return error_response;
+        }
+    }
+
+    Public static Map<String, String> prepareRequestParams(String phone_num){
+        Map<String, String> requestParams = new Map<String, String>();
+        requestParams.put('userid', whatsapp_userid);
+        requestParams.put('password', whatsapp_password);
+        requestParams.put('send_to', phone_num);
+        requestParams.put('method', 'OPT_IN');
+        requestParams.put('auth_scheme', 'plain');
+        requestParams.put('v', '1.1');
+        requestParams.put('channel', 'WHATSAPP');
+        requestParams.put('format', 'json');
+        return requestParams;
+    } 
+
     public static void sendWhatsAppMessage(string phoneNo, string message){
         // Create an instance of the HttpRequest class
         HttpRequest httpRequest = new HttpRequest();

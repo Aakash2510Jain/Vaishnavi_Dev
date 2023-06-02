@@ -1,0 +1,12 @@
+.circle{
+	background-color: #078dea; /* Green */
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+ 
+  border-radius: 50%;
+}

@@ -31,6 +31,28 @@
     font-size: 15px;
 }
 
+.THIS .rcorners2 {
+  border-radius: 25px;
+  border: 2px solid #2173AD;
+ margin-bottom: 1rem;
+  height: 140px;  
+}
+
+.THIS .dinesh {
+  background-color: #078dea; /* Green */
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.THIS 
+.button5 {border-radius: 50%;}
+
 .THIS.circular-data-container {
     width: 100px; /* Adjust width and height as per your requirements */
     height: 100px;
@@ -42,14 +64,11 @@
     justify-content: center;
 }
 
-.THIS.circle {
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    padding: 10px;
-    background: #fff;
-    border: 3px solid #000;
-    color: #000;
-    text-align: center;
-    font: 32px Arial, sans-serif;
+@media only screen and (max-width: 768px) {
+    /* Styles for screens up to 768px (tablets) */
+}
+
+
+@media only screen and (max-width: 480px) {
+    /* Styles for screens up to 480px (mobile devices) */
 }

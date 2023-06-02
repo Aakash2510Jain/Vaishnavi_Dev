@@ -1,0 +1,13 @@
+<template>
+
+    <lightning-modal-header label="Select the Template"></lightning-modal-header>
+    <lightning-modal-body> 
+        <c-custom-lookup obj-name="SMS_Template__c" search-placeholder="Select Template"
+            icon-name="standard:messaging_user" onlookupselected={handleTemplateSelection} style="width:100%">
+        </c-custom-lookup>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="OK" onclick={handleOkay}></lightning-button>
+    </lightning-modal-footer>
+   
+</template>

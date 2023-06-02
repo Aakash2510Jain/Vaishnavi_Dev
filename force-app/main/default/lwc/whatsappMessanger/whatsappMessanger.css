@@ -1,0 +1,79 @@
+.conversation-window {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 350px;
+    overflow-y: scroll;
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+    padding-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 300px;
+    overflow-y: scroll;
+  }
+  
+  .conversation-window .message-row {
+    margin-bottom: 10px;
+  }
+  
+  .conversation-window .sent-message {
+    background-color: #DCF8C6;
+    padding: 10px;
+    border-radius: 8px;
+    align-self: flex-end;
+    max-width: 70%;
+    display: flex; /* Added */
+    justify-content: flex-end; /* Added */
+  }
+  
+  .conversation-window .received-message {
+    background-color: #EAEAEA;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 70%;
+    display: flex; /* Added */
+    justify-content: flex-start; /* Added */
+  }
+  
+  .conversation-window .message-time {
+    font-size: 12px;
+    color: #999;
+    margin-top: 5px;
+  }
+  
+  .conversation-window .message-input-container {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+  
+  .conversation-window .message-input {
+    flex: 1;
+    border: none;
+    background-color: #f5f5f5;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .conversation-window .send-message-button {
+    border: none;
+    background-color: #5C6BC0;
+    color: white;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin-left: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .conversation-window .send-message-button:hover {
+    background-color: #3949AB;
+  }

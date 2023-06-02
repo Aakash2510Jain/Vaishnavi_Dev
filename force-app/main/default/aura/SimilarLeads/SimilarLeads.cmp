@@ -3,26 +3,14 @@
     <aura:attribute name="recordId" type="String"/>
     <aura:attribute name="leadListWithsimDomain" type="List" />
     <aura:attribute name="showImage" type="boolean" default="false"/>
-    
+    <aura:attribute name="LeadSourcePickList" type="List"/>
     <aura:attribute name="url" type="String" />
     <!--Handler-->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <!--Lightning Card-->
     
     <lightning:card >
-        <div class="card" style="margin-left: 3%">
-            <div class="card-header">
-                <h3><b>Leads With Similar Domain ⬇️</b></h3>
-            </div>
-            <div class="card-body">
-                <aura:iteration items="{! v.leadListWithsimDomain }" var="lead">
-                    <div class="card">
-                        <h4>{!lead.Name__c}</h4>
-                    </div>
-                </aura:iteration>
-            </div>
-        </div>
-        <!-- <div style = "border-style: solid;margin :1%" >
+        <div style = "border-style: solid;margin :1%" >
             <div style = "margin :1%" >
                 <aura:if  isTrue="{!v.leadListWithsimDomain.length > 0}">
                     <div style="margin-bottom: 2%;margin-left: 4%;margin-top: 2%;">
@@ -30,66 +18,53 @@
                         <br/>
                     </div>
                     <table aria-multiselectable="true" class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols" role="grid" aria-label="Example advanced table of Opportunities with cell focused">
-                        <thead>
-                            <tr class="slds-line-height_reset">
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="lead Name">Name</div>
-                                </th>
-                                
-                                
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="Owner">Source</div>
-                                </th>
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="Rating">Source Type</div>
-                                </th>
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="Rating">Sub Source</div>
-                                </th>
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="lead CIN">Phone</div>
-                                </th>
-                                <th class="slds-text-title_caps" scope="col">
-                                    <div class="slds-truncate" title="lead CIN">Email</div>
-                                </th>
-                            </tr>
-                        </thead>
+                      
                         <tbody>
                             <aura:iteration items="{! v.leadListWithsimDomain }" var="lead">
+                                <p class="rcorners2">
                                 <tr>
-                                    <td class="slds-grow slds-cell-wrap">
-                                        <a target="_blank" href="{!$Site.CurrentSiteUrl+'/lightning/r/Lead__c/'+lead.Id+'/view'}" tabindex="-1">
-                                            {!lead.Name__c}
-                                        </a> 
-                                    </td>
-                                    
-                                    
-                                    <td class="slds-cell_action-mode slds-grow slds-cell-wrap" role="gridcell">
+                                    <!--td class="slds-cell_action-mode slds-grow slds-cell-wrap" role="gridcell">
                                         <b>
                                             {!lead.Lead_Source__c}
                                         </b> 
-                                    </td>
-                                    <td class="slds-grow slds-cell-wrap"> 
+                                    </td-->
+                                    <!--td class="slds-grow slds-cell-wrap"> 
                                         <b>
                                             {!lead.Lead_Source_Type__c}
                                         </b> 
-                                    </td>
-                                    <td> 
+                                    </td-->
+                                    <!--td> 
                                         <b>
                                             {!lead.Lead_Sub_Source__c}
                                         </b> 
-                                    </td>
-                                    <td class="slds-grow slds-cell-wrap">
-                                        <b>
-                                            {!lead.Phone__c}
+                                    </td-->
+                                    <td class="slds-grow slds-cell-wrap" style=" padding-left: 26px; ">
+                                      <b style="font-size:20px;">
+                                        <p class="dinesh button5" style="text-transform:uppercase">{!lead.ShortName}</p> 
                                         </b>
-                                    </td>
-                                    <td class="slds-grow slds-cell-wrap">
-                                        <b>
-                                            {!lead.Email__c}
+                                        <b style="font-size:20px;">
+                                        <a target="_blank" href="{!$Site.CurrentSiteUrl+'/lightning/r/Lead__c/'+lead.Id+'/view'}" tabindex="-1">
+                                            <span style=" padding-left: 6px; "> {!lead.Name__c} </span >
+                                            <span style=" padding-left: 200px; ">{!lead.Project_Interested_In__c}</span>
+                                        </a> 
                                         </b>
+                                        <br/>
+                                        <div style="margin-top: -18px;">
+                                         <b style=" color: rgb(1, 118, 211);font-size:16px; ">
+                                          <span style=" margin-left: 68px; ">Phone: {!lead.Phone__c}</span> 
+                                        </b> 
+                                        <br/>
+                                         <b style=" color: rgb(1, 118, 211);font-size:16px; ">
+                                          <span style=" margin-left: 68px; ">Email:  {!lead.Email__c}</span>
+                                        </b>
+                                        </div>
+                                       
                                     </td>
+                                    
                                 </tr>	
+                                
+                                </p>
+                                
                             </aura:iteration>
                         </tbody>
                     </table>
@@ -109,7 +84,7 @@
                     </aura:set>
                 </aura:if> 
             </div>
-        </div> -->
+        </div>
     </lightning:card>
     
     
