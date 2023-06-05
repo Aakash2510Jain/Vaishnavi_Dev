@@ -9,7 +9,7 @@
                                 <div class="slds-grid">
 
                                     <div class="slds-col slds-size_1-of-4 slds-align_absolute-center">
-                                       <!--{rec.Source_Type__c}
+                                        <!--{rec.Source_Type__c}
                                         <span class="slds-avatar slds-avatar_large richtext  slds-m-top_large">
                                             <abbr class="slds-avatar__initials" title="person name">
                                                 <a href={rec.url}>
@@ -18,7 +18,9 @@
                                                     </lightning-formatted-rich-text> </a>
                                             </abbr>
                                         </span> -->
-                                        <p class="circle" >{rec.sourceType}</p> 
+                                        <a href={rec.url}>
+                                            <p class="circle">{rec.sourceType}</p>
+                                        </a>
                                     </div>
                                     <div class="slds-col slds-size_3-of-4">
                                         <p class="slds-p-horizontal_small">Name :
@@ -29,7 +31,7 @@
                                         <p class="slds-p-horizontal_small">Phone : <b>{rec.Phone__c}</b>
                                         </p>
                                         <p class="slds-p-horizontal_small">Source Type :
-                                            <b>{rec.sourceType}</b>
+                                            <b>{rec.Lead_Source_Type__c}</b>
                                         </p>
                                     </div>
                                 </div>
