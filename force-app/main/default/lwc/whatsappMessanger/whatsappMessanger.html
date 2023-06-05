@@ -1,7 +1,7 @@
 <template>
-    <div class="conversation-window" style="width:100%;">
-        <template for:each={messages} for:item="message">
-            <div key={message.id} class="message-row">
+    <div class="conversation-window" style="width:100%;" >
+        <template for:each={messages} for:item="message"  >
+            <div key={message.id} class={message.pclass}>
                 <div class={message.classs}>
                     {message.content}
                     <div class="message-time">{message.timee}</div>
@@ -9,8 +9,42 @@
             </div>
         </template>
 
+        <template if:true={isModalOpen}>
+            <!-- Modal/Popup Box LWC starts here -->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_full">
+                <div class="slds-modal__container" >
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="inverse"
+                                size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Select the Template</h2>
+                    </header>
+                    <!-- Modal/Popup Box LWC body starts here -->
+                
+                    <div class="slds-modal__content slds-p-around_small" id="modal-content-id-1">
+
+                            <lightning-modal-body> 
+                                <c-custom-lookup obj-name="SMS_Template__c" search-placeholder="Select Template"
+                                    icon-name="standard:messaging_user" onlookupselected={handleTemplateSelection} style="width:100%">
+                                </c-custom-lookup>
+                            </lightning-modal-body>
+                          
+                           
+                    </div>  
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="OK" onclick={handleOkay}></lightning-button>
+                    </footer>               
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
         <div class="message-input-container">
-            <input class="message-input" type="text" placeholder="Type a message..." />
+            <input class="message-input" type="text" value={textMessage} placeholder="Type a message..." onchange={enableSendButton} />
             <lightning-button icon-name="utility:insert_template" onclick={handleOpenModal}></lightning-button>
             <lightning-button label="Send" title="Send Message" icon-name="utility:send" class="send-message-button slds-m-left_x-small" onclick={handleSendMessage} disabled={disableSend}></lightning-button>
         </div>

@@ -43,7 +43,7 @@ export default class CustomLookUp extends LightningElement {
         let selectedId = event.currentTarget.dataset.id;
         let selectedName = event.currentTarget.dataset.name;
         let selectedTemplateName = event.currentTarget.dataset.templatename;
-        const valueSelectedEvent = new CustomEvent('lookupselected', {detail:  selectedTemplateName });
+        const valueSelectedEvent = new CustomEvent('lookupselected', {detail:  selectedId });
         this.dispatchEvent(valueSelectedEvent);
         this.isValueSelected = true;
         this.selectedName = selectedName;

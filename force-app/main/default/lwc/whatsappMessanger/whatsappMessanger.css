@@ -18,25 +18,34 @@
   .conversation-window .message-row {
     margin-bottom: 10px;
   }
+
+  .message-row-recieve{
+    margin-bottom: 10px;
+    align-self: self-start !important;
+  }
+  .message-row-send{
+    margin-bottom: 10px;
+    align-self: self-end !important;
+  }
   
   .conversation-window .sent-message {
     background-color: #DCF8C6;
     padding: 10px;
     border-radius: 8px;
     align-self: flex-end;
-    max-width: 70%;
+    width: fit-content;
     display: flex; /* Added */
-    justify-content: flex-end; /* Added */
-  }
+    align-self: self-end !important;
+    }
   
   .conversation-window .received-message {
     background-color: #EAEAEA;
     padding: 10px;
     border-radius: 8px;
-    max-width: 70%;
+    width: fit-content;
     display: flex; /* Added */
-    justify-content: flex-start; /* Added */
-  }
+    align-self: self-start !important;
+    }
   
   .conversation-window .message-time {
     font-size: 12px;

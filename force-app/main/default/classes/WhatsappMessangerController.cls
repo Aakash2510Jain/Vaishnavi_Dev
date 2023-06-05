@@ -4,18 +4,43 @@
 public without sharing class WhatsappMessangerController {
     
     @AuraEnabled(cacheable=true)
-    public static List<MessageWrapper> getContactWhatsappHistory(String contactId){
-        system.debug('--- '+contactId);
+    public static List<MessageWrapper> getContactWhatsappHistory(String recordId){
         try {
-            List<MessageWrapper> messages = new List<MessageWrapper>();
-            if(!String.isBlank(contactId)) {
-                for(Messages__c message : [SELECT Id, OwnerId, IsDeleted, Name, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, Txn_Id__c, Display_Phone_Number__c, Phone_Number_Id__c, Contact_Name__c, Wa_Id__c, From__c, Message_Id__c, Timestamp__c, Message_Body__c, Type__c FROM Messages__c WHERE Contact__c = :contactId ORDER By CreatedDate]) {
-                    if(true) {
-                        messages.add(new MessageWrapper(message.id, message.From__c, message.Message_Body__c, message.Timestamp__c, 'received-message'));
+            System.debug('recordId---'+recordId);
+            if(!string.isBlank(recordId)){
+                string sObjectName = getObjectAPIName(recordId);
+                system.debug('--- '+recordId+'-----sObjectName----'+sObjectName);
+                List<MessageWrapper> messages = new List<MessageWrapper>();
+                list<Messages__c> MessageList = New List<Messages__c>();
+                // if(sObjectName == 'Contact'){
+                //     MessageList = [SELECT Id, OwnerId, IsDeleted, Name, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, Txn_Id__c, Display_Phone_Number__c, Phone_Number_Id__c, Contact_Name__c, Wa_Id__c, From__c, Message_Id__c, Timestamp__c, Message_Body__c, Type__c,Message_Type__c FROM Messages__c WHERE Contact__c = :recordId ORDER By CreatedDate];
+                // }else if(sObjectName == 'Opportunity__c'){
+                //     MessageList = [SELECT Id, OwnerId, IsDeleted, Name, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, Txn_Id__c, Display_Phone_Number__c, Phone_Number_Id__c, Contact_Name__c, Wa_Id__c, From__c, Message_Id__c, Timestamp__c, Message_Body__c, Type__c,Message_Type__c FROM Messages__c WHERE Opportunity__c = :recordId ORDER By CreatedDate];
+                // }
+                if(sObjectName == 'Campaign'){
+                    sObjectName = 'Campaign__c';
+                }
+                string queryString = 'SELECT Id, OwnerId, IsDeleted, Name, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, Txn_Id__c, Display_Phone_Number__c, Phone_Number_Id__c, Contact_Name__c, Wa_Id__c, From__c, Message_Id__c, Timestamp__c, Message_Body__c, Type__c,Message_Type__c FROM Messages__c WHERE '+sObjectName+' = :recordId ORDER By CreatedDate';
+                MessageList = database.query(queryString);
+                system.debug('MessageList--'+MessageList);
+                if(!String.isBlank(recordId)) {
+                    for(Messages__c message : MessageList) {
+                         MessageWrapper mWrapper = New MessageWrapper(string.valueOf(message.id), message.From__c, message.Message_Body__c, message.Timestamp__c, '','');
+                         if(message.Message_Type__c == 'Sent'){
+                            System.debug('sentMessage');
+                            mWrapper.classs = 'sent-message';
+                            mWrapper.pclass = 'message-row-send';
+                         }else{
+                            mWrapper.classs = 'received-message';
+                            mWrapper.pclass = 'message-row-recieve';
+                         }
+                         messages.add(mWrapper);
                     }
                 }
+                System.debug('messages--'+messages);
+                return messages;
             }
-            return messages;
+            return null;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
@@ -61,16 +86,39 @@ public without sharing class WhatsappMessangerController {
 
     //static String testText = '{"phone_number": "whatsapp:+919738951291","message": {"content": {"type": "text","text": "Hello, this is a test message!"}}}';
     @AuraEnabled
-    public static Boolean sendMessageText(String textMessage, String phoneNumber){
-        try {
-            Map<String,String> headerMap = new Map<String,String>{'Content-Type' => 'application/json', 'Authorization' => 'Bearer '+ WHATSAPP_TOKEN};
-            HttpUtility utilityInstance = HttpUtility.getInstance();
-            String responseBody = utilityInstance.httpReqHelper(headerMap, 'POST', JSON.serialize(constructTextMsgBody(textMessage, phoneNumber), true),WHATSAPP_ENDPOINT);
-            System.debug('--- httpReqHelper '+ responseBody);
+    public static Boolean sendMessageText(String textMessage, String phoneNumber, string recordId){
+        // try {
+        //     Map<String,String> headerMap = new Map<String,String>{'Content-Type' => 'application/json', 'Authorization' => 'Bearer '+ WHATSAPP_TOKEN};
+        //     HttpUtility utilityInstance = HttpUtility.getInstance();
+        //     String responseBody = utilityInstance.httpReqHelper(headerMap, 'POST', JSON.serialize(constructTextMsgBody(textMessage, phoneNumber), true),WHATSAPP_ENDPOINT);
+        //     System.debug('--- httpReqHelper '+ responseBody);
+        //     return true;
+        // } catch (Exception e) {
+        //     System.debug('--- error message '+e.getMessage());
+        //     return false;
+        // }
+        try{
+            System.debug('textMessage----'+textMessage+'---phoneNumber-----'+phoneNumber+'----recordId----'+recordId);
+            boolean isMessageSentSuccessfully = API_WhatsApp.sendSingleMessage(phoneNumber,textMessage);
+            if(isMessageSentSuccessfully){
+                string sObjectName = getObjectAPIName(recordId);
+                Messages__c newMessage = New Messages__c();
+                newMessage.Message_Body__c = textMessage;
+                newMessage.Message_Type__c = 'Sent';
+                if(sObjectName == 'Opportunity__c'){
+                    newMessage.Opportunity__c = recordId;
+                } else if(sObjectName == 'Lead__c'){
+                    newMessage.Lead__c = recordId;
+                }else if(sObjectName == 'Campaign'){
+                    newMessage.Campaign__c = recordId;
+                }
+                system.debug('newMessage---'+newMessage);
+                insert newMessage;
+            }
             return true;
-        } catch (Exception e) {
-            System.debug('--- error message '+e.getMessage());
-            return false;
+        }catch(Exception e){
+            System.debug('line--'+e.getLineNumber()+'-------'+e.getMessage());
+            return false;   
         }
     }
 
@@ -113,6 +161,41 @@ public without sharing class WhatsappMessangerController {
         return msgWrapper;
     }
 
+    @AuraEnabled
+    public static List<sobject> getPhoneNumber(string sojectName, string recordId){
+        string querystring = 'select name,id,phone__c from '+sojectName+' where Id = \''+recordId +'\'';
+        System.debug('querystring=='+querystring);
+        List<sobject> retrivedData = Database.query(querystring);
+        System.debug('retrivedData---'+retrivedData);
+        system.debug('retrivedData.size()'+retrivedData.size());
+        if(!retrivedData.isEmpty()){
+            return retrivedData;
+        }
+        return null;
+    }
+
+    @AuraEnabled
+    public static string getTemplateDetails(string tempId){
+       List<SMS_Template__c> templateList = [select name,id,Message_for_FrontEnd__c,Message__c from SMS_Template__c where Id =:tempId];
+        if(!templateList.isEmpty()){
+            return JSON.serialize(templateList[0]);
+        }
+        return null;
+    }
+
+    public static string getObjectAPIName(string recordId){
+        String keyCode  = recordId.subString(0,3);
+        string objectAPIName;
+    Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
+    for(Schema.SObjectType objectInstance : gd.values()){
+        if(objectInstance.getDescribe().getKeyPrefix() == keyCode){
+        System.debug('Id is related to object: '+ objectInstance.getDescribe().getName());
+        objectAPIName =  objectInstance.getDescribe().getName();
+            }
+        }
+        return objectAPIName;
+    }
+
     public class MessageWrapper {
         @AuraEnabled
         public String id;
@@ -124,13 +207,16 @@ public without sharing class WhatsappMessangerController {
         public String timee;
         @AuraEnabled
         public String classs;
+        @AuraEnabled
+        public String pclass;
 
-        public MessageWrapper(String id, String sender, String content, String timee, String classs) {
+        public MessageWrapper(String id, String sender, String content, String timee, String classs, string pclass) {
             this.id = id;
             this.sender = sender;
             this.content = content;
             this.timee = timee;
             this.classs = classs;
+            this.pclass = pclass;
         }
     }
 
