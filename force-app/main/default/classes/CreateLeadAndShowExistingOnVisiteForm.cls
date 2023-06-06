@@ -3,38 +3,38 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
     public Static Lead__c showExistingLead(string searchkey){
         try{
             if(searchkey != null){
-               string phonestring = '%' +searchkey;
-            Lead__c leadRec = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring limit 1  ];
-        system.debug('leadRec===>>'+leadRec);
-                 return leadRec; 
+                string phonestring = '%' +searchkey;
+                Lead__c leadRec = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring limit 1  ];
+                system.debug('leadRec===>>'+leadRec);
+                return leadRec; 
             }
-        
+            
         }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
         return null;
- 
+        
     }
-     @AuraEnabled
+    @AuraEnabled
     public Static void updateExistinglead(string recid,Lead__c leadRec){
         try{
             update leadRec;
         }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
-     }
+    }
     @AuraEnabled
     public Static void createNewLead(string recid,Lead__c createleadRec){
         try{
             
-               insert createleadRec;  
-                system.debug('createleadRec'+createleadRec);
+            insert createleadRec;  
+            system.debug('createleadRec'+createleadRec);
             
-         }catch(Exception e){
+        }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
-     }
-     @AuraEnabled 
+    }
+    @AuraEnabled 
     public static Map<String, List<String>> getDependentMap(sObject objDetail, string contrfieldApiName,string depfieldApiName) {
         String controllingField = contrfieldApiName.toLowerCase();
         String dependentField = depfieldApiName.toLowerCase();
@@ -129,24 +129,24 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         try{
             newVisitRec.Lead__c = recid;
             newVisitRec.Actual_visit_date__c = changedate;
-               insert newVisitRec;  
-                system.debug('newVisitRec===>>>'+newVisitRec);
+            insert newVisitRec;  
+            system.debug('newVisitRec===>>>'+newVisitRec);
             
-         }catch(Exception e){
+        }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
-     }
-     @AuraEnabled
+    }
+    @AuraEnabled
     public Static List<Visit__c> fetchvisitRecord(string leadid ){
         try{
             
             List<Visit__c> visitList = [Select Name,Actual_visit_date__c,Interested_In__c from Visit__c where Lead__c=:leadid]  ;  
-                system.debug('visitList===='+visitList);
+            system.debug('visitList===='+visitList);
             return visitList;
-         }catch(Exception e){
+        }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
         return null;
-     }
-
- }
+    }
+    
+}

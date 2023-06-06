@@ -6,12 +6,12 @@
     debugger;
     $Lightning.use("c:Create_And_Show_Leads_On_Site_Visit_App", function() {
         $Lightning.createComponent("c:Create_And_Show_Leads_On_Site_Visit",
-          { recordId: '{!$CurrentPage.parameters.id}'
-          },
-          "LightningComponentid",
-          function(cmp) {
-             console.log('LWC Componenet added in VF page');
-          });
+                                   { recordId: '{!$CurrentPage.parameters.id}'
+                                   },
+                                   "LightningComponentid",
+                                   function(cmp) {
+                                       console.log('LWC Componenet added in VF page');
+                                   });
     });
     </script>
 </apex:page>

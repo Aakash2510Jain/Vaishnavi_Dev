@@ -14,8 +14,8 @@
     <aura:attribute name="showVisitButton" type="boolean" default="false"  />
     <aura:attribute name="showVisitPage" type="boolean" default="false"  />
     
-     <aura:attribute name="showError" type="boolean" default="false"  />
-     <aura:attribute name="activeTab" type="String" default="tab1" />
+    <aura:attribute name="showError" type="boolean" default="false"  />
+    <aura:attribute name="activeTab" type="String" default="tab1" />
     
     <!--  /////// Dependent Picklist //////// -->
     <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
@@ -42,7 +42,7 @@
         <lightning:layout  horizontalAlign="center" verticalAlign="end" >
             <lightning:layoutItem class="slds-p-around_xxx-small" size="4" padding="around-large">
                 <div class="slds-align_absolute-left"  >
-                      <h3> <lightning:input   type="text" value="{!v.Searchkey}" placeholder="Enter Email or Phone"  label ="Enter Email Or Phone"  /></h3></div>
+                    <h3> <lightning:input   type="text" value="{!v.Searchkey}" placeholder="Enter Email or Phone"  label ="Enter Email Or Phone"  /></h3></div>
             </lightning:layoutItem>
             <lightning:layoutItem class="slds-p-around_xxx-small" size="4" padding="around-large">
                 <div class="slds-align_absolute-left">
@@ -57,190 +57,125 @@
             </lightning:layoutItem> 
         </lightning:layout>
     </lightning:card>
-     <!--  /////// Tabset  {!v.selTabId} //////// -->
+    <!--  /////// Tabset  {!v.selTabId} //////// -->
     <aura:if isTrue="{!v.showRecordDetail}">
-    <div aura:id="data-entry">
-        <lightning:tabset variant="default" selectedTabId="{!v.activeTab}">
-            <lightning:tab label="Details" aura:id="tab1" tabindex="1" id="tab1" title="Details">
-                <lightning:card>
-            <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
-                <span><h2>Existing Lead Record</h2></span>
-            </div>
-                    
-            <lightning:layout class="abc" >
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left" >
-                        <lightning:input   type="text" value="{!v.LeadRec.Name__c}" label ="Name"  /></div>
-                </lightning:layoutItem>
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:input   type="text" value="{!v.LeadRec.Email__c}"   label ="Email"/></div>
-                </lightning:layoutItem>
-                 </lightning:layout>
-             <lightning:layout class="abc">
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:input   type="text" value="{!v.LeadRec.Phone__c}"  label ="Phone"/></div>
-                </lightning:layoutItem>
-                 <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left" >
-                        <lightning:select name="controllerFld"
-                                          value="{!v.LeadRec.Lead_Source__c}"
-                                          label="Lead Source"
-                                          onchange="{!c.onControllerFieldChange}">
-                            <aura:iteration items="{!v.listControllingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
+        <div aura:id="data-entry">
+            <lightning:tabset variant="default" selectedTabId="{!v.activeTab}">
+                <lightning:tab label="Details" aura:id="tab1" tabindex="1" id="tab1" title="Details">
+                    <lightning:card>
+                        <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
+                            <span><h2>Existing Lead Record</h2></span>
+                        </div>
+                        
+                        <lightning:layout class="abc" >
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left" >
+                                    <lightning:input   type="text" value="{!v.LeadRec.Name__c}" label ="Name"  /></div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left">
+                                    <lightning:input   type="text" value="{!v.LeadRec.Email__c}"   label ="Email" disabled="true"/></div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout class="abc">
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left">
+                                    <lightning:input   type="text" value="{!v.LeadRec.Phone__c}"  label ="Phone" disabled="true"/></div>
+                            </lightning:layoutItem>
+                            <!--div>
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left" >
+                                    <lightning:select name="controllerFld"
+                                                      value="{!v.LeadRec.Lead_Source__c}"
+                                                      label="Lead Source"
+                                                      onchange="{!c.onControllerFieldChange}">
+                                        <aura:iteration items="{!v.listControllingValues}" var="val">
+                                            <option value="{!val}">{!val}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout class="abc">
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left">
+                                    <lightning:select name="dependentFld"
+                                                      value="{!v.LeadRec.Lead_Sub_Source__c}"
+                                                      label="Lead Sub Source"
+                                                      disabled="{!v.bDisabledDependentFld}"
+                                                      onchange="{!c.onSubControllerFieldChange}">
+                                        <aura:iteration items="{!v.listDependingValues}" var="val">
+                                            <option value="{!val}">{!val}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="6" padding="around-large">
+                                <div class="slds-align_absolute-left">
+                                    <lightning:select name="subDependentFld"
+                                                      value="{!v.LeadRec.Lead_Source_Type__c}"
+                                                      label="Lead Source Type"
+                                                      disabled="{!v.bDisabledSubDependentFld}">
+                                        <aura:iteration items="{!v.listSubDependingValues}" var="val">
+                                            <option value="{!val}">{!val}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </lightning:layoutItem>
+</div-->
+                        </lightning:layout>
+                        <div class="slds-align_absolute-center">
+                            <lightning:button variant="brand" label="Update" onclick="{!c.UpdateLead}"></lightning:button>
+                        </div>
+                    </lightning:card>  
+                </lightning:tab>
+                <lightning:tab label="Visit" aura:id="tab2" tabindex="2" id="tab2" title="Visit"  >
+                    <div class="slds-align_absolute-center" padding="around-large">
+                        <table class="slds-table slds-table_bordered slds-table_resizable-cols" style="width:100%;" >
+                            <thead>
+                                <tr  >
+                                    <th >&nbsp;&nbsp;&nbsp;Visit</th>
+                                    <th >Actual Visit Date</th>
+                                    <th>Interested In</th>
+                                    <!-- Add other columns as needed -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.visitReclist}" var="visit">
+                                    <tr>	
+                                        <td>{!visit.Name}</td>
+                                        <td>{!visit.Actual_visit_date__c}</td>
+                                        <td>{!visit.Interested_In__c}</td>
+                                        <!-- Add other columns as needed -->
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
                     </div>
-                </lightning:layoutItem>
-                 </lightning:layout>
-            <lightning:layout class="abc">
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:select name="dependentFld"
-                                          value="{!v.LeadRec.Lead_Sub_Source__c}"
-                                          label="Lead Sub Source"
-                                          disabled="{!v.bDisabledDependentFld}"
-                                          onchange="{!c.onSubControllerFieldChange}">
-                            <aura:iteration items="{!v.listDependingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                    </div>
-                </lightning:layoutItem>
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:select name="subDependentFld"
-                                          value="{!v.LeadRec.Lead_Source_Type__c}"
-                                          label="Lead Source Type"
-                                          disabled="{!v.bDisabledSubDependentFld}">
-                            <aura:iteration items="{!v.listSubDependingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                    </div>
-                </lightning:layoutItem>
-            </lightning:layout>
-            <div class="slds-align_absolute-center">
-                <lightning:button variant="brand" label="Update" onclick="{!c.UpdateLead}"></lightning:button>
-            </div>
-        </lightning:card>  
-            </lightning:tab>
-             <lightning:tab label="Visit" aura:id="tab2" tabindex="2" id="tab2" title="Visit"  >
-                 <div class="slds-align_absolute-center" padding="around-large">
-                <table class="slds-table slds-table_bordered slds-table_resizable-cols" style="width:100%;" >
-                    <thead>
-                        <tr  >
-                             <th >&nbsp;&nbsp;&nbsp;Visit</th>
-                            <th >Actual Visit Date</th>
-                             <th>Interested In</th>
-                             <!-- Add other columns as needed -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <aura:iteration items="{!v.visitReclist}" var="visit">
-                            <tr>	
-                                 <td>{!visit.Name}</td>
-                                <td>{!visit.Actual_visit_date__c}</td>
-                                <td>{!visit.Interested_In__c}</td>
-                                <!-- Add other columns as needed -->
-                            </tr>
-                        </aura:iteration>
-                    </tbody>
-                 </table>
-                     </div>
-            </lightning:tab>  
-        </lightning:tabset>
-     </div>
+                </lightning:tab>  
+            </lightning:tabset>
+        </div>
     </aura:if>
     
     <!-- ////Show Search Error///// -->
     
     <aura:if isTrue="{!v.showError}">
-                  <div aura:id="data-entry">
-        <lightning:tabset variant="default" selectedTabId="{!v.activeTab}">
-            <lightning:tab label="Details" aura:id="tab1" tabindex="1" id="tab1" title="Details">
-             <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
-                <span><h2 style="color:red;">No Record Is Available!</h2></span>
-            </div>
-             </lightning:tab>
-             <lightning:tab label="Visit" aura:id="tab2" tabindex="2" id="tab2" title="Visit"  >
-                 <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
-                <span><h2 style="color:red;">No Record Is Available!</h2></span>
-            </div>
-             </lightning:tab>  
-        </lightning:tabset>
-     </div>
-  </aura:if>
+        <div aura:id="data-entry">
+            <lightning:tabset variant="default" selectedTabId="{!v.activeTab}">
+                <lightning:tab label="Details" aura:id="tab1" tabindex="1" id="tab1" title="Details">
+                    <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
+                        <span><h2 style="color:red;">No Record Is Available!</h2></span>
+                    </div>
+                </lightning:tab>
+                <lightning:tab label="Visit" aura:id="tab2" tabindex="2" id="tab2" title="Visit"  >
+                    <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
+                        <span><h2 style="color:red;">No Record Is Available!</h2></span>
+                    </div>
+                </lightning:tab>  
+            </lightning:tabset>
+        </div>
+    </aura:if>
     
-    
-    <!--  /////// Existing Lead Record //////// -->
- <!--   <aura:if isTrue="{!v.showRecordDetail}">
-        <lightning:card>
-            <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
-                <span><h2>Existing Lead Record</h2></span>
-            </div>
-            <lightning:layout class="abc" >
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left" >
-                        <lightning:input   type="text" value="{!v.LeadRec.Name__c}" label ="Name"  /></div>
-                </lightning:layoutItem>
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:input   type="text" value="{!v.LeadRec.Email__c}"   label ="Email"/></div>
-                </lightning:layoutItem>
-                 </lightning:layout>
-             <lightning:layout class="abc">
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:input   type="text" value="{!v.LeadRec.Phone__c}"  label ="Phone"/></div>
-                </lightning:layoutItem>
-                 <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left" >
-                        <lightning:select name="controllerFld"
-                                          value="{!v.LeadRec.Lead_Source__c}"
-                                          label="Lead Source"
-                                          onchange="{!c.onControllerFieldChange}">
-                            <aura:iteration items="{!v.listControllingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                    </div>
-                </lightning:layoutItem>
-                 </lightning:layout>
-            <lightning:layout class="abc">
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:select name="dependentFld"
-                                          value="{!v.LeadRec.Lead_Sub_Source__c}"
-                                          label="Lead Sub Source"
-                                          disabled="{!v.bDisabledDependentFld}"
-                                          onchange="{!c.onSubControllerFieldChange}">
-                            <aura:iteration items="{!v.listDependingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                    </div>
-                </lightning:layoutItem>
-                <lightning:layoutItem class="e" size="6" padding="around-large">
-                    <div class="slds-align_absolute-left">
-                        <lightning:select name="subDependentFld"
-                                          value="{!v.LeadRec.Lead_Source_Type__c}"
-                                          label="Lead Source Type"
-                                          disabled="{!v.bDisabledSubDependentFld}">
-                            <aura:iteration items="{!v.listSubDependingValues}" var="val">
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                    </div>
-                </lightning:layoutItem>
-            </lightning:layout>
-            <div class="slds-align_absolute-center">
-                <lightning:button variant="brand" label="Update" onclick="{!c.UpdateLead}"></lightning:button>
-            </div>
-        </lightning:card>
-    </aura:if>-->
     
     <!--  /////// Create New Lead Record //////// -->
     <aura:if isTrue="{!v.showNewLeadPage}">
@@ -257,13 +192,14 @@
                     <div class="slds-align_absolute-left">
                         <lightning:input   type="text" value="{!v.objDetail.Email__c}"   label ="Email"/></div>
                 </lightning:layoutItem>
-                 </lightning:layout>
+            </lightning:layout>
+            <!--div>
             <lightning:layout class="abc" >
                 <lightning:layoutItem class="e" size="6" padding="around-large">
                     <div class="slds-align_absolute-left">
                         <lightning:input   type="text" value="{!v.objDetail.Phone__c}"  label ="Phone"/></div>
                 </lightning:layoutItem>
-                 <lightning:layoutItem class="e" size="6" padding="around-large">
+                <lightning:layoutItem class="e" size="6" padding="around-large">
                     <div class="slds-align_absolute-left" >
                         <lightning:select name="controllerFld"
                                           value="{!v.objDetail.Lead_Source__c}"
@@ -276,7 +212,7 @@
                     </div>
                 </lightning:layoutItem>
             </lightning:layout>
-                <lightning:layout class="abc" >
+            <lightning:layout class="abc" >
                 <lightning:layoutItem class="e" size="6" padding="around-large">
                     <div class="slds-align_absolute-left">
                         <lightning:select name="dependentFld"
@@ -303,6 +239,7 @@
                     </div>
                 </lightning:layoutItem>
             </lightning:layout>
+</div-->
             <div class="slds-align_absolute-center">
                 <lightning:button variant="brand" label="Create" onclick="{!c.createNEwLead}"></lightning:button>
             </div>
@@ -311,15 +248,7 @@
     
     <!--  /////// Visit Popup //////// -->
     <aura:if isTrue="{!v.showVisitPage}">
-        <!-- <lightning:layoutItem class="e" size="4" padding="around-large">
-                <div class="slds-align_absolute-left">
-                    <lightning:input   type="text" value="{!v.LeadRec.Email__c}"   label ="Email"/></div>
-            </lightning:layoutItem>
-            <lightning:layoutItem class="e" size="4" padding="around-large">
-                <div class="slds-align_absolute-left">
-                    <lightning:input   type="text" value="{!v.LeadRec.Phone__c}"  label ="Phone"/></div>
-            </lightning:layoutItem>-->
-        
+     
         <lightning:card>
             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                      class="slds-modal slds-fade-in-open slds-modal_medium" style="background-color:grey;">
@@ -328,48 +257,35 @@
                         <h2 id="modal-heading-01" class="slds-text-heading_medium">Create New Visit</h2>
                     </header>
                     <div class="slds-modal__content slds-p-around_medium">
-                             <div class="slds-grid slds-gutters">
-                              <!--  <lightning:input label="Actul Visit Site" aura:id="date" type="Date" value="{!v.today}" onchange="{!c.selectdate}"/>
-                                <lightning:textarea
-                                                    value="{!v.SiteVistRec.Site_Visit_Remarks__c}"
-                                                    label="Visite Mark"
-                                                    max-length="300"
-                                                    >
-                                </lightning:textarea> 
-                                <lightning:textarea
-                                                    value="{!v.SiteVistRec.Interested_In__c}"
-                                                    label="Interested In"
-                                                    max-length="300"
-                                                    >
-                                </lightning:textarea> -->
-                                
-                                <lightning:layout class="abc" >
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <div class="slds-align_absolute-left" >
-                                            <lightning:input label="Actual Visit Date" aura:id="date"  type="Date" value="{!v.today}"   onchange="{!c.selectdate}"/>
-                                        </div>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <div class="slds-align_absolute-left">
-                                             <lightning:textarea
-                                                    value="{!v.SiteVistRec.Site_Visit_Remarks__c}"
-                                                    label="Visit Remark"
-                                                    max-length="300"
-                                                    >
-                                </lightning:textarea> </div>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <div class="slds-align_absolute-left">
-                                           <lightning:textarea
-                                                    value="{!v.SiteVistRec.Interested_In__c}"
-                                                    label="Interested In"
-                                                    max-length="300"
-                                                    >
-                                </lightning:textarea> </div>
-                                    </lightning:layoutItem>
-                                </lightning:layout>
-                             </div>
-                         
+                        <div class="slds-grid slds-gutters">
+                            
+                            <lightning:layout class="abc" >
+                                <lightning:layoutItem class="e" size="4" padding="around-large">
+                                    <div class="slds-align_absolute-left" >
+                                        <lightning:input label="Actual Visit Date" aura:id="date"  type="Date" value="{!v.today}"   onchange="{!c.selectdate}"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem class="e" size="4" padding="around-large">
+                                    <div class="slds-align_absolute-left">
+                                        <lightning:textarea
+                                                            value="{!v.SiteVistRec.Site_Visit_Remarks__c}"
+                                                            label="Visit Remark"
+                                                            max-length="300"
+                                                            >
+                                        </lightning:textarea> </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem class="e" size="4" padding="around-large">
+                                    <div class="slds-align_absolute-left">
+                                        <lightning:textarea
+                                                            value="{!v.SiteVistRec.Interested_In__c}"
+                                                            label="Interested In"
+                                                            max-length="300"
+                                                            >
+                                        </lightning:textarea> </div>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                        
                     </div>
                     <footer class="slds-modal__footer">
                         <button class="slds-button slds-button_neutral" onclick="{!c.createVistRec}">Create Visit</button>

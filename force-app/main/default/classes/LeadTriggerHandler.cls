@@ -38,7 +38,6 @@ public class LeadTriggerHandler {
         
         for(Lead__c leadRec : newLeadList){
             if(leadRec.Phone__c != null){
-                leadRec.Phone__c = '+91'+leadRec.Phone__c;
                 phonesSet.add(leadRec.Phone__c);
             }
             if(leadRec.Email__c != null)
@@ -153,6 +152,12 @@ public class LeadTriggerHandler {
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
             }
+            if(leadRec.isQualified__c == false && leadRec.isQualified__c != oldLeadMap.get(leadRec.Id).isQualified__c){
+                leadRec.isQualified__c = true;
+            }
+            if(leadRec.isQualified__c && leadRec.Qualified_Date_Time__c == null){
+                leadRec.Qualified_Date_Time__c = system.now();
+            }
             if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
                 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
                     leadRec.isConverted__c = true;
@@ -177,8 +182,9 @@ public class LeadTriggerHandler {
             if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Lead_Substage__c != null){
                 if(leadRec.Lead_Substage__c == 'Not Interested' || leadRec.Lead_Substage__c == 'Not a relevant call' || 
                    leadRec.Lead_Substage__c == 'Junk lead'|| leadRec.Lead_Substage__c == 'Just Enquiry'|| 
-                   leadRec.Lead_Substage__c == 'Did not Show up for site visit'|| leadRec.Lead_Substage__c == 'Not Interested in Property'
-                  ){ 
+                   leadRec.Lead_Substage__c == 'Did not Show up for site visit'|| leadRec.Lead_Substage__c == 'Not Interested in Property' ||
+                   leadRec.Lead_Substage__c == 'Budget' || leadRec.Lead_Substage__c == 'Location' || leadRec.Lead_Substage__c == 'Project Timeline' ||
+                   leadRec.Lead_Substage__c == 'Vaastu Compliance'){ 
                       leadRec.Lead_Stage__c = 'Drop';
                   }
                 if(leadRec.Lead_Substage__c == 'Interested' ){
