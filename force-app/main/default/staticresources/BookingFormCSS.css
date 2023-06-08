@@ -6,6 +6,14 @@ h1 {
     color : blue;
 }
 
-premierBg-color {
+header-bg {
+    width: 100%;
+    height: 60px;
     background-color : #DEA318;
+}
+
+header-text {
+    text-align: center;
+    padding-top: 10px;
+    color: white;
 }

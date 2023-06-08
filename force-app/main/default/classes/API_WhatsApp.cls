@@ -135,7 +135,7 @@ public without sharing class API_WhatsApp {
           String queryString = '';
           for (String param : requestParams.keySet()) {
               String value = EncodingUtil.urlEncode(requestParams.get(param), 'UTF-8');
-              queryString += '&' + param + '=' + value;
+              queryString += '&' + param + '=' + value.replaceAll('5Cn','0A');
           }
           System.debug('queryString----'+queryString);
           if (queryString != null && !String.isBlank(queryString)) {
@@ -160,4 +160,52 @@ public without sharing class API_WhatsApp {
               return false;
           }
     }
+    
+     public static boolean sendWhatsappTemplate(string phoneNo, string message){
+        HttpRequest httpRequest = new HttpRequest();
+        System.debug('message----'+message);
+        System.debug('phoneNo----'+phoneNo);
+        String endpointUrl = 'https://media.smsgupshup.com/GatewayAPI/rest';
+         
+        httpRequest.setEndpoint(endpointUrl);
+        httpRequest.setMethod('GET');
+        Map<String, String> requestParams = new Map<String, String>();
+        requestParams.put('userid', '2000212725');
+        requestParams.put('password', 'BTmHHaeBc');
+        requestParams.put('send_to', phoneNo);
+        requestParams.put('v', '1.1');
+        requestParams.put('format', 'json');
+        requestParams.put('msg_type', 'TEXT');
+        requestParams.put('method', 'SENDMESSAGE');
+        requestParams.put('msg',message);
+        String queryString = '';
+        for (String param : requestParams.keySet()) {
+            String value = EncodingUtil.urlEncode(requestParams.get(param), 'UTF-8');
+            queryString += '&' + param + '=' + value;
+        }
+        System.debug('queryString----'+queryString);
+        if (queryString != null && !String.isBlank(queryString)) {
+            queryString = queryString.substring(1);
+            System.debug('queryString----'+queryString);
+            httpRequest.setEndpoint(endpointUrl + '?' + queryString);
+        }        
+        String headerKey = 'Content-Type';
+        String headerValue = 'application/x-www-form-urlencoded';
+        httpRequest.setHeader(headerKey, headerValue);
+        
+        Http http = new Http();
+        HttpResponse httpResponse = http.send(httpRequest);        
+        System.debug('httpResponse.getStatusCode()-----'+httpResponse.getStatusCode());
+        System.debug('httpResponse.getBody()-----'+httpResponse.getBody());
+        if (httpResponse.getStatusCode() == 200) {
+            String responseBody = httpResponse.getBody();
+            System.debug('responseBody----'+responseBody);
+			return true;
+        } else {
+            System.debug('HTTP request failed with status code: ' + httpResponse.getStatusCode());
+            return false;
+        }
+        
+    }
+
 }

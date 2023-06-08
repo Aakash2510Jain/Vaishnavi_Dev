@@ -3,6 +3,34 @@
         debugger;
         component.set("v.showRecordDetail",false);  
         //  helper.fetchvisitrec(component, event);
+        var action =component.get("c.fetchAllThePickValues");
+        
+        action.setParams({
+        });
+        action.setCallback(this,function(response){
+            var state = response.getState();
+            if(state === "SUCCESS"){
+                var data = response.getReturnValue();
+                
+                //data = JSON.parse(JSON.stringify(data));
+                if(data != null){
+                    component.set("v.budgetList",data.budgetList);
+                    component.set("v.occupationList",data.occupationList);
+                    component.set("v.ageGroupList",data.ageGroupList);
+                    component.set("v.ethnicityList",data.ethnicityList);
+                    component.set("v.buyingPurposeList",data.buyingPurposeList);
+                    component.set("v.walkinTypeList",data.walkinTypeList);
+                    component.set("v.inventoryList",data.inventoryList);
+                    component.set("v.ownershipList",data.ownershipList);
+                    component.set("v.martialStatusList",data.martialStatusList);
+                    component.set("v.walkinSourceList",data.walkinSource);
+                    component.set("v.leadSourceList",data.leadSource);
+                }else{
+                    
+                } 
+            }
+        });
+        $A.enqueueAction(action);
     },
     searchLead : function(component, event, helper) {
         debugger;
@@ -30,15 +58,22 @@
                 var data = response.getReturnValue();
                 
                 if(data != null){
-                    component.set("v.LeadRec",data);
-                    component.set("v.leadRecId",data.Id); 
-                    helper.fetchvisitrec(component, event);
-                    component.set("v.showRecordDetail",true); 
-                    component.set("v.showError",false);
+                    if(data.isConverted__c == false){
+                        component.set("v.LeadRec",data);
+                        component.set("v.leadRecId",data.Id); 
+                        component.set("v.showRecordDetail",true); 
+                        component.set("v.showError",false);
+                    }else if(data.isConverted__c == true){
+                        helper.fetchvisitrec(component, event);
+                        component.set("v.showRecordDetail",false);
+                        component.set("v.showError",true);
+                        component.set("v.errorMessage","Customer Already Visited, Please checkout Visits");
+                    }
                 }else{
                     component.set("v.showRecordDetail",false);
                     component.set("v.showError",true);
                     component.set("v.showVisitButton",false); 
+                    component.set("v.errorMessage","No Record Is Available!");
                 } 
             }
         });

@@ -4,7 +4,6 @@
             <apex:stylesheet value="{!$Resource.BookingFormCSS}" />
             <c:Libraries ></c:Libraries>
             <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"/>
             <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>       
@@ -57,7 +56,7 @@
         </style>
     
         <script>
-            debugger;
+        debugger;
         var siteUrl = "{!$Label.BookingFormSiteURL}"; 
         var opportunityId = '{!$CurrentPage.parameters.id}';
         var relationpickValue = JSON.parse('{!relationpickValue}');
@@ -70,9 +69,13 @@
         var annualIncomepickValue = JSON.parse('{!annualIncomepickValue}');
         var modeOfPaymentpickValue = JSON.parse('{!modeOfPaymentpickValue}');
         var purposeOfPurchasepickValue = JSON.parse('{!purposeOfPurchasepickValue}');
+        var leadSourceType = JSON.parse('{!leadSourceType}');
+        var sourceOfBooking = JSON.parse('{!sourceOfBooking}');
+        // var bookingFormCheckList = JSON.parse('{!bookingFormCheckList}');
     
         var app = angular.module('myApp', []);
         app.controller('myCtrl', function ($scope) {
+            
             $scope.oppId = opportunityId;
             $scope.applicant1Details = {};
             $scope.applicant2Details = {};
@@ -88,6 +91,9 @@
             $scope.annualIncomepickValue = annualIncomepickValue;
             $scope.modeOfPaymentpickValue = modeOfPaymentpickValue;
             $scope.purposeOfPurchasepickValue = purposeOfPurchasepickValue;
+            $scope.leadSourceType = leadSourceType;
+            $scope.sourceOfBooking = sourceOfBooking;
+            // $scope.bookingFormCheckList = bookingFormCheckList;
     
             $scope.getOpportunityDetails = function(){
                 debugger;
@@ -96,16 +102,34 @@
                     debugger;
                     if(event.status && result != null){
                         debugger;
+                        if(result.Booking_Form_Premiere_Submission_Date__c != null){
+                            result.Booking_Form_Premiere_Submission_Date__c = new Date(result.Booking_Form_Premiere_Submission_Date__c);
+                        }else{
+                            result.Booking_Form_Premiere_Submission_Date__c = new Date();
+                        }
+
+                        if(result.Cheque_DD_Date__c != null){
+                            result.Cheque_DD_Date__c = new Date(result.Cheque_DD_Date__c);
+                        }
+
+                        if(result.Card_Swipe_Transaction_Date__c != null){
+                            result.Card_Swipe_Transaction_Date__c = new Date(result.Card_Swipe_Transaction_Date__c);
+                        }
+
+                        if(result.Online_Payment_Transaction_Date__c != null){
+                            result.Online_Payment_Transaction_Date__c = new Date(result.Online_Payment_Transaction_Date__c);
+                        }
+
                         if(result.Applicants__r != undefined){
                             if(result.Applicants__r[0] != undefined){
                                 if(result.Applicants__r[0].Date_Of_Birth__c != null){
-                                    $scope.applicant1BirthDate = new Date(result.Applicants__r[0]);
+                                    result.Applicants__r[0].Date_Of_Birth__c = new Date(result.Applicants__r[0].Date_Of_Birth__c);
                                 }
                                 $scope.applicant1Details = result.Applicants__r[0];
                             }
                             if(result.Applicants__r[1] != undefined){
                                 if(result.Applicants__r[1].Date_Of_Birth__c != null){
-                                    $scope.applicant2BirthDate = new Date(result.Applicants__r[1]);
+                                    result.Applicants__r[1].Date_Of_Birth__c = new Date(result.Applicants__r[1].Date_Of_Birth__c);
                                 }
                                 $scope.applicant2Details = result.Applicants__r[1];
                             }
@@ -220,6 +244,57 @@
                 $scope.applicant2Details.Annual_Income_INR__c = value;
             }
 
+            $scope.ChangeOfLeadSource = function(value){
+                debugger;
+                $scope.opportunityDetails.Lead_Source_Type__c = value;
+            }
+
+            $scope.ChangeOfBookingSource = function(value){
+                debugger;
+                $scope.opportunityDetails.Source_Of_Booking__c = value;
+            }
+
+            $scope.ChangeOfCustomerGPA = function(value){
+                debugger;
+                if(value == "Yes"){
+                    $scope.opportunityDetails.Existing_Customer_Referral__c = "Yes";
+                }else{
+                    $scope.opportunityDetails.Existing_Customer_Referral__c = "No";
+                }
+            }
+
+            $scope.ChangeOfVaishnaviRef = function(value){
+                debugger;
+                if(value == "Yes"){
+                    $scope.opportunityDetails.Vaishnavi_Referral__c = "Yes";
+                }else{
+                    $scope.opportunityDetails.Vaishnavi_Referral__c = "No";
+                }
+            }
+
+            $scope.ChangeOfCustomerGPA2 = function(value){
+                debugger;
+                if(value == "Yes"){
+                    $scope.opportunityDetails.Existing_Employee_Referral__c = "Yes";
+                }else{
+                    $scope.opportunityDetails.Existing_Employee_Referral__c = "No";
+                }
+            }
+
+            $scope.ChangeOfVaishnaviRef2 = function(value){
+                debugger;
+                if(value == "Yes"){
+                    $scope.opportunityDetails.Employee_Vaishnavi_Referral__c = "Yes";
+                }else{
+                    $scope.opportunityDetails.Employee_Vaishnavi_Referral__c = "No";
+                }
+            }
+
+            $scope.ChangeOfBookingChecklist = function(value){
+                debugger;
+                $scope.opportunityDetails.Booking_Form_Checklist__c = value;
+            }
+
             $scope.submitDet = function(){
                 debugger;
                 
@@ -241,12 +316,66 @@
                     birthday2 = $scope.applicant2Details.Date_Of_Birth__c.getDate();
                 }
 
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                var chequeYear = 0
+                var chequeMonth = 0;
+                var chequeDay = 0;
+                if($scope.opportunityDetails.Cheque_DD_Date__c !=undefined && $scope.opportunityDetails.Cheque_DD_Date__c!=''){
+                    chequeYear = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCFullYear();
+                    chequeMonth = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCMonth()+1;
+                    chequeDay = $scope.opportunityDetails.Cheque_DD_Date__c.getDate();
+                }
+
+                var cardSwipeYear = 0
+                var cardSwipeMonth = 0;
+                var cardSwipeDay = 0;
+                if($scope.opportunityDetails.Card_Swipe_Transaction_Date__c !=undefined && $scope.opportunityDetails.Card_Swipe_Transaction_Date__c!=''){
+                    cardSwipeYear = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCFullYear();
+                    cardSwipeMonth = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCMonth()+1;
+                    cardSwipeDay = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getDate();
+                }
+
+                var onlinePayYear = 0
+                var onlinePayMonth = 0;
+                var onlinePayDay = 0;
+                if($scope.opportunityDetails.Online_Payment_Transaction_Date__c !=undefined && $scope.opportunityDetails.Online_Payment_Transaction_Date__c!=''){
+                    onlinePayYear = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCFullYear();
+                    onlinePayMonth = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCMonth()+1;
+                    onlinePayDay = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getDate();
+                }
+
+
+                $scope.applicantdateListWrapper = [{"year":birthyear,"month":birthmonth,"day":birthday,"firstApp":true},{"year":birthyear2,"month":birthmonth2,"day":birthday2,"firstApp":false}];
+                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"},
+                                             {"dateyear":chequeYear,"datemonth":chequeMonth,"dateday":chequeDay,"dateName":"cheque"},
+                                             {"dateyear":cardSwipeYear,"datemonth":cardSwipeMonth,"dateday":cardSwipeDay,"dateName":"cardSwipe"},
+                                             {"dateyear":onlinePayYear,"datemonth":onlinePayMonth,"dateday":onlinePayDay,"dateName":"onlinePayment"}];
+
                 $scope.allApplicantDetails = [];
                 $scope.applicant1Details.Opportunity__c = $scope.oppId;
+                $scope.applicant1Details.First_Applicant__c = true;
                 $scope.applicant2Details.Opportunity__c = $scope.oppId;
+                $scope.applicant2Details.First_Applicant__c = false;
                 $scope.allApplicantDetails.push($scope.applicant1Details);
                 $scope.allApplicantDetails.push($scope.applicant2Details);
-                BookingFormController.submitDet($scope.allApplicantDetails,function(result,event){
+
+                for(var i=0;i<$scope.allApplicantDetails.length;i++){
+                    delete ($scope.allApplicantDetails[i].Date_Of_Birth__c);
+                }
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.submitDet($scope.allApplicantDetails,$scope.opportunityDetails,$scope.applicantdateListWrapper,$scope.oppDateListWrapper,function(result,event){
                     debugger;
                     if(event.status && result){
                         swal({
@@ -258,71 +387,14 @@
                     }
                 })
             }
-
-                // Function to convert a number to words
-                function convertToWords(num) {
-
-                    if (num === 0) {
-                        return 'Zero Rupees';
-                    }
-
-                    if (num < 0) {
-                        return 'Minus ' + convertToWords(Math.abs(num));
-                    }
-
-                    let words = '';
-
-                    if (Math.floor(num / 10000000) > 0) {
-                        words += convertToWords(Math.floor(num / 10000000)) + ' Crore ';
-                        num %= 10000000;
-                    }
-
-                    if (Math.floor(num / 100000) > 0) {
-                        words += convertToWords(Math.floor(num / 100000)) + ' Lakh ';
-                        num %= 100000;
-                    }
-
-                    if (Math.floor(num / 1000) > 0) {
-                        words += convertToWords(Math.floor(num / 1000)) + ' Thousand ';
-                        num %= 1000;
-                    }
-
-                    if (Math.floor(num / 100) > 0) {
-                        words += convertToWords(Math.floor(num / 100)) + ' Hundred ';
-                        num %= 100;
-                    }
-
-                    if (num > 0) {
-                        if (words !== '') {
-                            words += 'and ';
-                        }
-
-                        if (num < 10) {
-                            words += units[num];
-                        } else if (num < 20) {
-                            words += teens[num - 10];
-                        } else {
-                            words += tens[Math.floor(num / 10)];
-                            if (num % 10 > 0) {
-                                words += '-' + units[num % 10];
-                            }
-                        }
-                    }
-
-                    words += ' Rupees';
-                    return words;
-                }
-
-                return function (input) {
-                    return convertToWords(input);
-                };
         });
     
         </script>
         <div ng-app="myApp" ng-controller="myCtrl">
+            <body>
 
-            <div style="width: 100%;" class="premierBg-color">
-
+            <div class="header-bg">
+                <h3 class="header-text">VAISHNAVI PREMIERE</h3>
             </div>
             <apex:form >
                 <apex:pageBlock title="VAISHNAVI PREMIERE" mode="edit">
@@ -363,11 +435,11 @@
                     </div>
                     <div class="col-md-4 mt-2">
                         <label for="apartNo">Apartment No:</label>
-                        <input type="text" id="apartNo" name="apartNo"/>
+                        <input type="text" id="apartNo" name="apartNo" ng-model="opportunityDetails.Apartment_No__c" />
                     </div>
                     <div class="col-md-4 mt-2">
                         <label for="date">Date:</label>
-                        <input type="date" id="date" name="date"/>
+                        <input type="date" id="date" name="date" ng-model="opportunityDetails.Booking_Form_Premiere_Submission_Date__c"/>
                     </div>
                 </div>
                 <h5 class="ex1" style="margin-top: 400px;padding-top: 100px;"><FONT COLOR="#ffcc66"><b>APPLICANT DETAILS (SOLE /FIRST)</b></FONT></h5>
@@ -766,12 +838,12 @@
                         <input type="text" id="area" name="area" ng-model="opportunityDetails.Super_Built_Up_Area__c"/>
                     </div>       	
                     <div class="col-md-4 mt-2">
-                        <input type="text" id="feet" name="feet" ng-model="opportunityDetails.Floor_No__c"/>
+                        <input type="text" id="feet" name="feet" ng-model=""/>
                         <label for="feet">sq.ft.</label>
                         
                     </div> 
                     <div class="col-md-4 mt-2">
-                        <input type="text" id="meter" name="meter" ng-model="opportunityDetails.Floor_No__c"/>
+                        <input type="text" id="meter" name="meter" ng-model=""/>
                         <label for="meter">sq.mtr.</label>
                     </div> 
                 </div>
@@ -799,7 +871,7 @@
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-12 mt-2">
                         <label for="totalRate"><b>Total Rate: Rs.</b></label>
-                        <input type="number" id="totalRate" name="totalRate" ng-model="opportunityDetails.Total_Rate__c" ng-change="convertToWords(opportunityDetails.Total_Rate__c)" />
+                        <input type="number" id="totalRate" name="totalRate" ng-model="opportunityDetails.Total_Rate__c"/>
                         <label><b>/- sq.ft</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Excluding GST and other charges)</label>
                     </div>
                 </div>
@@ -860,11 +932,11 @@
                     </div>
                     <div class="col-md-4 mt-2">
                         <label for="date">Date:</label>
-                        <input type="date" id="date" name="date"/>
+                        <input type="date" id="date" name="date" ng-model="opportunityDetails.Cheque_DD_Date__c"/>
                     </div>
                     <div class="col-md-4 mt-2">
                         <label for="drawnOn">Drawn On:</label>
-                        <input type="text" id="drawnOn" name="drawnOn"/>
+                        <input type="text" id="drawnOn" name="drawnOn" ng-model="opportunityDetails.Drawn_On__c"/>
                     </div>       	     
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
@@ -880,7 +952,7 @@
                     </div>
                     <div class="col-md-6 mt-2">
                         <label for="date mt-2">Date:</label>
-                        <input type="date" id="date" name="date"/>
+                        <input type="date" id="date" name="date" ng-model="opportunityDetails.Card_Swipe_Transaction_Date__c"/>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
@@ -890,7 +962,7 @@
                     </div>
                     <div class="col-md-6 mt-2">
                         <label for="date">Date:</label>
-                        <input type="date" id="date" name="date"/>
+                        <input type="date" id="date" name="date" ng-model="opportunityDetails.Online_Payment_Transaction_Date__c"/>
                     </div>
                 </div>
                 <br/>
@@ -910,99 +982,33 @@
                     
                 <h5 class="ex1" style="margin-top: 60px;"><FONT COLOR="#ffcc66"><b>HOW DID YOU COME TO KNOW ABOUT</b></FONT></h5>&nbsp;&nbsp;<h3><FONT COLOR="#ffcc66"><b>VAISHNAVI PREMIERE</b></FONT></h3>
                 <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-4">
-                        <input type="checkbox" id="newsPaper" name="newsPaper" value="newsPaper"/>
-                        <label for="newsPaper"> Newspaper</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="hoarding" name="hoarding" value="hoarding"/>
-                        <label for="hoarding"> Hoarding / Outdoor</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="radio" name="radio" value="radio"/>
-                        <label for="radio"> Radio</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="website" name="website" value="website"/>
-                        <label for="website"> Website</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="email" name="email" value="email"/>
-                        <label for="email"> Email</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="sms" name="sms" value="sms"/>
-                        <label for="sms"> SMS</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="ads" name="ads" value="ads"/>
-                        <label for="ads"> Google Ads</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="facebook" name="facebook" value="facebook"/>
-                        <label for="facebook"> Facebook / Instagram</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="linkedIn" name="linkedIn" value="linkedIn"/>
-                        <label for="linkedIn"> LinkedIn</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="wordM" name="wordM" value="wordM"/>
-                        <label for="wordM"> Word of Mouth</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="property" name="property" value="property"/>
-                        <label for="property"> Property Portal</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="insert" name="insert" value="insert"/>
-                        <label for="insert"> Insert/Flyer</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="partner" name="partner" value="partner"/>
-                        <label for="partner"> Channel Partner</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="referral" name="referral" value="referral"/>
-                        <label for="referral"> Referral</label>
-                    </div>
-                    <div class="col-md-4">
-                        
-                    </div><br/>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="other" name="other" value="other"/>
-                        <label for="other"> Other, please specify</label>
-                        <input type="text" id="others" name="others"/>
-                    </div>            
+                    <div class="col-md-12">
+                        <span ng-repeat="value in leadSourceType">
+                            <input type="radio" name="sourceType" ng-model="opportunityDetails.Lead_Source_Type__c" ng-value="value" ng-change="ChangeOfLeadSource(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                    </div>           
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-3">
-                        <label for="soBook"><b>Source Of Booking:</b> </label>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="checkbox" id="direct" name="direct" value="direct"/>
-                        <label for="direct"> Direct</label>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="checkbox" id="cpart" name="cpart" value="cpart"/>
-                        <label for="cpart"> Channel Partner</label>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="checkbox" id="referral" name="referral" value="referral"/>
-                        <label for="referral"> Referral</label>
+                    <div class="col-md-12">
+                        <label><b>Source Of Booking:</b></label>
+                        <span ng-repeat="value in sourceOfBooking">
+                            <input type="radio" name="bookingSource" ng-model="opportunityDetails.Source_Of_Booking__c" ng-value="value" ng-change="ChangeOfBookingSource(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-12">
-                        <label for="soBook"><b>If Channel Partner(CP):</b> </label>
+                        <label><b>If Channel Partner(CP):</b> </label>
                     </div>
                     <div class="col-md-6">
-                        <label for="cpName">CP Name / Company: </label>
+                        <label>CP Name / Company: </label>
                         <input type="text" id="cpName" name="cpName"/>
                     </div>
                     <div class="col-md-6">
-                        <label for="mobile">Mobile No: </label>
-                        <input type="tel" id="mobile" name="mobile"/>
+                        <label>Mobile No: </label>
+                        <input type="tel" id="mobile" name="customermobile"/>
                     </div>
                     <div class="col-md-6">
                         <label for="rera">RERA Regn No: </label>
@@ -1025,55 +1031,46 @@
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-4">
                         <label for="existingCust">Are you an existing customer of Vaishnavi Group? </label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                        <label for="Yes"> Yes</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="No" name="No" value="No"/>
-                        <label for="No"> No</label>
+                        <span ng-repeat="value in gpapickValue">
+                            <input type="radio" name="customergpa" ng-model="opportunityDetails.Existing_Customer_Referral__c" ng-value="value" ng-change="ChangeOfCustomerGPA(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
                     </div>
                     
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-4">
                         <label for="existingCust">Are you referred by a Vaishnavi Group Customer?</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                        <label for="Yes"> Yes</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="No" name="No" value="No"/>
-                        <label for="No"> No</label>
-                    </div>
-                    
+                        <span ng-repeat="value in gpapickValue">
+                            <input type="radio" name="customerVasihRef" ng-model="opportunityDetails.Vaishnavi_Referral__c" ng-value="value" ng-change="ChangeOfVaishnaviRef(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                    </div>                    
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-6 mt-2">
-                        <label for="custName">Customer Name: </label>
-                        <input type="text" id="custName" name="custName"/>
+                        <label>Customer Name: </label>
+                        <input type="text" id="custName" name="custName" ng-model="opportunityDetails.Customer_Name__c"/>
                     </div>
                     <div class="col-md-6 mt-2">
-                        <label for="projName">Project Name: </label>
-                        <input type="text" id="projName" name="projName"/>
+                        <label>Project Name: </label>
+                        <input type="text" id="projName" name="projName" ng-model="opportunityDetails.Project_Name__c"/>
                     </div>       
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-6 mt-2">
                         <label for="unit">Unit / Plot No: </label>
-                        <input type="text" id="unit" name="unit"/>
+                        <input type="text" id="unit" name="unit" ng-model="opportunityDetails.Unit_Plot_No__c"/>
                     </div>
                     <div class="col-md-6 mt-2">
                         <label for="mobNo">Mobile No: </label>
-                        <input type="tel" id="mobNo" name="mobNo"/>
+                        <input type="tel" id="mobNo" name="mobNo" ng-model="opportunityDetails.Customer_Mobile_No__c"/>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-12 mt-2">
                         <label for="email">Email Id: </label>
-                        <input type="text" id="email" name="email"/>
+                        <input type="text" id="email" name="email" ng-model="opportunityDetails.Customer_Email_Id__c"/>
                     </div>
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
@@ -1083,50 +1080,41 @@
                 </div> 
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-4">
-                        <label for="existingCust">Are you an existing employee of Vaishnavi Group?</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                        <label for="Yes"> Yes</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="No" name="No" value="No"/>
-                        <label for="No"> No</label>
-                    </div>
-                    
+                        <label>Are you an existing employee of Vaishnavi Group?</label>
+                        <span ng-repeat="value in gpapickValue">
+                            <input type="radio" name="customergpa" ng-model="opportunityDetails.Existing_Employee_Referral__c" ng-value="value" ng-change="ChangeOfCustomerGPA2(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
+                    </div>                    
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-4">
                         <label for="existingCust">Are you referred by a Vaishnavi Group employee? </label>
+                        <span ng-repeat="value in gpapickValue">
+                            <input type="radio" name="customerVasihRef" ng-model="opportunityDetails.Employee_Vaishnavi_Referral__c" ng-value="value" ng-change="ChangeOfVaishnaviRef2(value)" />
+                            <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>
                     </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="Yes" name="Yes" value="Yes"/>
-                        <label for="Yes"> Yes</label>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="checkbox" id="No" name="No" value="No"/>
-                        <label for="No"> No</label>
-                    </div>
-                    
+                                    
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-6 mt-2">
                         <label for="empName">Employee Name: </label>
-                        <input type="text" id="empName" name="empName"/>
+                        <input type="text" id="empName" name="empName" ng-model="opportunityDetails.Employee_Name__c"/>
                     </div>
                     <div class="col-md-6 mt-2">
                         <label for="empId">Employee ID: </label>
-                        <input type="text" id="empId" name="empId"/>
+                        <input type="text" id="empId" name="empId" ng-model="opportunityDetails.Employee_Id__c"/>
                     </div>       
                 </div>
                 <div class="row box-shadow-2 mx-3 mt-3">
                     <div class="col-md-6 mt-2">
                         <label for="email">Email Id: </label>
-                        <input type="text" id="email" name="email"/>
+                        <input type="text" id="email" name="email" ng-model="opportunityDetails.Employee_Email_Id__c"/>
                     </div>
                     <div class="col-md-6 mt-2">
                         <label for="mobNo">Mobile No: </label>
-                        <input type="tel" id="mobNo" name="mobNo"/>
+                        <input type="tel" id="mobNo" name="mobNo" ng-model="opportunityDetails.Employee_Mobile_No__c"/>
                     </div>
                 </div>
                 
@@ -1156,48 +1144,13 @@
                 <div >
                     <h5 class="ex1"><FONT COLOR="#ffcc66"><b>CHECKLIST FOR BOOKING FORM</b></FONT></h5>
                 </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="form" name="form" value="form"/>
-                        <label for="form"> Completely filled and duly signed Booking Form</label>
+                <span ng-repeat="value in bookingFormCheckList">
+                    <div class="row box-shadow-2 mx-3 mt-3">
+                        <input type="radio" name="bookingFormCheck" ng-model="opportunityDetails.Booking_Form_Checklist__c" ng-value="value" ng-change="ChangeOfBookingChecklist(value)" />
+                        <label>{{value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="payment" name="payment" value="payment"/>
-                        <label for="payment"> Payment schedule / Cost sheet with Customer's Signature</label>
-                    </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="photo" name="photo" value="photo"/>
-                        <label for="photo"> One passport size photograph of each applicant</label>
-                    </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">    
-                    <div class="col-md-12">
-                        <input type="checkbox" id="proof" name="proof" value="proof"/>
-                        <label for="proof"> Address proof: Aadhaar / Passport / Any other Govt. document</label>
-                    </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="dd" name="dd" value="dd"/>
-                        <label for="dd"> DD / Cheque or online bank transfer</label>
-                    </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="pan" name="pan" value="pan"/>
-                        <label for="pan"> Copy of PAN card</label>
-                    </div>
-                </div>
-                <div class="row box-shadow-2 mx-3 mt-3">
-                    <div class="col-md-12">
-                        <input type="checkbox" id="nri" name="nri" value="nri"/>
-                        <label for="nri"> If NRI/PIO: Relevent documents</label>
-                    </div>
-                </div>
+                </span>
+                
                 <br/>
                 <br/>           
                 <div align="center" >
@@ -1206,6 +1159,7 @@
                 </div>
                 
             </apex:form>
+        </body>
         </div>
     </html>
 </apex:page>

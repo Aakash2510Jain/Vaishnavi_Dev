@@ -51,14 +51,14 @@ public without sharing class WhatsappMessangerController {
         String myQuery = null;
         myObject = 'SMS_Template__c';
         if(filter != null && filter != ''){
-            myQuery = 'Select Id, Name, Template_Name__c from '+myObject+' Where Name Like  \'%' + searchTerm + '%\' AND '+filter+' LIMIT  5';
+            myQuery = 'Select Id, Name,Message_Name__c, Template_Name__c from '+myObject+' Where Name Like  \'%' + searchTerm + '%\' AND '+filter+' LIMIT  5';
         }
         else {
             if(searchTerm == null || searchTerm == ''){
-                myQuery = 'Select Id, Name, Template_Name__c from '+myObject+' Where LastViewedDate != NULL ORDER BY LastViewedDate DESC LIMIT  5';
+                myQuery = 'Select Id,Message_Name__c, Name, Template_Name__c from '+myObject+' Where LastViewedDate != NULL ORDER BY LastViewedDate DESC LIMIT  5';
             }
             else {
-                myQuery = 'Select Id, Name, Template_Name__c from '+myObject+' Where Name Like  \'%' + searchTerm + '%\' LIMIT  5';
+                myQuery = 'Select Id, Name,Message_Name__c, Template_Name__c from '+myObject+' Where Name Like  \'%' + searchTerm + '%\' LIMIT  5';
             }
         }
         List<sObject> lookUpList = database.query(myQuery);
@@ -99,11 +99,24 @@ public without sharing class WhatsappMessangerController {
         // }
         try{
             System.debug('textMessage----'+textMessage+'---phoneNumber-----'+phoneNumber+'----recordId----'+recordId);
-            boolean isMessageSentSuccessfully = API_WhatsApp.sendSingleMessage(phoneNumber,textMessage);
+            
+            // replace 
+            list<string> messageList = string.valueOf(textMessage).split(' needlineBreak ');
+            string stringToPass = '';
+            system.debug('messageList---'+messageList.size());
+            for(string msg:messageList){
+                system.debug('msg--'+msg);
+                stringToPass += msg+'\n';
+            }
+            system.debug('stringToPass--'+stringToPass);
+            stringToPass = stringToPass.Substring(0,stringToPass.length()-1);
+            system.debug('stringToPass--'+stringToPass);
+            
+            boolean isMessageSentSuccessfully = API_WhatsApp.sendWhatsappTemplate(phoneNumber,stringToPass);
             if(isMessageSentSuccessfully){
                 string sObjectName = getObjectAPIName(recordId);
                 Messages__c newMessage = New Messages__c();
-                newMessage.Message_Body__c = textMessage;
+                newMessage.Message_Body__c = stringToPass;
                 newMessage.Message_Type__c = 'Sent';
                 if(sObjectName == 'Opportunity__c'){
                     newMessage.Opportunity__c = recordId;
