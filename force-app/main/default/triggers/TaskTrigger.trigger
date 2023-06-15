@@ -11,7 +11,7 @@ trigger TaskTrigger on Task (before insert,before Update, after update,after ins
         if(trigger.isAfter && trigger.isInsert){
         }
         if(trigger.isBefore && trigger.isUpdate){
-            
+            handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
         }
     }
 }

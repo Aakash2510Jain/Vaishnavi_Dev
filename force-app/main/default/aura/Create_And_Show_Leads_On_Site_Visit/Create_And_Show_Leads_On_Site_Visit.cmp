@@ -1,5 +1,4 @@
-<aura:component
-                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction"
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction"
                 access="global" controller="CreateLeadAndShowExistingOnVisiteForm">
     <aura:handler name="init" value="{!this }" action="{!c.doInit }" />
     <aura:attribute name="Searchkey" type="String" />
@@ -8,6 +7,7 @@
     <aura:attribute name="today" type="Date" />
     <aura:attribute name="changeDate" type="Date" />
     <aura:attribute name="visitReclist" type="list" />
+    
     <!--  <aura:attribute name="NewLeadRec" type="Lead__c" default="{}" />-->
     <aura:attribute name="leadRecId" type="String" />
     <aura:attribute name="showRecordDetail" type="boolean" default="false" />
@@ -56,15 +56,58 @@
     <aura:attribute name="walkinSourceList" type="list" />
     <aura:attribute name="leadSourceList" type="list" />
     <aura:attribute name="newSiteVisitRecord" type="Visit__c" />
+    <aura:attribute name="siteVisitRecordToInsert" type="Visit__c" default="{'Budget__c':'',
+                                                                            'Occupation__c':'',
+                                                                            'Age_Group__c':'',
+                                                                            'Ethnicity__c':'',
+                                                                            'Purpose_Of_Buying__c':'',
+                                                                            'Walkin_Source__c':'',
+                                                                            'WalkIn_Type__c':'',
+                                                                            'Inventory_Interested_In__c':'',
+                                                                            'Current_House_Ownership__c':'',
+                                                                            'Marital_Status__c':'',
+                                                                            'Organization__c':''
+                                                                            }"/>
+    <aura:attribute name="Organization" type="string" default=""/>
     
+    <aura:attribute name="companySearchTerm" type="String" default="" />
+    <aura:attribute name="companySearchedList" type="List" default="[]" />
+    <aura:attribute name="companiesList" type="List" default="[]" />
+    <aura:attribute name="selectedCompany" type="Object" />
+
     <!--  /////// Search Bar //////// -->
+    
+    <div class="slds-grid slds-p-around_small" style="background-color: white; width:100%">
+        
+        <div class="slds-col">
+             <div class=""><img class="imgBdr" src="{!$Resource.vaishnavi_logo}" style="width:200px; height:75px;" /> </div>
+
+        </div>
+        <div class="slds-col" style="font-size:25px;">
+            <div class="" style="font-weight: bold; text-align: center;">
+                VAISHNAVI  81 INFRASTRUCTURES LLP <br/>
+                Yelahanka, Bengaluru
+            </div>
+
+        </div>
+        <div class="slds-col">
+             <div class="" style="font-weight: bold; padding-left:50px;">
+                 #2/2,Waltaon RoadOff Vittal Mallya Road<br/>
+                 Bengaluru - 560 001<br/>
+                 +91 80 6696 6696<br/>
+                 www.vaishnavilife.com
+            </div>
+            
+           
+        </div>
+    </div>
     <lightning:card>
         <div class="slds-align_absolute-center slds-m-top_small slds-text-heading_large">
             <span>Site Visit Form</span>
         </div>
         
-        <lightning:layout horizontalAlign="center" verticalAlign="end">
-            <lightning:layoutItem class="slds-p-around_xxx-small" size="4" padding="around-large">
+        <lightning:layout horizontalAlign="center" verticalAlign="end" multipleRows="True">
+            <lightning:layoutItem class="slds-p-around_xxx-large" size="12" padding="around-large">
                 <div class="slds-align_absolute-left">
                     <h3>
                         <lightning:input type="text" value="{!v.Searchkey}" placeholder="Enter Email or Phone"
@@ -72,11 +115,11 @@
                     </h3>
                 </div>
             </lightning:layoutItem>
-            <lightning:layoutItem class="slds-p-around_xxx-small" size="4" padding="around-large">
-                <div class="slds-align_absolute-left">
-                    <lightning:button variant="brand" label="Search" title="Enter Email Or Phone"
+            <lightning:layoutItem class="slds-p-around_xxx-small" size="12" padding="around-large">
+                <div class="slds-align_absolute-center">
+                    <lightning:button variant="brand" label="Search" title="Enter Email Or Phone" 
                                       onclick="{!c.searchLead}"> </lightning:button>
-                    <lightning:button variant="brand" label="Create New Lead" onclick="{!c.CreateLead}">
+                    <lightning:button variant="brand" label="Create New Lead" iconName="utility:add" onclick="{!c.CreateLead}">
                     </lightning:button>
                     <aura:if isTrue="{!v.showVisitButton}">
                         <lightning:button variant="brand" label="Create Visit" onclick="{!c.createvisit}">
@@ -106,7 +149,7 @@
                             </lightning:layoutItem>
                             <lightning:layoutItem class="e" size="6" padding="around-large">
                                 <div class="slds-align_absolute-left">
-                                    <lightning:input type="text" value="{!v.LeadRec.Email__c}" label="Email"
+                                    <lightning:input type="email" value="{!v.LeadRec.Email__c}" label="Email"
                                                      disabled="true" />
                                 </div>
                             </lightning:layoutItem>
@@ -114,7 +157,7 @@
                         <lightning:layout class="abc">
                             <lightning:layoutItem class="e" size="6" padding="around-large">
                                 <div class="slds-align_absolute-left">
-                                    <lightning:input type="text" value="{!v.LeadRec.Phone__c}" label="Phone"
+                                    <lightning:input type="phone" value="{!v.LeadRec.Phone__c}" label="Phone"
                                                      disabled="true" />
                                 </div>
                             </lightning:layoutItem>
@@ -189,7 +232,7 @@ disabled="{!v.bDisabledSubDependentFld}">
                                     <th>Residential Address</th>	
                                     <th>Pincode</th>	
                                     <th>Office Address</th>
-
+                                    
                                     <!-- Add other columns as needed -->
                                 </tr>
                             </thead>
@@ -263,25 +306,28 @@ disabled="{!v.bDisabledSubDependentFld}">
                     </div>
                 </lightning:layoutItem>
             </lightning:layout>
+            
+            <lightning:layout class="abc" >
+                <lightning:layoutItem class="e" size="6" padding="around-large">
+                    <div class="slds-align_absolute-left">
+                        <lightning:input   type="text" value="{!v.objDetail.Phone__c}"  label ="Phone"/></div>
+                </lightning:layoutItem>
+                
+            </lightning:layout>
             <!--div>
-<lightning:layout class="abc" >
-<lightning:layoutItem class="e" size="6" padding="around-large">
-<div class="slds-align_absolute-left">
-<lightning:input   type="text" value="{!v.objDetail.Phone__c}"  label ="Phone"/></div>
-</lightning:layoutItem>
-<lightning:layoutItem class="e" size="6" padding="around-large">
-<div class="slds-align_absolute-left" >
-<lightning:select name="controllerFld"
-value="{!v.objDetail.Lead_Source__c}"
-label="Lead Source"
-onchange="{!c.onControllerFieldChange}">
-<aura:iteration items="{!v.listControllingValues}" var="val">
-<option value="{!val}">{!val}</option>
-</aura:iteration>
-</lightning:select>
-</div>
-</lightning:layoutItem>
-</lightning:layout>
+ <lightning:layoutItem class="e" size="6" padding="around-large">
+                    <div class="slds-align_absolute-left" >
+                        <lightning:select name="controllerFld"
+                                          value="{!v.objDetail.Lead_Source__c}"
+                                          label="Lead Source"
+                                          onchange="{!c.onControllerFieldChange}">
+                            <aura:iteration items="{!v.listControllingValues}" var="val">
+                                <option value="{!val}">{!val}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                </lightning:layoutItem>
+
 <lightning:layout class="abc" >
 <lightning:layoutItem class="e" size="6" padding="around-large">
 <div class="slds-align_absolute-left">
@@ -327,109 +373,122 @@ disabled="{!v.bDisabledSubDependentFld}">
                         <h2 id="modal-heading-01" class="slds-text-heading_medium">Create New Visit</h2>
                     </header>
                     <div class="slds-modal__content slds-p-around_medium">
-                        <div class="slds-grid slds-gutters">
-                            <div class="slds-col">
-                                <span>
-                                    <div></div>
-                                </span>
-                                <span>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="budgetList" label="Budget" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.budgetList}" var="budget" indexVar="key">
-                                                <option text="{!budget}" value="{!budget}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="occupationList" label="Occupation" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.occupationList}" var="occupation" indexVar="key">
-                                                <option text="{!occupation}" value="{!occupation}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="ageGroupList" label="Age Group" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.ageGroupList}" var="ageGroup" indexVar="key">
-                                                <option text="{!ageGroup}" value="{!ageGroup}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="ethnicityList" label="Ethnicity" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.ethnicityList}" var="ethnicity" indexVar="key">
-                                                <option text="{!ethnicity}" value="{!ethnicity}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="buyingPurposeList" label="Buying Purpose" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.buyingPurposeList}" var="buyingPurpose" indexVar="key">
-                                                <option text="{!buyingPurpose}" value="{!buyingPurpose}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="walkinTypeList" label="Walkin Type" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.walkinTypeList}" var="walkin" indexVar="key">
-                                                <option text="{!walkin}" value="{!walkin}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>  <lightning:layoutItem class="e" size="4" padding="around-large">
-                                    <lightning:select aura:id="inventoryList" label="Inventory" >
-                                        <option value="">--None--</option>
-                                        <aura:iteration items="{!v.inventoryList}" var="inventory" indexVar="key">
-                                            <option text="{!inventory}" value="{!inventory}"  />
-                                        </aura:iteration>
-                                    </lightning:select>
-                                    </lightning:layoutItem>
-                                </span>
-                            </div>
-                            <div class="slds-col">
-                                <span>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="ownershipList" label="OwnerShip Type" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.ownershipList}" var="ownership" indexVar="key">
-                                                <option text="{!ownership}" value="{!ownership}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="martialStatusList" label="Marital Status" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.martialStatusList}" var="martialStatus" indexVar="key">
-                                                <option text="{!martialStatus}" value="{!martialStatus}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="walkinSourceList" label="Walkin Source" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.walkinSourceList}" var="walkinSource" indexVar="key">
-                                                <option text="{!walkinSource}" value="{!walkinSource}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                    <lightning:layoutItem class="e" size="4" padding="around-large">
-                                        <lightning:select aura:id="leadSourceList" label="Lead Source" >
-                                            <option value="">--None--</option>
-                                            <aura:iteration items="{!v.leadSourceList}" var="leadSource" indexVar="key">
-                                                <option text="{!leadSource}" value="{!leadSource}"  />
-                                            </aura:iteration>
-                                        </lightning:select>
-                                    </lightning:layoutItem>
-                                </span>
-                            </div>
-                                
-                                 
-                        </div>
-                        
+                        <lightning:layout multipleRows="True">
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Budget : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.budgetList}" var="budget">
+                                    <lightning:input  style="display:inline-block !important; font-size:20px;" type="radio" label="{!budget}" value="{!budget}" name="budget" onchange="{!c.handleBudgetChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Occupation : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.occupationList}" var="occupation">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!occupation}" value="{!occupation}" name="occupation" onchange="{!c.handleOccupationChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Age Group : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.ageGroupList}" var="ageGroup">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!ageGroup}" value="{!ageGroup}" name="ageGroup" onchange="{!c.handleAgeGroupChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Ethnicity : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.ethnicityList}" var="ethnicity">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!ethnicity}" value="{!ethnicity}" name="ethnicity" onchange="{!c.handleEthnicityChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Purpose Of Buying : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.buyingPurposeList}" var="buyingPurpose">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!buyingPurpose}" value="{!buyingPurpose}" name="buyingPurpose" onchange="{!c.handleBuyingPurposeChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Walkin Type  : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.walkinTypeList}" var="walkin">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!walkin}" value="{!walkin}" name="walkin" onchange="{!c.handleWalkInTypeChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Inventory : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.inventoryList}" var="inventory">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!inventory}" value="{!inventory}" name="inventory" onchange="{!c.handleInventoryChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Current House Ownership : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.ownershipList}" var="ownership">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!ownership}" value="{!ownership}" name="ownership" onchange="{!c.handleOwnershipChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Marital Status : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.martialStatusList}" var="martialStatus">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!martialStatus}" value="{!martialStatus}" name="martialStatus" onchange="{!c.handleMartialStatusChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Walkin Source : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <aura:iteration items="{!v.walkinSourceList}" var="walkinSource">
+                                    <lightning:input style="display:inline-block !important" type="radio" label="{!walkinSource}" value="{!walkinSource}" name="walkinSource" onchange="{!c.handleWalkInSourceChange}"/>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem class="e" size="3" padding="around-large">
+                                <b>Organization : </b>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="e" size="9" padding="around-large">
+                                <lightning:input type="text" value="{!v.companySearchTerm}" onchange="{!c.searchCompany}" />
+                                <ul>
+                                    <aura:iteration items="{!v.companySearchedList}" var="result">
+                                        <li>
+                                            <a href="javascript:void(0);" onclick="{!c.selectCompany}" data-id="{!result.Id}">
+                                                {!result.Company_Name__c}
+                                            </a>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                                <aura:if isTrue="{!v.selectedCompany}">
+                                    <lightning:input type="text" value="{!v.selectedCompany.Company_Name__c}" disabled="true" />
+                                    <lightning:buttonIcon iconName="utility:clear" onclick="{!c.clearSelection}" alternativeText="Clear" />
+                                </aura:if>
+                            </lightning:layoutItem>
+                            
+                            
+                            
+                            
+                        </lightning:layout>
                     </div>
                     <footer class="slds-modal__footer">
                         <button class="slds-button slds-button_neutral" onclick="{!c.createVistRec}">Create

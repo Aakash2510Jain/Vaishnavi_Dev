@@ -4,10 +4,18 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         try{
             if(searchkey != null){
                 string phonestring = '%' +searchkey;
-                Lead__c leadRec = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1  ];
-                system.debug('leadRec===>>'+leadRec);
-               
-                return leadRec; 
+                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1  ];
+                system.debug('leadRec===>>'+leadList);
+                if(!leadList.isEmpty()){
+                    Lead_Search_Count__c leadSearchCountRec = new Lead_Search_Count__c();
+                    leadSearchCountRec.Lead__c = leadList[0].Id;
+                    leadSearchCountRec.Searched_Date_Time__c = DateTime.now();
+                    insert leadSearchCountRec;
+                    return leadList[0]; 
+                }else{
+                    return null;
+                }
+                
             }
             
         }catch(Exception e){
@@ -126,13 +134,23 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         
     }
     @AuraEnabled
-    public Static void createVisitUnderCurrentLead(string recid,Visit__c newVisitRec, Date changedate ){
+    public Static void createVisitUnderCurrentLead(string recid,Visit__c newVisitRec,Company__c selectedCompanyRec ){
         try{
-            newVisitRec.Lead__c = recid;
-            newVisitRec.Actual_visit_date__c = changedate;
-            insert newVisitRec;  
+           // newVisitRec.Lead__c = recid;
+            //newVisitRec.Actual_visit_date__c = changedate;
+            //insert newVisitRec;  
             system.debug('newVisitRec===>>>'+newVisitRec);
+            system.debug('recid===>>>'+recid);
+            system.debug('selectedCompanyRec===>>>'+selectedCompanyRec);
+            newVisitRec.Lead__c=recid;
+            newVisitRec.Actual_visit_date__c = system.today();
+            newVisitRec.Organization__c = selectedCompanyRec.Id;
+            insert newVisitRec;
             
+            Lead__c leadRecToUpdateAsClosedWon = new Lead__c();
+            leadRecToUpdateAsClosedWon.Id = recid;
+            leadRecToUpdateAsClosedWon.Lead_Stage__c = ConstantClass.LeadStageConverted;
+            update leadRecToUpdateAsClosedWon;
         }catch(Exception e){
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
@@ -175,8 +193,9 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
                 getPickListValuesIntoList('Visit__c','Inventory_Interested_In__c'),
                 getPickListValuesIntoList('Visit__c','Current_House_Ownership__c'),
                 getPickListValuesIntoList('Visit__c','Marital_Status__c'),
-                getPickListValuesIntoList('Lead__c','Walkin_Source__c'),
-                getPickListValuesIntoList('Lead__c','Lead_Source_Type__c')
+                getPickListValuesIntoList('Visit__c','Walkin_Source__c'),
+                getPickListValuesIntoList('Visit__c','Lead_Source__c'),
+                [Select Id,Company_Name__c From Company__c limit 50000]
             );
             system.debug('budgetList-->'+pickValWrapper.budgetList);
             system.debug('occupationList-->'+pickValWrapper.occupationList);
@@ -212,8 +231,10 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         public list<String> walkinSource;
         @AuraEnabled
         public list<String> leadSource;
+        @AuraEnabled
+        public list<Company__c> companiesList;
         
-        public getAllPicklisValues(list<String> budgetList,list<String> occupationList,list<String> ageGroupList,list<String> ethnicityList,list<String> buyingPurposeList,list<String> walkinTypeList,list<String> inventoryList,list<String> ownershipList,list<String> martialStatusList,list<String> walkinSource,list<String> leadSource){
+        public getAllPicklisValues(list<String> budgetList,list<String> occupationList,list<String> ageGroupList,list<String> ethnicityList,list<String> buyingPurposeList,list<String> walkinTypeList,list<String> inventoryList,list<String> ownershipList,list<String> martialStatusList,list<String> walkinSource,list<String> leadSource,list<Company__c> companiesList){
             this.budgetList = budgetList;
             this.occupationList = occupationList;
             this.ageGroupList = ageGroupList;
@@ -225,6 +246,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
             this.martialStatusList = martialStatusList;
             this.walkinSource = walkinSource;
             this.leadSource = leadSource;
+            this.companiesList = companiesList;
         }
     }
 }

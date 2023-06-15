@@ -25,6 +25,7 @@
                     component.set("v.martialStatusList",data.martialStatusList);
                     component.set("v.walkinSourceList",data.walkinSource);
                     component.set("v.leadSourceList",data.leadSource);
+                    component.set("v.companiesList",data.companiesList);
                 }else{
                     
                 } 
@@ -40,8 +41,8 @@
         var subDependingFieldAPI = component.get("v.subDependingFieldAPI");
         var objDetails = component.get("v.objDetail");
         
-        helper.fetchPicklistValues(component,objDetails,controllingFieldAPI, dependingFieldAPI, "v.depnedentFieldMap");
-        helper.fetchPicklistValues(component,objDetails,dependingFieldAPI, subDependingFieldAPI, "v.subDepnedentFieldMap");
+        //helper.fetchPicklistValues(component,objDetails,controllingFieldAPI, dependingFieldAPI, "v.depnedentFieldMap");
+        //helper.fetchPicklistValues(component,objDetails,dependingFieldAPI, subDependingFieldAPI, "v.subDepnedentFieldMap");
         
         component.set("v.showVisitButton",true); 
         component.set("v.showNewLeadPage",false); 
@@ -102,15 +103,15 @@
     },
     createVistRec : function(component, event, helper){
         debugger;
+        var visitRecord = component.get("v.siteVisitRecordToInsert");
+        
         var action = component.get("c.createVisitUnderCurrentLead");
         var leadid = component.get("v.leadRecId");
-        var visitRec = component.get("v.SiteVistRec");
-        var changdate = component.get("v.today");
-        
+        var companyRecord = component.get("v.selectedCompany");
         action.setParams({
             "recid" : leadid,
-            "changedate"  : changdate,
-            "newVisitRec" : visitRec
+            "newVisitRec" : visitRecord,
+            "selectedCompanyRec" : companyRecord
         });
         action.setCallback(this,function(response){
             var state = response.getState();
@@ -222,5 +223,91 @@
             }
         });
         $A.enqueueAction(action);  
+    },
+    handleBudgetChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Budget__c",selectedValue);
+    },
+    handleOccupationChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Occupation__c",selectedValue);
+    },
+    handleAgeGroupChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Age_Group__c",selectedValue);
+    },   
+    handleEthnicityChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+       component.set("v.siteVisitRecordToInsert.Ethnicity__c",selectedValue);
+    },
+    handleBuyingPurposeChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Purpose_Of_Buying__c",selectedValue);
+    },
+    handleWalkInTypeChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.WalkIn_Type__c	",selectedValue);
+    },
+    handleWalkInSourceChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Walkin_Source__c",selectedValue);
+    },
+    handleInventoryChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Inventory_Interested_In__c",selectedValue);
+    },  
+    handleOwnershipChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Current_House_Ownership__c",selectedValue);
+    },
+    handleMartialStatusChange: function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        component.set("v.siteVisitRecordToInsert.Marital_Status__c",selectedValue);
+    },
+   /* handleInputChange : function(component, event, helper) {
+        debugger;
+        var selectedValue = event.getSource().get("v.value");
+        var organizationValue = component.get("v.organization");
+        component.set("v.siteVisitRecordToInsert.Organization__c",organizationValue);
+    },*/
+    searchCompany: function(component, event, helper) {
+        debugger;
+        var searchTerm = component.get("v.companySearchTerm");
+        var companyList = component.get("v.companiesList");
+        var searchedCompanyList = [];
+        for(var i=0;i<companyList.length;i++){
+            if((companyList[i].Company_Name__c.toLowerCase()).includes(searchTerm.toLowerCase())){
+                searchedCompanyList.push(companyList[i]);
+            }
+        }
+            component.set("v.companySearchedList", searchedCompanyList);
+    },
+    
+    selectCompany: function(component, event, helper) {
+        debugger;
+        var selectedCompanyId = event.target.dataset.id;
+        var searchResults = component.get("v.companiesList");
+        
+        // Find the selected company in the searchResults list
+        var selectedCompany = searchResults.find(function(result) {
+            return result.Id === selectedCompanyId;
+        });
+        
+        // Set the selectedCompany attribute with the selected company object
+        component.set("v.selectedCompany", selectedCompany);
+    },
+    clearSelection: function(component, event, helper) {
+        // Clear the selectedCompany attribute to remove the selected company
+        component.set("v.selectedCompany", null);
     }
 })

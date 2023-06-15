@@ -48,6 +48,22 @@ public class LeadTriggerHandler {
                 if(campaignSourceByCampaignRecMap.containsKey(leadRec.Lead_Source_Type__c))
                     leadRec.Campaign__c = campaignSourceByCampaignRecMap.get(leadRec.Lead_Source_Type__c).Id;
             }
+            leadRec.RecordTypeId = ConstantClass.newEnquiryLeadRT;
+            //handle source and subsource and source type
+            if(leadRec.Lead_Source_Type__c != null ){
+                if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
+                    leadRec.Lead_Sub_Source__c = 'Print';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+                if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
+                    leadRec.Lead_Sub_Source__c = 'Outdoor';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+                if(leadRec.Lead_Source_Type__c == 'Radio' ){
+                    leadRec.Lead_Sub_Source__c = 'Electronic';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+            }
         }
         
         if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
@@ -73,7 +89,7 @@ public class LeadTriggerHandler {
                         if(leadRec.Phone__c != null){
                             system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
-                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
                                     leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
                                     leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                 }else{
@@ -83,7 +99,7 @@ public class LeadTriggerHandler {
                             }else if(leadRec.Email__c != null){
                                 system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) > ConstantClass.TATForReEnquiryLead){
                                         leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
                                         leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                     }else{
@@ -96,7 +112,7 @@ public class LeadTriggerHandler {
                         else if(leadRec.Email__c != null){
                             system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
-                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
                                     leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
                                     leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                 }else{
@@ -106,7 +122,7 @@ public class LeadTriggerHandler {
                             }else if(leadRec.Email__c != null){
                                 system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >90){
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
                                         leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
                                         leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                     }else{
@@ -133,9 +149,10 @@ public class LeadTriggerHandler {
         List<Task> taskListToInsert = new List<Task>();
         
         for(Id leadId : newLeadMap.keyset()){
+            transferToSalesTeamHelper.shareAndTagSalesTeamMember(leadId);
             Task taskRecToInsert = new Task();
             taskRecToInsert.whatId = leadId;
-            taskRecToInsert.Subject = ConstantClass.TaskSubjectForNewLead;
+            taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
             taskListToInsert.add(taskRecToInsert);
         }
         system.debug('taskListToInsert-->'+taskListToInsert);
@@ -147,7 +164,8 @@ public class LeadTriggerHandler {
         List<Task> taskListToInsertforFollowup = new List<Task>();
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
         String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
-        
+        set<Id> leadIds = new Set<Id>();
+                
         for(Lead__c leadRec : newLeadMap.values()){
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
@@ -163,7 +181,7 @@ public class LeadTriggerHandler {
                     leadRec.isConverted__c = true;
                     leadRec.OwnerId = ConstantClass.convertedLeadQueue;
                     convertedLeadRecordsList.add(leadRec);
-                }                
+                }    
             }
             if(leadRec.Next_Followup_Date_Time__c != oldLeadMap.get(leadRec.Id).Next_Followup_Date_Time__c && leadRec.Next_Followup_Date_Time__c != null){
                 if(leadRec.Next_Followup_Date_Time__c < system.now()){
@@ -172,7 +190,7 @@ public class LeadTriggerHandler {
                 else{
                     Task taskRecToInsert = new Task();
                     taskRecToInsert.whatId = leadRec.Id;
-                    taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
+                    taskRecToInsert.Subject = ConstantClass.TaskSubjectForNextFollowUpLead;
                     taskRecToInsert.Follow_Up_Date_Time__c = leadRec.Next_Followup_Date_Time__c;
                     taskRecToInsert.Description = 'Provide the Conversation Comments for the Call(Answered/UnAswered)';
                     taskListToInsertforFollowup.add(taskRecToInsert);
@@ -184,9 +202,9 @@ public class LeadTriggerHandler {
                    leadRec.Lead_Substage__c == 'Junk lead'|| leadRec.Lead_Substage__c == 'Just Enquiry'|| 
                    leadRec.Lead_Substage__c == 'Did not Show up for site visit'|| leadRec.Lead_Substage__c == 'Not Interested in Property' ||
                    leadRec.Lead_Substage__c == 'Budget' || leadRec.Lead_Substage__c == 'Location' || leadRec.Lead_Substage__c == 'Project Timeline' ||
-                   leadRec.Lead_Substage__c == 'Vaastu Compliance'){ 
-                      leadRec.Lead_Stage__c = 'Drop';
-                  }
+                   leadRec.Lead_Substage__c == 'Vaastu Compliance' || leadRec.Lead_Substage__c == 'Unit Availability'){ 
+                       leadRec.Lead_Stage__c = 'Drop';
+                   }
                 if(leadRec.Lead_Substage__c == 'Interested' ){
                     leadRec.Lead_Stage__c = ConstantClass.LeadStageSVProspect;
                 }
@@ -203,15 +221,62 @@ public class LeadTriggerHandler {
                     leadRec.Next_Followup_Date_Time__c.addError('Specify Follow up Date greater then today');
                 }
             }
+            system.debug('leadRec.Lead_Stage__c--->'+leadRec.Lead_Stage__c);
+            system.debug('leadRec.Lead_Stage__c--->'+leadRec.Lead_Stage__c);
             if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
                 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
                     if(leadRec.Site_Visit_Date__c < system.now() ||leadRec.Site_Visit_Date__c == null){
                         leadRec.Site_Visit_Date__c.addError('Specify Site visit Date greater then today');
                     }
                 }
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c))){
+                    leadRec.Sales_Drop_Reason__c.addError('Specify Drop Reason');
+                }
+                /*if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNewEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageReEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNotConnected || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageConnected){
+                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect || leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned || leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
+                        if(leadRec.Budget__c == null ||leadRec.Budget__c < 1){
+                            leadRec.Budget__c.addError('Specify Budget Value!!!');
+                        }
+                        if(leadRec.Project__c == null ){
+                            leadRec.Project__c.addError('Specify Project!!!');
+                        }
+                        if(leadRec.Unit_Details__c == null){
+                            leadRec.Unit_Details__c.addError('Specify Unit Details!!!');
+                        }
+                        if(leadRec.Location__c == null ){
+                            leadRec.Location__c.addError('Specify Location Value!!!');
+                        }
+                        if(leadRec.Project_TimeLine__c == null ){
+                            leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
+                        }
+                    }
+                }*/
             }
-			            
+            if(leadRec.Lead_Source_Type__c != null && leadRec.Lead_Source_Type__c != oldLeadMap.get(leadRec.Id).Lead_Source_Type__c){
+                if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
+                    leadRec.Lead_Sub_Source__c = 'Print';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+                if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
+                    leadRec.Lead_Sub_Source__c = 'Outdoor';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+                if(leadRec.Lead_Source_Type__c == 'Radio' ){
+                    leadRec.Lead_Sub_Source__c = 'Electronic';
+                    leadRec.Lead_Source__c = 'ATL';
+                }
+            }
+            
+            // send notification emails for pre-sales
+          /*  if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
+                leadIds.add(leadRec.Id);
+            }*/
+            
         }
+        /*if(!leadIds.isEMpty()){
+            EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
+        }
+		*/
         if(!convertedLeadRecordsList.isEmpty()){
             LeadConversionClass.convertLead(convertedLeadRecordsList);
         }
@@ -220,24 +285,53 @@ public class LeadTriggerHandler {
         }
     }
     public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
-        Map<Id, Lead__c> leadIdByLeadRecMap = new Map<Id, Lead__c>();
-        List<Visit__c> visitListToInsert = new List<Visit__c>();
+        set<Id> leadIds =  new Set<Id>();
+        set<Id> salesTeamLeadIds =  new Set<Id>();
+        set<String> phoneNos = new Set<String>();
+        
+        for(Lead__c leadRec: newLeadMap.values()){
+            // for pre sales team
+            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
+                leadIds.add(leadRec.Id);
+            }
+            // for sales team
+            if(leadRec.Sales_Team_Member__c	 != oldLeadMap.get(leadRec.Id).Sales_Team_Member__c	 && leadRec.Sales_Team_Member__c != null){
+                salesTeamLeadIds.add(leadRec.Id);
+            }
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageConnected){
+                if(leadRec.phone__c != null)
+                    phoneNos.add(leadRec.phone__c);
+            }
+            
+        }
+        if(!leadIds.isEMpty()){
+            EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
+        }
+        if(!salesTeamLeadIds.isEMpty()){
+            EmailIUtility.notifySalesTeamOnLeadAssignment(salesTeamLeadIds, 'Sales Lead Verified Notification');
+        }
+        if(!phoneNos.isEmpty()){
+            SendWhatsAppNotificationHelper.sendWelcimeMessage(phoneNos);
+        }
+        
+        /* Map<Id, Lead__c> leadIdByLeadRecMap = new Map<Id, Lead__c>();
+List<Visit__c> visitListToInsert = new List<Visit__c>();
 
-        for(Lead__c leadRec : newLeadMap.values()){
-            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
-                leadIdByLeadRecMap.put(leadRec.Id, leadRec);
-            }
-        }
-        if(!leadIdByLeadRecMap.isEmpty()){
-            for(Lead__c leadRec: leadIdByLeadRecMap.values()){
-                Visit__c visitRecToInsert = new Visit__c();
-                visitRecToInsert.Lead__c = leadRec.id;
-                visitRecToInsert.Planned_visit_date__c = leadRec.Site_Visit_Date__c;
-                visitListToInsert.add(visitRecToInsert);
-            }
-            if(!visitListToInsert.isEmpty()){
-                insert visitListToInsert;
-            }
-        }
+for(Lead__c leadRec : newLeadMap.values()){
+if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
+leadIdByLeadRecMap.put(leadRec.Id, leadRec);
+}
+}
+if(!leadIdByLeadRecMap.isEmpty()){
+for(Lead__c leadRec: leadIdByLeadRecMap.values()){
+Visit__c visitRecToInsert = new Visit__c();
+visitRecToInsert.Lead__c = leadRec.id;
+visitRecToInsert.Planned_visit_date__c = leadRec.Site_Visit_Date__c;
+visitListToInsert.add(visitRecToInsert);
+}
+if(!visitListToInsert.isEmpty()){
+insert visitListToInsert;
+}
+}*/
     }
 }

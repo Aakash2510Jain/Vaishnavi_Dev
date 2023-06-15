@@ -1,0 +1,9 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="url" type="String" default="https://vaishnavigroup--dev.sandbox.lightning.force.com/lightning/n/GRE_Site_Visit" description="URL to redirect to" />
+    
+    <lightning:card  title="">
+        <div class="slds-clearfix">
+            <lightning:button label="Site Visit Form" onclick="{!c.redirectToURL}" class="slds-align_absolute-center"/>
+        </div>
+    </lightning:card>
+</aura:component>

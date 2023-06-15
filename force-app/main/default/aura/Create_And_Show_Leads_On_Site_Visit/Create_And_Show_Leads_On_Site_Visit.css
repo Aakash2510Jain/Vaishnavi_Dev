@@ -1,2 +1,17 @@
-.THIS {
+.THIS .slds-radio {  
+    display: inline !important;  
+}
+.THIS.test  .slds-form-element__label{
+    font-size:20pt;
+    font-weight: bold;
+}
+.THIS.test  .slds-form-element__legend{
+    font-size:12pt;
+}
+.THIS div.slds-radio_button-group{
+    border: none;
+}
+
+.THIS label.slds-radio_button__label {
+    border-radius: 0.25rem !important;
 }

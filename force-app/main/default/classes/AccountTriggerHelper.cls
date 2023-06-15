@@ -11,11 +11,15 @@ public class AccountTriggerHelper {
         Map<Id,Account> accountIdbyAccountMap = new Map<Id,Account>();
         List<Opportunity__c> opportunityListToInsert = new List<Opportunity__c>();
         List<Contact> ContactList = new List<Contact>();
+        Map<string, string> leadIdByAccountId = new Map<string, string>();
+        List<Task> existingTaskList = new List<Task>();
+        List<Task> taskToLinkToAccount = new List<Task>();
         
         if(!newAccountMap.isEmpty()){
             for(Account accountRecord : newAccountMap.values()){
                 if(accountRecord.Lead__c != null){
                     accountIdbyAccountMap.put(accountRecord.Id, accountRecord);
+                    leadIdByAccountId.put(accountRecord.Lead__c, accountRecord.Id);
                 }
             }
             if(!accountIdbyAccountMap.isEmpty()){
@@ -38,6 +42,20 @@ public class AccountTriggerHelper {
                 }
                 if(!opportunityListToInsert.isEmpty()){
                     insert opportunityListToInsert;
+                }
+            }
+            if(!leadIdByAccountId.isEmpty()){
+                existingTaskList = [Select Id,whatId From Task where whatId in :leadIdByAccountId.keyset()];
+                if(!existingTaskList.isEmpty()){
+                    for(Task taskRec : existingTaskList){
+                        Task taskRecToUpdate = new Task();
+                        taskRecToUpdate.Id = taskRec.Id;
+                        taskRecToUpdate.WhatId = leadIdByAccountId.get(taskRec.Id);
+                        taskToLinkToAccount.add(taskRecToUpdate);
+                    }
+                    if(!taskToLinkToAccount.isEmpty()){
+                        update taskToLinkToAccount;
+                    }
                 }
             }
         }

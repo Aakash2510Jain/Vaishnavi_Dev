@@ -55,7 +55,7 @@ public without sharing class BookingFormController {
         Opportunity__c opportunityRecord = New Opportunity__c();
         try{
             opportunityRecord = [SELECT Id,Opportunity_Name__c,Drawn_On__c,Booking_Form_Premiere_Submission_Date__c,Cheque_DD_Date__c,Card_Swipe_Transaction_Date__c,Online_Payment_Transaction_Date__c,
-            About_VAISHNAVI_PREMIERE__c,Source_Of_Booking__c,Booking_Form_Checklist__c,Existing_Customer_Referral__c,Vaishnavi_Referral__c,Customer_Name__c,Project_Name__c,Unit_Plot_No__c,
+            About_VAISHNAVI_PREMIERE__c,Source_Of_Booking__c,Booking_Form_Checklist__c,Booking_Form_Checklist_Option__c,Existing_Customer_Referral__c,Vaishnavi_Referral__c,Customer_Name__c,Project_Name__c,Unit_Plot_No__c,
             Customer_Mobile_No__c,Customer_Email_Id__c,Existing_Employee_Referral__c,Employee_Vaishnavi_Referral__c,Employee_Name__c,Employee_Id__c,Employee_Email_Id__c,Employee_Mobile_No__c,
             (SELECT Id,Name__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
             Phone__c,Employee_Email_ID__c,PAN_Number__c,Aadhaar_Number__c,Name_of_the_Organization_Business__c,Office_Phone_No__c,Source_of_Income__c,Organization_Type__c,Industry_Sector__c,

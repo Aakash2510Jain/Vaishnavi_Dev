@@ -11,6 +11,8 @@ trigger LeadTrigger on Lead__c (before insert, after insert, before update,after
         if(trigger.isAfter && trigger.isInsert){
             system.debug('After lead Insert');
             handlerInstance.afteInsert(trigger.newMap, trigger.oldMap);
+            
+            //delete duplicate leads	
             BatchToDeleteDuplicateLeads batchInstance = new BatchToDeleteDuplicateLeads();
             database.executeBatch(batchInstance);
         }
