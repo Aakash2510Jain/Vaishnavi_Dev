@@ -9,6 +9,8 @@ import MOBILE_PHONE from '@salesforce/schema/Contact.MobilePhone';
 import WTemplateModal from 'c/wtemplateModal';
 import sendtextMessage from '@salesforce/apex/WhatsappMessangerController.sendMessageText';
 import templateDetails from '@salesforce/apex/WhatsappMessangerController.getTemplateDetails';
+import wMediaDetails from '@salesforce/apex/WhatsappMessangerController.getWhatsappMediaDetails';
+import sendMedia from '@salesforce/apex/WhatsappMessangerController.sendWhatsappMedia';
 
 
 
@@ -22,9 +24,18 @@ export default class WhatsappMessanger extends LightningElement {
      @api recordId = '';
 
      isModalOpen = false;
+     isImageModalOpen = false;
      templateDetails = {};
      templateMessage;
      templateMessageBackend;
+     imageURL;
+     imageCaption;
+     selMedia = {};
+     typeOfMessage;
+    mediaDetails = new Map();
+
+     @track likeState = false;
+
     @track messages = [
         //  {
         //     id: 1,
@@ -59,6 +70,14 @@ export default class WhatsappMessanger extends LightningElement {
     phoneNo;
     wiredMessagesResult;
     selectedRecPhoneNumber;
+    mediaDetailsList =[];
+
+    handleAttachButtonClick() {
+        debugger;
+        this.likeState = !this.likeState;
+        this.isImageModalOpen = true;
+        this.getPhoneNum();
+    }
 
     get backgroundStyle() {
         return `height:50rem;background-image:url("https://img.freepik.com/premium-photo/3d-rendering-bunch-square-badges-with-whatsapp-logo-green-background_284880-352.jpg")`;
@@ -78,7 +97,20 @@ export default class WhatsappMessanger extends LightningElement {
         }
     }
 
-   
+    @wire(wMediaDetails)
+    getMediaDetails(result){
+            if(result && result.data){
+                debugger;
+                let options = [];
+                this.mediaDetailsList = result.data;
+                for (var key in this.mediaDetailsList) {
+                    // Here key will have index of list of records starting from 0,1,2,....
+                    options.push({ label: this.mediaDetailsList[key].Name, value: this.mediaDetailsList[key].Id});
+                    this.mediaDetails.set(this.mediaDetailsList[key].Id, this.mediaDetailsList[key]); 
+                }
+                this.TypeOptions = options;
+                             }  
+    }
     
     //3. Wire the output of the out of the box method getRecord to the property account
     @wire(getRecord, {
@@ -211,6 +243,12 @@ export default class WhatsappMessanger extends LightningElement {
     handleCloseModal() {
       
     }
+    closeModal(){
+        this.isModalOpen = false;
+    }
+    closeImageModal(){
+        this.isImageModalOpen = false; 
+    }
     // Changes by Vigi
 
     // @wire(getPhoneNumber, { sojectName: '$objectApiName', recordId: '$recordId'})
@@ -239,11 +277,13 @@ export default class WhatsappMessanger extends LightningElement {
            
     }
    
+
     
     enableSendButton(event){
         debugger;
         this.getPhoneNum();
         console.log(event.target.value);
+        this.typeOfMessage = 'text';
         this.textMessage = event.target.value;
         this.disableSend = false;
     }
@@ -254,4 +294,27 @@ export default class WhatsappMessanger extends LightningElement {
         this.isModalOpen = false;
     }
 
+    handleMediaOkay(){
+        debugger;
+        this.typeOfMessage = 'media';
+        sendMedia({ recordId: this.recordId, phoneNo: this.selectedRecPhoneNumber, mediaURL: this.imageURL, messageCaption:this.imageCaption})
+        .then(result => {
+            if(result){
+                debugger;
+                this.isImageModalOpen = false; 
+                refreshApex(this.wiredMessagesResult);
+            }
+                })
+        .catch(error => {
+            this.error = error;
+        });
+        
+    }
+    handleTypeChange(event){
+        debugger;
+        this.selMedia = this.mediaDetails.get(event.target.value);
+        this.imageURL = this.selMedia.Image_URL__c;
+        this.imageCaption = this.selMedia.caption__c;
+
+    }
 }

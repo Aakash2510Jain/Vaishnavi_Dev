@@ -24,6 +24,12 @@ h1 {
     background-color : #1e45aa;
 }
 
+.header-siteVisit {
+    width: 100%;
+    height: 60px;
+    background-color : #12a1d2;
+}
+
 .header-text {
     padding-top: 10px;
     color: white;

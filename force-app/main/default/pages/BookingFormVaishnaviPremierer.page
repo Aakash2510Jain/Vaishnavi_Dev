@@ -58,25 +58,52 @@
             $scope.purposeOfPurchasepickValue = purposeOfPurchasepickValue;
             $scope.leadSourceType = leadSourceType;
             $scope.sourceOfBooking = sourceOfBooking;
-            // $scope.bookingFormCheckList = bookingFormCheckList;
-    
-            $scope.getOpportunityDetails = function(){
+
+            $scope.getFirstApplicantDetails = function(){
                 debugger;
-                
-                BookingFormController.getOpportunityDetails($scope.oppId, function(result,event){
+                BookingFormController.getFirstApplicantDetails($scope.oppId,function(result,event){
                     debugger;
-                    if(event.status && result != null){
-                        debugger;
+                    if(event.status && result){
+                        $scope.applicant1Details = result;
+                        if(result.Date_Of_Birth__c != null){
+                        $scope.applicant1Details.Date_Of_Birth__c = new Date(result.Date_Of_Birth__c);
+                        }
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.getFirstApplicantDetails();
+
+            $scope.getSecondApplicantDetails = function(){
+                debugger;
+                BookingFormController.getSecondApplicantDetails($scope.oppId,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        $scope.applicant2Details = result;
+                        if(result.Date_Of_Birth__c != null){
+                        $scope.applicant2Details.Date_Of_Birth__c = new Date(result.Date_Of_Birth__c);
+                        }
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.getSecondApplicantDetails();
+
+            $scope.getAllOpportunityDetails = function(){
+                debugger;
+                BookingFormController.getAllOpportunityDetails($scope.oppId,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        $scope.opportunityDetails = result;
+
                         if(result.Booking_Form_Premiere_Submission_Date__c != null){
-                            result.Booking_Form_Premiere_Submission_Date__c = new Date(result.Booking_Form_Premiere_Submission_Date__c);
+                            $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c = new Date(result.Booking_Form_Premiere_Submission_Date__c);
                         }else{
                             result.Booking_Form_Premiere_Submission_Date__c = new Date();
                         }
-
                         if(result.Cheque_DD_Date__c != null){
                             result.Cheque_DD_Date__c = new Date(result.Cheque_DD_Date__c);
                         }
-
                         if(result.Card_Swipe_Transaction_Date__c != null){
                             result.Card_Swipe_Transaction_Date__c = new Date(result.Card_Swipe_Transaction_Date__c);
                         }
@@ -84,48 +111,11 @@
                         if(result.Online_Payment_Transaction_Date__c != null){
                             result.Online_Payment_Transaction_Date__c = new Date(result.Online_Payment_Transaction_Date__c);
                         }
-
-                        if(result.Applicants__r != undefined){
-                            if(result.Applicants__r[0] != undefined){
-                                if(result.Applicants__r[0].Date_Of_Birth__c != null){
-                                    result.Applicants__r[0].Date_Of_Birth__c = new Date(result.Applicants__r[0].Date_Of_Birth__c);
-                                }
-                                $scope.applicant1Details = result.Applicants__r[0];
-                            }
-                            if(result.Applicants__r[1] != undefined){
-                                if(result.Applicants__r[1].Date_Of_Birth__c != null){
-                                    result.Applicants__r[1].Date_Of_Birth__c = new Date(result.Applicants__r[1].Date_Of_Birth__c);
-                                }
-                                $scope.applicant2Details = result.Applicants__r[1];
-                            }
-                            delete (result.Applicants__r);
-                            $scope.opportunityDetails = result;
-                        }else{
-                            $scope.applicant1Details = {
-                                "Name__c":"",
-                                "Relation_With__c":"",
-                                "Occupation__c":"",
-                                "Designation__c":""
-                            };
-                            $scope.applicant2Details = {
-                                "Name__c":"",
-                                "Relation_With__c":"",
-                                "Occupation__c":"",
-                                "Designation__c":""
-                            }; 
-                            $scope.opportunityDetails = result;
-                        }
                         $scope.$apply();
-                    }else{
-                        swal({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Error'
-                        }) 
                     }
                 })
             }
-            $scope.getOpportunityDetails();
+            $scope.getAllOpportunityDetails();
 
             $scope.ChangeOfCitizenStatus1 = function(value){
                 debugger;
@@ -264,99 +254,6 @@
                 $scope.opportunityDetails.Booking_Form_Checklist__c = value;
             }
 
-            $scope.submitDet = function(){
-                debugger;
-                
-                var birthyear=0;
-                var birthmonth=0;
-                var birthday=0;
-                if($scope.applicant1Details.Date_Of_Birth__c !=undefined && $scope.applicant1Details.Date_Of_Birth__c!=''){
-                    birthyear = $scope.applicant1Details.Date_Of_Birth__c.getUTCFullYear();
-                    birthmonth = $scope.applicant1Details.Date_Of_Birth__c.getUTCMonth()+1;
-                    birthday = $scope.applicant1Details.Date_Of_Birth__c.getDate();
-                }
-
-                var birthyear2=0;
-                var birthmonth2=0;
-                var birthday2=0;
-                if($scope.applicant2Details.Date_Of_Birth__c !=undefined && $scope.applicant2Details.Date_Of_Birth__c!=''){
-                    birthyear2 = $scope.applicant2Details.Date_Of_Birth__c.getUTCFullYear();
-                    birthmonth2 = $scope.applicant2Details.Date_Of_Birth__c.getUTCMonth()+1;
-                    birthday2 = $scope.applicant2Details.Date_Of_Birth__c.getDate();
-                }
-
-                var todayYear = 0;
-                var todayMonth = 0;
-                var todayDay = 0;
-                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
-                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
-                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
-                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
-                }
-
-                var chequeYear = 0
-                var chequeMonth = 0;
-                var chequeDay = 0;
-                if($scope.opportunityDetails.Cheque_DD_Date__c !=undefined && $scope.opportunityDetails.Cheque_DD_Date__c!=''){
-                    chequeYear = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCFullYear();
-                    chequeMonth = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCMonth()+1;
-                    chequeDay = $scope.opportunityDetails.Cheque_DD_Date__c.getDate();
-                }
-
-                var cardSwipeYear = 0
-                var cardSwipeMonth = 0;
-                var cardSwipeDay = 0;
-                if($scope.opportunityDetails.Card_Swipe_Transaction_Date__c !=undefined && $scope.opportunityDetails.Card_Swipe_Transaction_Date__c!=''){
-                    cardSwipeYear = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCFullYear();
-                    cardSwipeMonth = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCMonth()+1;
-                    cardSwipeDay = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getDate();
-                }
-
-                var onlinePayYear = 0
-                var onlinePayMonth = 0;
-                var onlinePayDay = 0;
-                if($scope.opportunityDetails.Online_Payment_Transaction_Date__c !=undefined && $scope.opportunityDetails.Online_Payment_Transaction_Date__c!=''){
-                    onlinePayYear = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCFullYear();
-                    onlinePayMonth = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCMonth()+1;
-                    onlinePayDay = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getDate();
-                }
-
-
-                $scope.applicantdateListWrapper = [{"year":birthyear,"month":birthmonth,"day":birthday,"firstApp":true},{"year":birthyear2,"month":birthmonth2,"day":birthday2,"firstApp":false}];
-                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"},
-                                             {"dateyear":chequeYear,"datemonth":chequeMonth,"dateday":chequeDay,"dateName":"cheque"},
-                                             {"dateyear":cardSwipeYear,"datemonth":cardSwipeMonth,"dateday":cardSwipeDay,"dateName":"cardSwipe"},
-                                             {"dateyear":onlinePayYear,"datemonth":onlinePayMonth,"dateday":onlinePayDay,"dateName":"onlinePayment"}];
-
-                $scope.allApplicantDetails = [];
-                $scope.applicant1Details.Opportunity__c = $scope.oppId;
-                $scope.applicant1Details.First_Applicant__c = true;
-                $scope.applicant2Details.Opportunity__c = $scope.oppId;
-                $scope.applicant2Details.First_Applicant__c = false;
-                $scope.allApplicantDetails.push($scope.applicant1Details);
-                $scope.allApplicantDetails.push($scope.applicant2Details);
-
-                for(var i=0;i<$scope.allApplicantDetails.length;i++){
-                    delete ($scope.allApplicantDetails[i].Date_Of_Birth__c);
-                }
-                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
-                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
-                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
-                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
-
-                BookingFormController.submitDet($scope.allApplicantDetails,$scope.opportunityDetails,$scope.applicantdateListWrapper,$scope.oppDateListWrapper,function(result,event){
-                    debugger;
-                    if(event.status && result){
-                        swal({
-                            icon: 'success',
-                            title: 'success',
-                            text: 'Applicant Details have been saved successfully..'
-                        }) 
-                        $scope.$apply();
-                    }
-                })
-            }
-
             $scope.showFA1 = function(){
                 debugger;
                 $scope.firstAppDet = true;
@@ -473,6 +370,395 @@
                 $scope.termsCond = false;
                 $scope.checkList = true;
             }
+
+            $scope.firstSave = function(){
+                debugger;
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.applicant1Details.Date_Of_Birth__c !=undefined && $scope.applicant1Details.Date_Of_Birth__c!=''){
+                    birthyear = $scope.applicant1Details.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.applicant1Details.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.applicant1Details.Date_Of_Birth__c.getDate();
+                }
+
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                $scope.applicant1Details.Opportunity__c = $scope.oppId;
+                $scope.applicant1Details.First_Applicant__c = true;
+                delete ($scope.applicant1Details.Date_Of_Birth__c);
+
+                BookingFormController.saveFirstApplicantData($scope.applicant1Details,$scope.oppId,$scope.opportunityDetails,$scope.oppDateListWrapper,birthday,birthmonth,birthyear,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Applicant Details(Sole/First) have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = true;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.secondSave = function(){
+                debugger;
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.applicant1Details.Date_Of_Birth__c !=undefined && $scope.applicant1Details.Date_Of_Birth__c!=''){
+                    birthyear = $scope.applicant1Details.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.applicant1Details.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.applicant1Details.Date_Of_Birth__c.getDate();
+                }
+
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+                delete ($scope.applicant1Details.Date_Of_Birth__c);
+
+                BookingFormController.saveFirstApplicantData($scope.applicant1Details,$scope.oppId,birthday,birthmonth,birthyear,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details of the First Applicant have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = true;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.thirdSave = function(){
+                debugger;
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.applicant2Details.Date_Of_Birth__c !=undefined && $scope.applicant2Details.Date_Of_Birth__c!=''){
+                    birthyear = $scope.applicant2Details.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.applicant2Details.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.applicant2Details.Date_Of_Birth__c.getDate();
+                }
+
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                $scope.applicant2Details.Opportunity__c = $scope.oppId;
+                $scope.applicant2Details.First_Applicant__c = false;
+                delete ($scope.applicant2Details.Date_Of_Birth__c);
+
+                BookingFormController.saveSecondApplicantData($scope.applicant2Details,$scope.oppId,birthday,birthmonth,birthyear,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Co-Applicant Details(Second) have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = true;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.forthSave = function(){
+                debugger;
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.applicant2Details.Date_Of_Birth__c !=undefined && $scope.applicant2Details.Date_Of_Birth__c!=''){
+                    birthyear = $scope.applicant2Details.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.applicant2Details.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.applicant2Details.Date_Of_Birth__c.getDate();
+                }
+
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+                delete ($scope.applicant2Details.Date_Of_Birth__c);
+
+                BookingFormController.saveSecondApplicantData($scope.applicant2Details,$scope.oppId,birthday,birthmonth,birthyear,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details of the Co-Applicant have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = true;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.saveAllOppDetails = function(){
+                debugger;
+                $scope.oppDateListWrapper = [{"dateyear":0,"datemonth":0,"dateday":0,"dateName":""}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.saveAllOppDetails($scope.opportunityDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Apartment Cost Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = true;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.savePaymentDetails = function(){
+                debugger;
+
+                var chequeYear = 0
+                var chequeMonth = 0;
+                var chequeDay = 0;
+                if($scope.opportunityDetails.Cheque_DD_Date__c !=undefined && $scope.opportunityDetails.Cheque_DD_Date__c!=''){
+                    chequeYear = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCFullYear();
+                    chequeMonth = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCMonth()+1;
+                    chequeDay = $scope.opportunityDetails.Cheque_DD_Date__c.getDate();
+                }
+
+                var cardSwipeYear = 0
+                var cardSwipeMonth = 0;
+                var cardSwipeDay = 0;
+                if($scope.opportunityDetails.Card_Swipe_Transaction_Date__c !=undefined && $scope.opportunityDetails.Card_Swipe_Transaction_Date__c!=''){
+                    cardSwipeYear = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCFullYear();
+                    cardSwipeMonth = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCMonth()+1;
+                    cardSwipeDay = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getDate();
+                }
+
+                var onlinePayYear = 0
+                var onlinePayMonth = 0;
+                var onlinePayDay = 0;
+                if($scope.opportunityDetails.Online_Payment_Transaction_Date__c !=undefined && $scope.opportunityDetails.Online_Payment_Transaction_Date__c!=''){
+                    onlinePayYear = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCFullYear();
+                    onlinePayMonth = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCMonth()+1;
+                    onlinePayDay = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":chequeYear,"datemonth":chequeMonth,"dateday":chequeDay,"dateName":"cheque"},
+                                             {"dateyear":cardSwipeYear,"datemonth":cardSwipeMonth,"dateday":cardSwipeDay,"dateName":"cardSwipe"},
+                                             {"dateyear":onlinePayYear,"datemonth":onlinePayMonth,"dateday":onlinePayDay,"dateName":"onlinePayment"}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.saveAllOppDetails($scope.opportunityDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Payment Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = true;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.saveSurveyDetails = function(){
+                debugger;
+                $scope.oppDateListWrapper = [{"dateyear":0,"datemonth":0,"dateday":0,"dateName":""}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.saveAllOppDetails($scope.opportunityDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Survey Form Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = true;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.saveTermsCondsDetails = function(){
+                debugger;
+                $scope.oppDateListWrapper = [{"dateyear":0,"datemonth":0,"dateday":0,"dateName":""}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.saveAllOppDetails($scope.opportunityDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = true;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.finalSubmit = function(){
+                debugger;
+                $scope.oppDateListWrapper = [{"dateyear":0,"datemonth":0,"dateday":0,"dateName":""}];
+                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
+                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
+                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormController.saveAllOppDetails($scope.opportunityDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = true;
+                        $scope.$apply();
+                    }
+                })
+            }
         });
     
         </script>
@@ -587,7 +873,10 @@
                                                     <label class="label">Relation With:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="applicant1Details.Relation_With__c" />
+                                                    <select class="form-control" aria-label="Default select example" ng-model="applicant1Details.Relation_With__c">
+                                                        <option ng-repeat="staff in relationpickValue">{{staff}}</option>
+                                                    </select>
+                                                    <!-- <input type="text" class="form-control" ng-model="applicant1Details.Relation_With__c" /> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -735,7 +1024,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showFA2()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="firstSave()">Save and Next</button>
                                         </div>
                                     </div>
                                 </div>
@@ -929,7 +1218,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSA1()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="secondSave()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showFA1()">Back</button>
                                         </div>
                                     </div>
@@ -1030,7 +1319,10 @@
                                                     <label class="label">Relation With:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="applicant2Details.Relation_With__c" />
+                                                    <select class="form-control" aria-label="Default select example" ng-model="applicant2Details.Relation_With__c">
+                                                        <option ng-repeat="staff in relationpickValue">{{staff}}</option>
+                                                    </select>
+                                                    <!-- <input type="text" class="form-control" ng-model="applicant2Details.Relation_With__c" /> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -1178,7 +1470,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSA2()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="thirdSave()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showFA2()">Back</button>
                                         </div>
                                     </div>
@@ -1350,7 +1642,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showApartment()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="forthSave()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showSA1()">Back</button>
                                         </div>
                                     </div>
@@ -1620,7 +1912,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showPayment()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveAllOppDetails()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showSA2()">Back</button>
                                         </div>
                                     </div>
@@ -1804,7 +2096,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSurvey()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="savePaymentDetails()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showApartment()">Back</button>
                                         </div>
                                     </div> 
@@ -2044,7 +2336,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showTerms()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveSurveyDetails()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showPayment()">Back</button>
                                         </div>
                                     </div>
@@ -2126,7 +2418,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <button type="button" class="button float-end" ng-click="showcheckList()">Next</button>
+                                    <button type="button" class="button float-end" ng-click="saveTermsCondsDetails()">Save and Next</button>
                                     <button type="button" class="cancelbutton float-end me-2" ng-click="showSurvey()">Back</button>
                                 </div>
                             </div>
@@ -2243,7 +2535,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="submitDet()">Submit</button>
+                                            <button type="button" class="button float-end" ng-click="finalSubmit()">Submit</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showTerms()">Back</button>
                                         </div>
                                     </div>

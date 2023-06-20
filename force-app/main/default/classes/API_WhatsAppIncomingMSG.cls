@@ -5,15 +5,47 @@ global class API_WhatsAppIncomingMSG {
         RestRequest req = RestContext.request;
         RestResponse res = RestContext.response;
         String body = req.requestBody.toString();
-        List<String> recipientEmailList = new List<String>();
-        recipientEmailList.add('aakash.jain@utilitarianlab.com');
-        recipientEmailList.add('vignesh.naik@utilitarianlab.com');
+        system.debug('body---->'+body);
+        Map<String, Object> jsonMap = (Map<String, Object>) JSON.deserializeUntyped(body);
         
-        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-        email.setToAddresses( recipientEmailList );
-        email.setSubject('this is the response from whatsapp for incoming message!');
-        email.setPlainTextBody(body);
-        email.setHtmlBody(body);
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });
+        String mobileNumber = (String) jsonMap.get('mobile');
+        
+        //List<List<SObject>> searchResults = [FIND '7042458620' IN ALL FIELDS RETURNING Lead__c(Id, Phone__c, Phone_Alternative__c),Opportunity__C(Id,Name,Phone__c)];
+        
+        List<Lead__c> leadsList = [Select Id,Name,Phone__c from Lead__c where Phone__C Like: mobileNumber];
+        List<Opportunity__C> opportunityList = [Select Id,Name,Phone__c from Opportunity__C where Phone__C Like: mobileNumber];
+        
+        List<Messages__c> messageListToInsert = new List<Messages__c>();
+        
+        if(!leadsList.isEmpty()){
+            for(Lead__c leadRec : leadsList){
+                if( (leadRec.Phone__c).contains(mobileNumber)){
+                    Messages__c messageRecToInsert = new Messages__c();
+                    messageRecToInsert.Message_Body__c = (String) jsonMap.get('text');
+                    messageRecToInsert.Lead__c = leadRec.Id;
+                    messageRecToInsert.Type__c = 'Received';
+                    messageListToInsert.add(messageRecToInsert);
+                }
+            }
+            if(!messageListToInsert.isEmpty()){
+                insert messageListToInsert;
+            }
+        }
+        
+        if(!opportunityList.isEmpty()){
+            for(Opportunity__C oppRec : opportunityList){
+                if( (oppRec.Phone__c).contains(mobileNumber)){
+                    Messages__c messageRecToInsert = new Messages__c();
+                    messageRecToInsert.Message_Body__c = (String) jsonMap.get('text');
+                    messageRecToInsert.Opportunity__c = oppRec.Id;
+                    messageRecToInsert.Type__c = 'Received';
+                    messageListToInsert.add(messageRecToInsert);
+                }
+            }
+            if(!messageListToInsert.isEmpty()){
+                insert messageListToInsert;
+            }
+        }
+        
     }
 }

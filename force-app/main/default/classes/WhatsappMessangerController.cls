@@ -196,6 +196,16 @@ public without sharing class WhatsappMessangerController {
         return null;
     }
 
+    @AuraEnabled (cacheable=true)
+    public static List<Whatsapp_Media_Config__c> getWhatsappMediaDetails(){
+        try {
+            List<Whatsapp_Media_Config__c> mediaDetails = [select name,id,caption__c,Image_URL__c from Whatsapp_Media_Config__c];
+            system.debug('mediaDetails---'+mediaDetails);
+            return mediaDetails;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
     public static string getObjectAPIName(string recordId){
         String keyCode  = recordId.subString(0,3);
         string objectAPIName;
@@ -207,6 +217,28 @@ public without sharing class WhatsappMessangerController {
             }
         }
         return objectAPIName;
+    }
+    @AuraEnabled
+    public static string sendWhatsappMedia(string recordId,string phoneNo, string mediaURL, string messageCaption){
+        system.debug('phoneNo--'+phoneNo+'mediaURL--'+mediaURL+'---messageCaption----'+messageCaption);
+         boolean messageSent = API_WhatsApp.sendMediaMessage( phoneNo, mediaURL, messageCaption);
+         if(messageSent){
+            string sObjectName = getObjectAPIName(recordId);
+            Messages__c newMessage = New Messages__c();
+            newMessage.Message_Body__c = messageCaption +' Image Sent';
+            newMessage.Message_Type__c = 'Sent';
+            if(sObjectName == 'Opportunity__c'){
+                newMessage.Opportunity__c = recordId;
+            } else if(sObjectName == 'Lead__c'){
+                newMessage.Lead__c = recordId;
+            }else if(sObjectName == 'Campaign'){
+                newMessage.Campaign__c = recordId;
+            }
+            system.debug('newMessage---'+newMessage);
+            insert newMessage;
+            return 'messageSent';
+         }
+        return 'messageFail';
     }
 
     public class MessageWrapper {

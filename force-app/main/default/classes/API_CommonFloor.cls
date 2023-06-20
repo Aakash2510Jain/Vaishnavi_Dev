@@ -15,7 +15,7 @@ global class API_CommonFloor {
             leadRecToInsert.Phone__C = (string)requestBodyMap.get('phone');
             leadRecToInsert.Lead_Source__c = 'DIGITAL';
             leadRecToInsert.Lead_Sub_Source__c ='Portals';
-            leadRecToInsert.Lead_Source_Type__c = '	Commonfloor';
+            leadRecToInsert.Lead_Source_Type__c = 'Commonfloor';
             leadRecToInsert.Email__c = (string)requestBodyMap.get('email');
             insert leadRecToInsert;
             

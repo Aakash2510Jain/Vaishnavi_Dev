@@ -49,19 +49,96 @@ public class LeadTriggerHandler {
                     leadRec.Campaign__c = campaignSourceByCampaignRecMap.get(leadRec.Lead_Source_Type__c).Id;
             }
             leadRec.RecordTypeId = ConstantClass.newEnquiryLeadRT;
+            
             //handle source and subsource and source type
-            if(leadRec.Lead_Source_Type__c != null ){
+            if(leadRec.Lead_Source_Type__c != null){
                 if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
                     leadRec.Lead_Sub_Source__c = 'Print';
                     leadRec.Lead_Source__c = 'ATL';
                 }
-                if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
+                else if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
                     leadRec.Lead_Sub_Source__c = 'Outdoor';
                     leadRec.Lead_Source__c = 'ATL';
                 }
-                if(leadRec.Lead_Source_Type__c == 'Radio' ){
+                else if(leadRec.Lead_Source_Type__c == 'Radio' ){
                     leadRec.Lead_Sub_Source__c = 'Electronic';
                     leadRec.Lead_Source__c = 'ATL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Exhibition/ Expo' ){
+                    leadRec.Lead_Sub_Source__c = 'Exhibition/ Expo';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'News Paper Insert' ){
+                    leadRec.Lead_Sub_Source__c = 'News Paper Insert';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Bangalore Club Event' || leadRec.Lead_Source_Type__c == 'Durga Pooja Event' || leadRec.Lead_Source_Type__c == 'Serene Run'){
+                    leadRec.Lead_Sub_Source__c = 'Sponsorship';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Apartment Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Apartment Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Mall Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Mall Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Corporate Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Corporate Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Other Activations' ){
+                    leadRec.Lead_Sub_Source__c = 'Other Activations';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == '99 Acres' || leadRec.Lead_Source_Type__c == 'Commonfloor' || leadRec.Lead_Source_Type__c == 'Housing' || leadRec.Lead_Source_Type__c == 'Magicbricks' || leadRec.Lead_Source_Type__c == 'Roofandfloor' ){
+                    leadRec.Lead_Sub_Source__c = 'Portals';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Facebook/ Instagram' || leadRec.Lead_Source_Type__c == 'LinkedIn' || leadRec.Lead_Source_Type__c == 'Google Search' || leadRec.Lead_Source_Type__c == 'Google Display' || leadRec.Lead_Source_Type__c == 'Google Youtube'  || leadRec.Lead_Source_Type__c == 'Native Ads' ||  leadRec.Lead_Source_Type__c == 'Online PR' || leadRec.Lead_Source_Type__c == 'Propstory' ){
+                    leadRec.Lead_Sub_Source__c = 'Paid Advertising';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Main Website-Inbound Call' || leadRec.Lead_Source_Type__c == 'Main Website-Enquiry Form' || leadRec.Lead_Source_Type__c == 'Main Website-Contact Us' || leadRec.Lead_Source_Type__c == 'Main Website-Chat' || leadRec.Lead_Source_Type__c == 'Microsite'){
+                    leadRec.Lead_Sub_Source__c = 'Website';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Emailer' ){
+                    leadRec.Lead_Sub_Source__c = 'Emailer';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'SMS' ){
+                    leadRec.Lead_Sub_Source__c = 'SMS';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'HDFC Expo' || leadRec.Lead_Source_Type__c == 'ICICI Expo'){
+                    leadRec.Lead_Sub_Source__c = 'Digital Expos';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Site Visit Referral'){
+                    leadRec.Lead_Sub_Source__c = 'Site Visit Referral';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Management Booking' || leadRec.Lead_Source_Type__c == 'Management Referral' ||  leadRec.Lead_Source_Type__c == 'Employee Booking' || leadRec.Lead_Source_Type__c == 'Employee Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Team';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else  if(leadRec.Lead_Source_Type__c == 'Existing Customer' || leadRec.Lead_Source_Type__c == 'Existing Tenant' || leadRec.Lead_Source_Type__c == 'Existing Customer Referral' || leadRec.Lead_Source_Type__c == 'Existing Tenant Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Connect';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Associate Booking' || leadRec.Lead_Source_Type__c == 'Associate Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Associates';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Investors/ Shareholders'){
+                    leadRec.Lead_Sub_Source__c = 'Investors/ Shareholders';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Others'){
+                    leadRec.Lead_Sub_Source__c = 'Others';
+                    leadRec.Lead_Source__c = 'Others';
                 }
             }
         }
@@ -149,7 +226,7 @@ public class LeadTriggerHandler {
         List<Task> taskListToInsert = new List<Task>();
         
         for(Id leadId : newLeadMap.keyset()){
-            transferToSalesTeamHelper.shareAndTagSalesTeamMember(leadId);
+            //transferToSalesTeamHelper.shareAndTagSalesTeamMember(leadId);
             Task taskRecToInsert = new Task();
             taskRecToInsert.whatId = leadId;
             taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
@@ -165,7 +242,7 @@ public class LeadTriggerHandler {
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
         String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
         set<Id> leadIds = new Set<Id>();
-                
+        
         for(Lead__c leadRec : newLeadMap.values()){
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
@@ -232,51 +309,130 @@ public class LeadTriggerHandler {
                 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c))){
                     leadRec.Sales_Drop_Reason__c.addError('Specify Drop Reason');
                 }
-                /*if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNewEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageReEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNotConnected || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageConnected){
-                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect || leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned || leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
-                        if(leadRec.Budget__c == null ||leadRec.Budget__c < 1){
-                            leadRec.Budget__c.addError('Specify Budget Value!!!');
-                        }
-                        if(leadRec.Project__c == null ){
-                            leadRec.Project__c.addError('Specify Project!!!');
-                        }
-                        if(leadRec.Unit_Details__c == null){
-                            leadRec.Unit_Details__c.addError('Specify Unit Details!!!');
-                        }
-                        if(leadRec.Location__c == null ){
-                            leadRec.Location__c.addError('Specify Location Value!!!');
-                        }
-                        if(leadRec.Project_TimeLine__c == null ){
-                            leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
-                        }
-                    }
-                }*/
+                /*
+* if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNewEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageReEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNotConnected || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageConnected){
+if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect || leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned || leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
+if(leadRec.Budget__c == null ||leadRec.Budget__c < 1){
+leadRec.Budget__c.addError('Specify Budget Value!!!');
+}
+if(leadRec.Project__c == null ){
+leadRec.Project__c.addError('Specify Project!!!');
+}
+if(leadRec.Unit_Details__c == null){
+leadRec.Unit_Details__c.addError('Specify Unit Details!!!');
+}
+if(leadRec.Location__c == null ){
+leadRec.Location__c.addError('Specify Location Value!!!');
+}
+if(leadRec.Project_TimeLine__c == null ){
+leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
+}
+}
+}*/
             }
             if(leadRec.Lead_Source_Type__c != null && leadRec.Lead_Source_Type__c != oldLeadMap.get(leadRec.Id).Lead_Source_Type__c){
                 if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
                     leadRec.Lead_Sub_Source__c = 'Print';
                     leadRec.Lead_Source__c = 'ATL';
                 }
-                if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
+                else if(leadRec.Lead_Source_Type__c == 'Hoarding' || leadRec.Lead_Source_Type__c == 'Site Hoarding' || leadRec.Lead_Source_Type__c == 'Bus Wrap & Bus Shelter' || leadRec.Lead_Source_Type__c == 'Mobile Van'){
                     leadRec.Lead_Sub_Source__c = 'Outdoor';
                     leadRec.Lead_Source__c = 'ATL';
                 }
-                if(leadRec.Lead_Source_Type__c == 'Radio' ){
+                else if(leadRec.Lead_Source_Type__c == 'Radio' ){
                     leadRec.Lead_Sub_Source__c = 'Electronic';
                     leadRec.Lead_Source__c = 'ATL';
                 }
+                else if(leadRec.Lead_Source_Type__c == 'Exhibition/ Expo' ){
+                    leadRec.Lead_Sub_Source__c = 'Exhibition/ Expo';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'News Paper Insert' ){
+                    leadRec.Lead_Sub_Source__c = 'News Paper Insert';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Bangalore Club Event' || leadRec.Lead_Source_Type__c == 'Durga Pooja Event' || leadRec.Lead_Source_Type__c == 'Serene Run'){
+                    leadRec.Lead_Sub_Source__c = 'Sponsorship';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Apartment Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Apartment Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Mall Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Mall Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Corporate Activity' ){
+                    leadRec.Lead_Sub_Source__c = 'Corporate Activity';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Other Activations' ){
+                    leadRec.Lead_Sub_Source__c = 'Other Activations';
+                    leadRec.Lead_Source__c = 'BTL';
+                }
+                else if(leadRec.Lead_Source_Type__c == '99 Acres' || leadRec.Lead_Source_Type__c == 'Commonfloor' || leadRec.Lead_Source_Type__c == 'Housing' || leadRec.Lead_Source_Type__c == 'Magicbricks' || leadRec.Lead_Source_Type__c == 'Roofandfloor' ){
+                    leadRec.Lead_Sub_Source__c = 'Portals';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Facebook/ Instagram' || leadRec.Lead_Source_Type__c == 'LinkedIn' || leadRec.Lead_Source_Type__c == 'Google Search' || leadRec.Lead_Source_Type__c == 'Google Display' || leadRec.Lead_Source_Type__c == 'Google Youtube'  || leadRec.Lead_Source_Type__c == 'Native Ads' ||  leadRec.Lead_Source_Type__c == 'Online PR' || leadRec.Lead_Source_Type__c == 'Propstory' ){
+                    leadRec.Lead_Sub_Source__c = 'Paid Advertising';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Main Website-Inbound Call' || leadRec.Lead_Source_Type__c == 'Main Website-Enquiry Form' || leadRec.Lead_Source_Type__c == 'Main Website-Contact Us' || leadRec.Lead_Source_Type__c == 'Main Website-Chat' || leadRec.Lead_Source_Type__c == 'Microsite'){
+                    leadRec.Lead_Sub_Source__c = 'Website';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Emailer' ){
+                    leadRec.Lead_Sub_Source__c = 'Emailer';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'SMS' ){
+                    leadRec.Lead_Sub_Source__c = 'SMS';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'HDFC Expo' || leadRec.Lead_Source_Type__c == 'ICICI Expo'){
+                    leadRec.Lead_Sub_Source__c = 'Digital Expos';
+                    leadRec.Lead_Source__c = 'DIGITAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Site Visit Referral'){
+                    leadRec.Lead_Sub_Source__c = 'Site Visit Referral';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Management Booking' || leadRec.Lead_Source_Type__c == 'Management Referral' ||  leadRec.Lead_Source_Type__c == 'Employee Booking' || leadRec.Lead_Source_Type__c == 'Employee Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Team';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else  if(leadRec.Lead_Source_Type__c == 'Existing Customer' || leadRec.Lead_Source_Type__c == 'Existing Tenant' || leadRec.Lead_Source_Type__c == 'Existing Customer Referral' || leadRec.Lead_Source_Type__c == 'Existing Tenant Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Connect';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Associate Booking' || leadRec.Lead_Source_Type__c == 'Associate Referral'){
+                    leadRec.Lead_Sub_Source__c = 'V-Associates';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Investors/ Shareholders'){
+                    leadRec.Lead_Sub_Source__c = 'Investors/ Shareholders';
+                    leadRec.Lead_Source__c = 'REFERRAL';
+                }
+                else if(leadRec.Lead_Source_Type__c == 'Others'){
+                    leadRec.Lead_Sub_Source__c = 'Others';
+                    leadRec.Lead_Source__c = 'Others';
+                }
+                
+                
             }
             
             // send notification emails for pre-sales
-          /*  if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
-                leadIds.add(leadRec.Id);
-            }*/
+            /*  if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
+leadIds.add(leadRec.Id);
+}*/
             
         }
         /*if(!leadIds.isEMpty()){
-            EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
-        }
-		*/
+EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
+}
+*/
         if(!convertedLeadRecordsList.isEmpty()){
             LeadConversionClass.convertLead(convertedLeadRecordsList);
         }
@@ -333,5 +489,49 @@ if(!visitListToInsert.isEmpty()){
 insert visitListToInsert;
 }
 }*/
+        
+        // updated by Vighnesh: Need to call whatsapp bulk api but currently bulk API is not available 
+        Map<string,string> leadIdWithNewStage = New Map<string,string>();
+        for(Lead__c leadRec: newLeadMap.values()){
+            if(leadRec.Lead_Stage__c != null && leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
+                leadIdWithNewStage.put(leadRec.Id,leadRec.Lead_Stage__c);
+            }
+        }
+        if(!leadIdWithNewStage.isEmpty()){
+            Map<string,string> stageXTemplate = New Map<string,string>();
+            Map<string,string> smsTemplateNameXstage = New Map<string,string>();
+            
+            List<Whatsapp_Template_Trigger_Config__c> wTemplates = [select name,Template_Name__c from Whatsapp_Template_Trigger_Config__c];
+            for(Whatsapp_Template_Trigger_Config__c templates:wTemplates){
+                stageXTemplate.put(templates.name,templates.Template_Name__c);
+                smsTemplateNameXstage.put(templates.Template_Name__c,templates.name);
+            }
+            List<SMS_Template__c> smsTemplates = [select name,Message__c from SMS_Template__c where name IN:smsTemplateNameXstage.KeySet()];
+            for(SMS_Template__c tempName: smsTemplates){
+                string stringTopass = utility.whatsappReplaceLineBreak(tempName.Message__c);
+                stageXTemplate.put(smsTemplateNameXstage.get(tempName.name), stringToPass);
+            }
+            System.debug('stageXTemplate---'+stageXTemplate);
+            List<messages__c> messagesToInsert = New List<Messages__c>();
+            for(string leadId:leadIdWithNewStage.keySet()){
+                // call whatsapp API in future method
+                string templateBody = stageXTemplate.get(newLeadMap.get(leadId).Lead_Stage__c);
+                system.debug(templateBody);
+                if(!string.isBlank(newLeadMap.get(leadId).Phone__c) && !string.isBlank(templateBody)){
+                    API_WhatsApp.sendWhatsappTemplateFuture(newLeadMap.get(leadId).Phone__c,templateBody);
+                    Messages__c newMessage = New Messages__c();
+                    newMessage.Message_Body__c = templateBody;
+                    newMessage.Message_Type__c = 'Sent';
+                    newMessage.Lead__c = leadId;
+                    messagesToInsert.add(newMessage);
+                }
+                
+            }
+            system.debug('messagesToInsert---'+messagesToInsert);
+            if(!messagesToInsert.isEmpty())
+                insert messagesToInsert;
+        }
+        
     }
+    
 }

@@ -8,54 +8,7 @@ public class TaskTriggerHelper {
     }
     
     public void beforeInsert(List<Task> newTaskList){
-        /*
-        set<Id> connectedLeadIds = new Set<Id>();
-        set<Id> calledLeadIds = new Set<Id>();
-        List<Lead__c> existingConnectedLeads = new List<Lead__c>();
-        List<Lead__c> existingCalledLeads = new List<Lead__c>();
-        List<Lead__c> leadToBeUpdatedAsConnected = new List<Lead__c>();
-        List<Lead__c> leadToBeUpdatedAsCalled = new List<Lead__c>();
-        
-        if(!newTaskList.isEmpty()){
-            for(Task taskRec : newTaskList){
-                system.debug('taskRec.Subject--->'+taskRec.Subject);
-                if((taskRec.Subject).containsIgnoreCase(ConstantClass.TaskSubjectForConnectedCall)){
-                    connectedLeadIds.add(taskRec.WhatId);
-                }
-                if((taskRec.Subject).containsIgnoreCase(ConstantClass.TaskSubjectForCalledCall)){
-                    calledLeadIds.add(taskRec.WhatId);
-                }
-            }   
-            system.debug('connectedLeadIds--->'+connectedLeadIds);
-            if(!connectedLeadIds.isEmpty()){
-                existingConnectedLeads = [Select Id,Lead_Stage__c,Total_Calls__c,Total_Connected_Call__c,Total_Connected_Duration__c From Lead__c where (Lead_Stage__c =: ConstantClass.LeadStageNewEnquiry OR Lead_Stage__c =: ConstantClass.LeadStageReEnquiry OR Lead_Stage__c =: ConstantClass.LeadStageNotConnected) and Id In : connectedLeadIds limit 1000];
-                if(!existingConnectedLeads.isEmpty()){
-                    for(Lead__c leadRec : existingConnectedLeads){
-                        Lead__c leadRecToMarkConnected = new Lead__c();
-                        leadRecToMarkConnected.Id = leadRec.Id;
-                        leadRecToMarkConnected.Lead_Stage__c = ConstantClass.LeadStageConnected;
-                        leadToBeUpdatedAsConnected.add(leadRecToMarkConnected);
-                    }
-                    if(!leadToBeUpdatedAsConnected.isEmpty()){
-                        update leadToBeUpdatedAsConnected;
-                    }
-                }
-            }
-            if(!calledLeadIds.isEmpty()){
-                existingCalledLeads = [Select Id,Lead_Stage__c,Total_Calls__c,Total_Connected_Call__c,Total_Connected_Duration__c From Lead__c where (Lead_Stage__c =: ConstantClass.LeadStageNewEnquiry OR Lead_Stage__c =: ConstantClass.LeadStageReEnquiry) and Id In : calledLeadIds limit 1000];
-                if(!existingCalledLeads.isEmpty()){
-                    for(Lead__c leadRec : existingCalledLeads){
-                        Lead__c leadRecToMarkCalled = new Lead__c();
-                        leadRecToMarkCalled.Id = leadRec.Id;
-                        leadRecToMarkCalled.Lead_Stage__c = ConstantClass.LeadStageNotConnected;
-                        leadToBeUpdatedAsCalled.add(leadRecToMarkCalled);
-                    }
-                    if(!leadToBeUpdatedAsCalled.isEmpty()){
-                        update leadToBeUpdatedAsCalled;
-                    }
-                }
-            }
-        }          */  
+      
     }
     public void afterInsert(List<Task> newTaskList){
         
@@ -70,7 +23,7 @@ public class TaskTriggerHelper {
             List<Lead__c> connectedLeadListToUpdate = New List<Lead__c>();
             
             for (task task : newTaskMap.values()){
-                if(task.Agent_Status__c != null && task.Agent_Status__c != oldTaskMap.get(task.id).Agent_Status__c && task.Agent_Status__c == ConstantClass.CallTaskAgentStatusANSWERED && task.Customer_Status__c == ConstantClass.CallTaskCustomerStatusNOT_ANSWERED && task.callStatus__c == ConstantClass.CallTaskCallStatusFAIL){
+                if(task.Agent_Status__c != null && task.Agent_Status__c == ConstantClass.CallTaskAgentStatusANSWERED && task.Customer_Status__c != null && (task.Customer_Status__c == ConstantClass.CallTaskCustomerStatusNOT_ANSWERED || task.Customer_Status__c == ConstantClass.CallTaskCustomerStatusNO_Answer) && task.callStatus__c == ConstantClass.CallTaskCallStatusFAIL){
                     //called
                     if(calledLeadIdByListofTaskMap.containsKey(task.WhatId)){
                         calledLeadIdByListofTaskMap.get(task.WhatId).add(task);
@@ -78,9 +31,10 @@ public class TaskTriggerHelper {
                     }else{
                         calledLeadIdByListofTaskMap.put(task.WhatId, new List<Task>{task});
                     }
+                    task.Status = 'Completed';
                 }
                 if(task.Agent_Status__c != null && task.Customer_Status__c != null && task.Agent_Status__c == ConstantClass.CallTaskAgentStatusANSWERED && task.Customer_Status__c == ConstantClass.CallTaskCustomerStatusANSWERED && task.callStatus__c != null && task.callStatus__c == ConstantClass.CallTaskCallStatusSUCCESS
-                  && task.CallDurationInSeconds != oldTaskMap.get(task.id).CallDurationInSeconds && task.CallDurationInSeconds >0){
+                  && task.CallDurationInSeconds != oldTaskMap.get(task.id).CallDurationInSeconds && task.CallDurationInSeconds > 5){
                     //connected
                     if(connectedLeadIdByListofTaskMap.containsKey(task.WhatId)){
                         connectedLeadIdByListofTaskMap.get(task.WhatId).add(task);
@@ -88,8 +42,8 @@ public class TaskTriggerHelper {
                     }else{
                         connectedLeadIdByListofTaskMap.put(task.WhatId, new List<Task>{task});
                     }           
+                    task.Status = 'Completed';
                 }
-                task.Status = 'Completed';
             }
             
             if(!calledLeadIdByListofTaskMap.isEmpty()){
@@ -123,9 +77,9 @@ public class TaskTriggerHelper {
                             }
                             calledLeadListToUpdate.add(leadToUpdate);
                             //handle drop for 5 consecutive non connects
-                            if(leadRec.Total_Calls__c >= 5 && leadRec.Total_Connected_Call__c ==0 ){
+                            /*if(leadRec.Total_Calls__c >= 5 && leadRec.Total_Connected_Call__c ==0 ){
                                 leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
-                            }
+                            }*/
                         }
                     }
                     if(!calledLeadListToUpdate.isEmpty()){

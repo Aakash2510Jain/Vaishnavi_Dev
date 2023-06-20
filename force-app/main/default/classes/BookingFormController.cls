@@ -120,4 +120,122 @@ public without sharing class BookingFormController {
         public Integer dateday {get;set;}
         public string dateName {get;set;}
     }
+
+    @RemoteAction
+    public static string saveFirstApplicantData(Applicant__c applicantDetails, string oppId, Opportunity__c oppDetails, List<BookingFormController.oppDateWrapperClass> oppDateList, integer birthday, integer birthmonth, integer birthyear){
+        try{
+            if(birthday == 0 && birthmonth==0 && birthyear==0){
+                
+            }else{
+                applicantDetails.Date_Of_Birth__c = Date.newInstance(birthyear, birthmonth, birthday); 
+            }
+            List<Applicant__c> appList = [SELECT Id FROM Applicant__c WHERE First_Applicant__c = true AND Opportunity__c =: oppId];
+            if(appList.size() > 0){
+                update applicantDetails;
+            }else{
+                insert applicantDetails;
+            }
+            for(oppDateWrapperClass oppWrapp : oppDateList){
+                if(oppWrapp.dateName == 'today'){
+                    oppDetails.Booking_Form_Premiere_Submission_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                } 
+            }
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveSecondApplicantData(Applicant__c applicantDetails, string oppId, Opportunity__c oppDetails, List<BookingFormController.oppDateWrapperClass> oppDateList, integer birthday, integer birthmonth, integer birthyear){
+        try{
+            system.debug('applicantDetails ----> '+applicantDetails);
+            if(birthday == 0 && birthmonth==0 && birthyear==0){
+                
+            }else{
+                applicantDetails.Date_Of_Birth__c = Date.newInstance(birthyear, birthmonth, birthday); 
+            }
+            List<Applicant__c> appList = [SELECT Id FROM Applicant__c WHERE First_Applicant__c = false AND Opportunity__c =: oppId];
+            system.debug('appList ---> '+appList);
+            if(appList.size() > 0){
+                update applicantDetails;
+            }else{
+                insert applicantDetails;
+            }
+            for(oppDateWrapperClass oppWrapp : oppDateList){
+                if(oppWrapp.dateName == 'today'){
+                    oppDetails.Booking_Form_Premiere_Submission_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                } 
+            }
+            update oppDetails;
+
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveAllOppDetails(Opportunity__c oppDetails, List<BookingFormController.oppDateWrapperClass> oppDateList){
+        try{
+
+            system.debug('oppDetails ----> '+oppDetails);
+            for(oppDateWrapperClass oppWrapp : oppDateList){
+                if(oppWrapp.dateName == 'today'){
+                    oppDetails.Booking_Form_Premiere_Submission_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                }else if(oppWrapp.dateName == 'cheque'){
+                    oppDetails.Cheque_DD_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                }else if(oppWrapp.dateName == 'cardSwipe'){
+                    oppDetails.Card_Swipe_Transaction_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                }else if(oppWrapp.dateName == 'onlinePayment'){
+                    oppDetails.Online_Payment_Transaction_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                }
+            }
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static Applicant__c getFirstApplicantDetails(string oppId){
+        try{
+            Applicant__c appDetails = [SELECT Id,Name__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
+            Phone__c,Employee_Email_ID__c,PAN_Number__c,Aadhaar_Number__c,Name_of_the_Organization_Business__c,Office_Phone_No__c,Source_of_Income__c,Organization_Type__c,Industry_Sector__c,
+            Work_Role__c,Annual_Income_INR__c,Mode_of_Payment_Source__c,Purpose_of_Purchase__c FROM Applicant__c WHERE Opportunity__c =: oppId AND First_Applicant__c = true];
+            return appDetails;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    @RemoteAction
+    public static Applicant__c getSecondApplicantDetails(string oppId){
+        try{
+            Applicant__c appDetails = [SELECT Id,Name__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
+            Phone__c,Employee_Email_ID__c,PAN_Number__c,Aadhaar_Number__c,Name_of_the_Organization_Business__c,Office_Phone_No__c,Source_of_Income__c,Organization_Type__c,Industry_Sector__c,
+            Work_Role__c,Annual_Income_INR__c,Mode_of_Payment_Source__c,Purpose_of_Purchase__c FROM Applicant__c WHERE Opportunity__c =: oppId AND First_Applicant__c = false];
+            return appDetails;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    @RemoteAction
+    public static Opportunity__c getAllOpportunityDetails(string oppId){
+        try{
+            Opportunity__c oppDetails = [SELECT Id,Opportunity_Name__c,Drawn_On__c,Booking_Form_Premiere_Submission_Date__c,Cheque_DD_Date__c,Card_Swipe_Transaction_Date__c,
+            Online_Payment_Transaction_Date__c,About_VAISHNAVI_PREMIERE__c,Source_Of_Booking__c,Booking_Form_Checklist__c,Booking_Form_Checklist_Option__c,
+            Existing_Customer_Referral__c,Vaishnavi_Referral__c,Customer_Name__c,Project_Name__c,Unit_Plot_No__c,Customer_Mobile_No__c,Customer_Email_Id__c,
+            Existing_Employee_Referral__c,Employee_Vaishnavi_Referral__c,Employee_Name__c,Employee_Id__c,Employee_Email_Id__c,Employee_Mobile_No__c,
+            Lead_Source_Type__c,Apartment_No__c,Floor_No__c,Super_Built_Up_Area__c,Base_Rate__c,Floor_Rise_Rate__c,PLC_Charges__c,Total_Rate__c,
+            Clubhouse_Charges__c,Car_Park_Cost__c,No_of_Car_Parks__c,Sale_Value__c,Booking_Amount__c,Cheque_DD_No__c,Branch__c,Card_Swipe_Transaction_Number__c,
+            Online_Payment_Transaction_Number__c From Opportunity__c WHERE Id =: oppId];
+            return oppDetails;
+        }catch(Exception e){
+            return null;
+        }
+    }
 }

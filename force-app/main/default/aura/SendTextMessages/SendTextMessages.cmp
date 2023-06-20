@@ -1,0 +1,22 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="SendTextMessageController">
+    <aura:attribute name="messageBody" type="String" />
+    <aura:attribute name="recordId" type="String" default="a041m00000dA4R3AAK" />
+    <aura:attribute name="previousMessages" type="List" default="[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="message-container">
+        <ul class="message-list">
+            <aura:iteration items="{!v.previousMessages}" var="message">
+                <li class="">
+                    <span class="message-body"><div class="{!message.Message_Type__c}">{!message.Message_Body__c}</div></span>
+                </li>
+            </aura:iteration>
+        </ul>
+    </div>
+    
+    <div class="input-container">
+        <ui:inputTextArea  placeholder="Type your message here..."  value="{!v.messageBody}" rows="5"/>
+        <button onclick="{!c.sendTextMessage}">Send</button>
+    </div>
+   
+</aura:component>

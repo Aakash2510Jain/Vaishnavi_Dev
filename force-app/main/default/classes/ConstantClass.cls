@@ -28,6 +28,7 @@ public without sharing class ConstantClass {
     public Static Final String CallTaskCustomerStatusANSWERED = 'answered';
     public Static Final String CallTaskCallStatusSUCCESS = 'Success';
     public Static Final String CallTaskCustomerStatusNOT_ANSWERED = 'not_answered';
+    public Static Final String CallTaskCustomerStatusNO_Answer = 'NoAnswer';
     public Static Final String CallTaskCallStatusFAIL = 'Fail';
 
 

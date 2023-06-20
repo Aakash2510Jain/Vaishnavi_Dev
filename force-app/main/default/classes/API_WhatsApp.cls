@@ -5,6 +5,8 @@ public without sharing class API_WhatsApp {
     private static String whatsapp_password         = 'BTmHHaeBc';
     final static string success_response            = 'success';
     final static string error_response              = 'failure';
+    final static string wEndpointUrl = 'https://media.smsgupshup.com/GatewayAPI/rest';
+
 
     // To mark a user as Opt-in
     Public static String whatsappOptIn(string phoneNoToOpt){
@@ -208,4 +210,97 @@ public without sharing class API_WhatsApp {
         
     }
 
+    //whatsapp send media 
+    public static boolean sendMediaMessage(string phoneNo, string mediaURL, string messageCaption){
+
+        Map<String, String> requestParams = new Map<String, String>();
+        requestParams.put('userid', whatsapp_userid);
+        requestParams.put('password', whatsapp_password);
+        requestParams.put('method', 'SendMediaMessage');
+        requestParams.put('auth_scheme', 'plain');
+        requestParams.put('v', '1.1');
+        requestParams.put('send_to', phoneNo);
+        requestParams.put('msg_type', 'IMAGE');    
+        requestParams.put('media_url', mediaURL);
+        requestParams.put('isHSM', 'false');
+        requestParams.put('caption', messageCaption);
+
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setMethod('GET');
+        String queryString = '';
+     //  queryString = 'https://media.smsgupshup.com/GatewayAPI/rest?method%3DSendMediaMessage%26format%3Djson%26userid%3Dwhatsapp_userid%26password%3Dwhatsapp_password%26send_to%3D919663709640%26v%3D1.1%26auth_scheme%3Dplain%26msg_type%3DIMAGE%26isHSM%3Dfalse%26media_url%3Dhttps%3A%2F%2Fimage.shutterstock.com%2Fimage-illustration%2Fmovie-ticket-icon-260nw-663331288.jpg%26caption%3Dtest';
+        for (String param : requestParams.keySet()) {
+            String value = EncodingUtil.urlEncode(requestParams.get(param), 'UTF-8');
+            queryString += '&' + param + '=' + value;
+        }
+        if (queryString != null && !String.isBlank(queryString)) {
+            queryString = queryString.substring(1);
+            System.debug('queryString----'+queryString);
+            System.debug('-----'+wEndpointUrl + '?' + queryString);
+            httpRequest.setEndpoint(wEndpointUrl + '?' + queryString);
+        }   
+       // httpRequest.setEndpoint(queryString) ;
+        httpRequest.setHeader('Content-Type', 'application/x-www-form-urlencoded');    
+        Http http = new Http();
+        HttpResponse httpResponse = http.send(httpRequest);        
+        System.debug('httpResponse.getStatusCode()-----'+httpResponse.getStatusCode());
+        System.debug('httpResponse.getBody()-----'+httpResponse.getBody());
+        String responseBody = httpResponse.getBody();
+        if (httpResponse.getStatusCode() == 200) {
+            System.debug('responseBody----'+responseBody);
+			return true;
+        } else {
+            System.debug('HTTP request failed with status code: ' + httpResponse.getStatusCode());
+            return false;
+        }
+    }
+
+    public static boolean sendBulkMessage(){
+      //  string filePath = 'https://vaishnavigroup--dev.sandbox.my.salesforce.com/sfc/p/1m0000008pgz/a/1m0000008jmb/lJLv4.7QAxM0.80X3LSq_s3nLVzyRDxwY1g10coNgrA';
+        string filePath = 'C:/Users/LENOVO/Downloads/whatsappAPI.csv';
+        Map<String, String> requestParams = new Map<String, String>();
+        requestParams.put('userid', whatsapp_userid);
+        requestParams.put('password', whatsapp_password);
+        requestParams.put('method', 'XLSUPLOAD');
+        requestParams.put('auth_scheme', 'plain');
+        requestParams.put('v', '1.1');
+        requestParams.put('msg', 'Hello World');
+        requestParams.put('Filename', filePath);    
+ 
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setMethod('GET');
+        String queryString = '';
+
+        for (String param : requestParams.keySet()) {
+            String value = EncodingUtil.urlEncode(requestParams.get(param), 'UTF-8');
+            queryString += '&' + param + '=' + value;
+        }
+        if (queryString != null && !String.isBlank(queryString)) {
+            queryString = queryString.substring(1);
+            System.debug('queryString----'+queryString);
+            System.debug('-----'+wEndpointUrl + '?' + queryString);
+            httpRequest.setEndpoint(wEndpointUrl + '?' + queryString);
+        }   
+       // httpRequest.setEndpoint(queryString) ;
+        httpRequest.setHeader('Content-Type', 'application/x-www-form-urlencoded');    
+        Http http = new Http();
+        HttpResponse httpResponse = http.send(httpRequest);        
+        System.debug('httpResponse.getStatusCode()-----'+httpResponse.getStatusCode());
+        System.debug('httpResponse.getBody()-----'+httpResponse.getBody());
+        String responseBody = httpResponse.getBody();
+        if (httpResponse.getStatusCode() == 200) {
+            System.debug('responseBody----'+responseBody);
+			return true;
+        } else {
+            System.debug('HTTP request failed with status code: ' + httpResponse.getStatusCode());
+            return false;
+        }
+    }
+
+    @future(callout=true)
+    public static void sendWhatsappTemplateFuture(string phoneNo, string template){
+        boolean status = sendWhatsappTemplate(phoneNo,template);
+    }
 }
