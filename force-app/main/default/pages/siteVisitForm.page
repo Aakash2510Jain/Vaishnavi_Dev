@@ -64,16 +64,17 @@
                     siteVisitFormController.searchLead($scope.searchValue,function(result,event){
                         debugger;
                         if(event.status && result){
-                            if(result.isConverted__c == false){
+                            if(result.leadRec != null){
                                 console.log('success....');
-                                $scope.leadDetails = result;
-                                $scope.leadId = result.Id;
+                                $scope.leadDetails = result.leadRec;
+                                $scope.leadId = result.leadRec.Id;
                                 $scope.showLeadDetails = true;
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
                             }else{
                                 console.log('success....');
-                                $scope.leadId = result.Id;
+                                $scope.oppDetails = result.oppRec;
+                                //$scope.leadId = result.Id;
                                 $scope.showLeadDetails = false;
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
@@ -85,7 +86,6 @@
                             $scope.showLeadDetails = false;
                             $scope.showCreateLead = false;
                         }
-                        $scope.getVisitRecord();
                     })
                 }
 
@@ -109,33 +109,6 @@
                                 text: 'Lead has been created successfully..'
                             })
                             $scope.showVisitAfterCreatn = true;
-                       }
-                    })
-                }
-
-                $scope.getVisitRecord = function(){
-                    debugger;
-                    siteVisitFormController.getVisitRecord($scope.leadId,function(result,event){
-                       debugger;
-                       if(event.status && result){
-                            debugger;
-                            $scope.visit = result;
-                            $scope.visit.Name__c = result.Lead__r.Name__c;
-                            $scope.visit.Mobile_No__c = result.Lead__r.Phone__c;
-                            $scope.visit.Email__c = result.Lead__r.Email__c;
-                        if(result.Actual_visit_date__c != null){
-                            $scope.visit.Actual_visit_date__c = new Date(result.Actual_visit_date__c);
-                        }else{
-                            $scope.visit.Actual_visit_date__c = new Date();
-                        }
-                        if(result.Date_Of_Birth__c != null){
-                            $scope.visit.Date_Of_Birth__c = new Date(result.Date_Of_Birth__c);
-                        }
-                        if(result.GRE_Date_of_Birth__c != null){
-                            $scope.visit.GRE_Date_of_Birth__c = new Date(result.GRE_Date_of_Birth__c);
-                        }
-                       }else{
-                        $scope.visit=({"Name__c":"","Mobile_No__c":"","Email__c":""});
                        }
                     })
                 }
@@ -467,6 +440,24 @@
 
                         <div class="row mt-5" ng-show="showConvertedLead">
                             <h3 style="color: red; text-align:center;">Already visited site... Please check Visit Records !!</h3>
+                            <h4 style="text-align:center;">Below is the details.</h4>
+                            <div class="col-md-6">
+                                <label class="label pe-3 text-nowrap">Name</label>
+                                <input type="text" class="form-control" ng-model="oppDetails.Opportunity_Name__c" ng-disabled="true" /> 
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label pe-3 text-nowrap">Email</label>
+                                <input type="text" class="form-control" ng-model="oppDetails.Email__c" ng-disabled="true" /> 
+                            </div>
+                            <!-- <div class="row mt-3">
+                                Visit Records
+                            </div>
+                            <table class="mt-3">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Booking Amount</th>
+                                </tr>
+                            </table> -->
                         </div>
 
                         <div ng-show="showCreateLead">

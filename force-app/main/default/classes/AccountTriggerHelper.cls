@@ -17,8 +17,8 @@ public class AccountTriggerHelper {
         
         if(!newAccountMap.isEmpty()){
             for(Account accountRecord : newAccountMap.values()){
+                accountIdbyAccountMap.put(accountRecord.Id, accountRecord);
                 if(accountRecord.Lead__c != null){
-                    accountIdbyAccountMap.put(accountRecord.Id, accountRecord);
                     leadIdByAccountId.put(accountRecord.Lead__c, accountRecord.Id);
                 }
             }
@@ -31,6 +31,7 @@ public class AccountTriggerHelper {
                     
                     Opportunity__c opportunityRec = new Opportunity__c();
                     opportunityRec.AccountId__c = accountId;
+                    opportunityRec.Lead__c = accountIdbyAccountMap.get(accountId).Lead__c;
                     opportunityRec.Opportunity_Name__c = accountIdbyAccountMap.get(accountId).Name;
                     opportunityRec.Lead_Source__c = accountIdbyAccountMap.get(accountId).AccountSource;
                     opportunityRec.Lead_Sub_Source__c = accountIdbyAccountMap.get(accountId).Sub_Source__c;

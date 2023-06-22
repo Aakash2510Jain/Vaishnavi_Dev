@@ -1,0 +1,2 @@
+<apex:page standardController="Lead__c" recordSetVar="acc" extensions="SendBulkMessageController" action="{!redirectToLC}">
+</apex:page>

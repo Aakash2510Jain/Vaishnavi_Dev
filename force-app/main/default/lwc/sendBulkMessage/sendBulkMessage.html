@@ -1,0 +1,15 @@
+<template>
+    <div class="slds-p-around_medium">
+        <lightning-combobox
+    name="templatePicklist"
+    label="Select Template"
+    value={selectedTempId}
+    options={templateRecords}
+    onchange={handleTempChange}
+    required>
+  </lightning-combobox>
+  <div class="slds-p-around_medium">
+    <lightning-button variant="brand" label="Send Message" title="Primary action" onclick={sendWhatsappMessage} class="slds-m-left_x-small"></lightning-button>
+  </div>
+    </div>
+</template>

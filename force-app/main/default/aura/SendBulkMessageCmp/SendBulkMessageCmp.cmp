@@ -1,0 +1,6 @@
+<aura:component implements="lightning:isUrlAddressable" controller="SendBulkMessageController">
+    <aura:attribute name="leadIds" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <aura:attribute name="leadList" type="Lead__c[]"/>
+<c:sendBulkMessage aura-id="childAuraId"  ></c:sendBulkMessage>  
+ </aura:component>
