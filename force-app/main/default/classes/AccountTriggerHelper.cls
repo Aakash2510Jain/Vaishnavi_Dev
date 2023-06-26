@@ -36,6 +36,8 @@ public class AccountTriggerHelper {
                     opportunityRec.Lead_Source__c = accountIdbyAccountMap.get(accountId).AccountSource;
                     opportunityRec.Lead_Sub_Source__c = accountIdbyAccountMap.get(accountId).Sub_Source__c;
                     opportunityRec.Lead_Source_Type__c = accountIdbyAccountMap.get(accountId).Source_Type__c;
+                    opportunityRec.Email__c = accountIdbyAccountMap.get(accountId).Email__c;
+                    opportunityRec.Phone__c = accountIdbyAccountMap.get(accountId).Phone;
                     opportunityListToInsert.add(opportunityRec);
                 }
                 if(!ContactList.isEmpty()){

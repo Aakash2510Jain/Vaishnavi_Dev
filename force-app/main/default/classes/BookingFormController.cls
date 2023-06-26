@@ -238,4 +238,120 @@ public without sharing class BookingFormController {
             return null;
         }
     }
+
+
+
+
+
+
+    /* UPDATED CODE */
+
+    @RemoteAction
+    public static string saveAppDetails(Applicant__c appDetails, Opportunity__c oppDetails, Integer year, Integer month, Integer day){
+        try{
+            if(day == 0 && month==0 && year==0){
+                
+            }else{
+                appDetails.Date_Of_Birth__c = Date.newInstance(year, month, day); 
+            }
+            insert appDetails;
+            update oppDetails;
+            return appDetails.Id;
+
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveAppDetails2(Applicant__c appDetails){
+        try{
+            update appDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveSecondAppDetails(Applicant__c appDetails, Integer year, Integer month, Integer day){
+        try{
+            if(day == 0 && month==0 && year==0){
+                
+            }else{
+                appDetails.Date_Of_Birth__c = Date.newInstance(year, month, day); 
+            }
+            insert appDetails;
+            return appDetails.Id;
+
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveApartmentCostDetails(Opportunity__c oppDetails){
+        try{
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string savePaymentDetails(Opportunity__c oppDetails, List<BookingFormController.oppDateWrapperClass> oppDateList){
+        try{
+            for(oppDateWrapperClass oppWrapp : oppDateList){
+                if(oppWrapp.dateName == 'cheque'){
+                    if(oppWrapp.dateyear == 0 && oppWrapp.datemonth==0 && oppWrapp.dateday==0){
+
+                    }else{
+                        oppDetails.Cheque_DD_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                    }
+                }else if(oppWrapp.dateName == 'cardSwipe'){
+                    if(oppWrapp.dateyear == 0 && oppWrapp.datemonth==0 && oppWrapp.dateday==0){
+
+                    }else{
+                        oppDetails.Card_Swipe_Transaction_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                    }
+                }else if(oppWrapp.dateName == 'onlinePayment'){
+                    if(oppWrapp.dateyear == 0 && oppWrapp.datemonth==0 && oppWrapp.dateday==0){
+
+                    }else{
+                        oppDetails.Online_Payment_Transaction_Date__c = Date.newInstance(oppWrapp.dateyear, oppWrapp.datemonth, oppWrapp.dateday);
+                    }
+                }
+            }
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string saveSurveyDetails(Opportunity__c oppDetails){
+        try{
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
+
+    @RemoteAction
+    public static string finalOpportunitySubmit(Opportunity__c oppDetails, Integer year, Integer month, Integer day){
+        try{
+            if(day == 0 && month==0 && year==0){
+                
+            }else{
+                oppDetails.Booking_Form_Premiere_Submission_Date__c = Date.newInstance(year, month, day); 
+            }
+            update oppDetails;
+            return 'SUCCESS';
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
 }

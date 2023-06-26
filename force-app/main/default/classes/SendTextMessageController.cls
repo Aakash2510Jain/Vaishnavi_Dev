@@ -5,7 +5,7 @@ public class SendTextMessageController {
         
         wrapper wrapperInstance = new wrapper([Select Id, Message_Body__c,Message_Type__c From Messages__c Where Lead__c =: leadId And Type__c = 'Text SMS' order by CreatedDate ASC limit 10000],
                                              [Select Id,Message_Name__c,Message_for_FrontEnd__c,Message__c from SMS_Template__c where Type__c = 'SMS']);
-        return wrapperInstance;
+        return wrapperInstance; 
     }
     @AuraEnabled
     public static void sendSMS(String leadId, String messageBody, string smsTempId) {

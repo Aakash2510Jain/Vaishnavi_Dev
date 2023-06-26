@@ -74,11 +74,22 @@
                             }else{
                                 console.log('success....');
                                 $scope.oppDetails = result.oppRec;
+                                $scope.oppId = result.oppRec.Id;
+                                $scope.siteVisitList = result.visitList;
+                                if($scope.siteVisitList.length > 0){
+                                    for(var i=0; i<$scope.siteVisitList.length;i++){
+                                        debugger;
+                                        if($scope.siteVisitList[i].Actual_visit_date__c != null){
+                                            $scope.siteVisitList[i].Actual_visit_date__c = new Date($scope.siteVisitList[i].Actual_visit_date__c);
+                                        }
+                                    }
+                                }
                                 //$scope.leadId = result.Id;
                                 $scope.showLeadDetails = false;
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
                                 $scope.showConvertedLead = true;
+                                $scope.$apply();
                             }
                             
                         }else{
@@ -86,6 +97,7 @@
                             $scope.showLeadDetails = false;
                             $scope.showCreateLead = false;
                         }
+						$scope.$apply();
                     })
                 }
 
@@ -109,6 +121,7 @@
                                 text: 'Lead has been created successfully..'
                             })
                             $scope.showVisitAfterCreatn = true;
+                            $scope.$apply();
                        }
                     })
                 }
@@ -120,59 +133,98 @@
                     $scope.showLeadDetails = false;
                     $scope.showCreateLead = false;
                     $scope.showVisitAfterCreatn = false;
+                    $scope.showConvertedLead = false;
                 }
 
-                $scope.changeOfAgeGroup = function(){
+                $scope.changeOfAgeGroup = function(value){
                     debugger;
                     $scope.visit.Age_Group__c = value;
                 }
 
-                $scope.ChangeOfEmpType = function(){
+                $scope.ChangeOfEmpType = function(value){
                     debugger;
                     $scope.visit.Employment_Type__c = value;
                 }
 
                 $scope.saveCustomerDet = function(){
                     debugger;
-                    //$scope.visit.Lead__c = $scope.leadId;
 
+                    $scope.firstVisitRecord = {"Form_No__c":$scope.visit.Form_No__c,"Name__c":$scope.visit.Name__c,
+                    "Mobile_No__c":$scope.visit.Mobile_No__c,"Email__c":$scope.visit.Email__c,"Date_Of_Birth__c":$scope.visit.Date_Of_Birth__c,"Age_Group__c":$scope.visit.Age_Group__c,
+                    "Residential_Address__c":$scope.visit.Residential_Address__c,"City__c":$scope.visit.City__c,"Locality__c":$scope.visit.Locality__c,
+                    "Pincode__c":$scope.visit.Pincode__c,"Employment_Type__c":$scope.visit.Employment_Type__c,"Company_Name__c":$scope.visit.Company_Name__c,
+                    "Industry__c":$scope.visit.Industry__c,"Office_Address__c":$scope.visit.Office_Address__c,"Office_PinCode__c":$scope.visit.Office_PinCode__c};
                     var year = 0
                     var month = 0;
                     var day = 0;
-                    if($scope.visit.Date_Of_Birth__c !=undefined && $scope.visit.Date_Of_Birth__c!=''){
-                        year = $scope.visit.Date_Of_Birth__c.getUTCFullYear();
-                        month = $scope.visit.Date_Of_Birth__c.getUTCMonth()+1;
-                        day = $scope.visit.Date_Of_Birth__c.getDate();
+                    if($scope.firstVisitRecord.Date_Of_Birth__c !=undefined && $scope.firstVisitRecord.Date_Of_Birth__c!=''){
+                        year = $scope.firstVisitRecord.Date_Of_Birth__c.getUTCFullYear();
+                        month = $scope.firstVisitRecord.Date_Of_Birth__c.getUTCMonth()+1;
+                        day = $scope.firstVisitRecord.Date_Of_Birth__c.getDate();
                     }
-                    delete($scope.visit.Date_Of_Birth__c);
-                    delete($scope.visit.Actual_visit_date__c);
-                    siteVisitFormController.insertVisitRecord(JSON.stringify($scope.visit),$scope.leadId,year,month,day,function(result,event){
-                    debugger;
-                    if(event.status && result){
+                    delete($scope.firstVisitRecord.Date_Of_Birth__c);
+
+                    if($scope.oppId != null){
+                        $scope.firstVisitRecord.Opportunities__c = $scope.oppId;
+                    }else{
+                        $scope.firstVisitRecord.Lead__c = $scope.leadId;
+                    }
+                    if($scope.leadId != undefined){
+                        siteVisitFormController.insertVisitRecord($scope.firstVisitRecord,$scope.leadId,year,month,day,function(result,event){
                         debugger;
-                        $scope.visitId = result;
-                        swal({
-                            icon: 'success',
-                            title: 'success',
-                            text: 'Customer Details have been saved successfully..'
-                        })
-                        $scope.showCustReq = true;
-                        $scope.showVisitSection = false;
-                        $scope.visitDet = false;
-                        $scope.showGRE = false;
-                        $scope.showSalesManager = false;
-                        $scope.$apply();
-                    }
-                })
+                        if(event.status && result){
+                            debugger;
+                            $scope.visitId = result;
+                            swal({
+                                icon: 'success',
+                                title: 'success',
+                                text: 'Customer Details have been saved successfully..'
+                            })
+                            $scope.showCustReq = true;
+                            $scope.showVisitSection = false;
+                            $scope.visitDet = false;
+                            $scope.showGRE = false;
+                            $scope.showSalesManager = false;
+                            $scope.$apply();
+                        }
+                    })
+                }else{
+                    siteVisitFormController.insertVisitRecordUnderOpportunity($scope.firstVisitRecord,year,month,day,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.visitId = result;
+                            swal({
+                                icon: 'success',
+                                title: 'success',
+                                text: 'Customer Details have been saved successfully..'
+                            })
+                            $scope.showCustReq = true;
+                            $scope.showVisitSection = false;
+                            $scope.visitDet = false;
+                            $scope.showGRE = false;
+                            $scope.showSalesManager = false;
+                            $scope.$apply();
+                        }
+                    })
+                }
+                    
             }
 
             $scope.saveCustomerReq = function(){
                     debugger;
 
-                    $scope.visit.Id = $scope.visitId;
-                    delete($scope.visit.Date_Of_Birth__c);
-                    delete($scope.visit.Actual_visit_date__c);
-                    siteVisitFormController.updateVisitRecord($scope.visit,$scope.leadId,function(result,event){
+                    $scope.secondVisitRecord = {"Form_No__c":$scope.visit.Form_No__c,"Budget__c":$scope.visit.Budget__c,"Area__c":$scope.visit.Area__c,
+                    "Construction_Status__c":$scope.visit.Construction_Status__c,"Purpose_Of_Buying__c":$scope.visit.Purpose_Of_Buying__c};
+
+                    $scope.secondVisitRecord.Id = $scope.visitId;
+
+                    if($scope.oppId != null){
+                        $scope.secondVisitRecord.Opportunities__c = $scope.oppId;
+                    }else{
+                        $scope.secondVisitRecord.Lead__c = $scope.leadId;
+                    }
+                    siteVisitFormController.updateVisitRecord($scope.secondVisitRecord,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -194,10 +246,22 @@
             $scope.savevisitDetails = function(){
                     debugger;
 
-                    $scope.visit.Id = $scope.visitId;
-                    delete($scope.visit.Date_Of_Birth__c);
-                    delete($scope.visit.Actual_visit_date__c);
-                    siteVisitFormController.updateVisitRecord($scope.visit,$scope.leadId,function(result,event){
+                    $scope.thirdVisitRecord = {"Form_No__c":$scope.visit.Form_No__c,"Visiting_With__c":$scope.visit.Visiting_With__c,
+                    "Visiting_On_Behalf_Of__c":$scope.visit.Visiting_On_Behalf_Of__c,"Walkin_Source__c":$scope.visit.Walkin_Source__c,
+                    "GR_Code__c":$scope.visit.GR_Code__c,"Channel_Partner_Not_registered__c":$scope.visit.Channel_Partner_Not_registered__c,
+                    "Firm_Name__c":$scope.visit.Firm_Name__c,"Channel_Partner_Name__c":$scope.visit.Channel_Partner_Name__c,
+                    "Channel_Partner_Mobile_No__c":$scope.visit.Channel_Partner_Mobile_No__c,"RERA_No__c":$scope.visit.RERA_No__c,
+                    "Channel_Partner_Email__c":$scope.visit.Channel_Partner_Email__c,"Referral_Name__c":$scope.visit.Referral_Name__c,
+                    "Referral_Mobile_No__c":$scope.visit.Referral_Mobile_No__c};
+
+                    $scope.thirdVisitRecord.Id = $scope.visitId;
+
+                    if($scope.oppId != null){
+                        $scope.thirdVisitRecord.Opportunities__c = $scope.oppId;
+                    }else{
+                        $scope.thirdVisitRecord.Lead__c = $scope.leadId;
+                    }
+                    siteVisitFormController.updateVisitRecord($scope.thirdVisitRecord,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -218,20 +282,47 @@
 
             $scope.saveGREDetails = function(){
                     debugger;
+
+                    $scope.forthVisitRecord = {"Form_No__c":$scope.visit.Form_No__c,"Sourcing_Manager__c":$scope.visit.Sourcing_Manager__c,
+                    "Sales_Manager__c":$scope.visit.Sales_Manager__c,"Customer_Gender__c":$scope.visit.Customer_Gender__c,
+                    "Facilitated_By__c":$scope.visit.Facilitated_By__c,"GRE_Mobile_No__c":$scope.visit.GRE_Mobile_No__c,
+                    "GRE_Email__c":$scope.visit.GRE_Email__c,"GRE_Date_of_Birth__c":$scope.visit.GRE_Date_of_Birth__c,
+                    "Customer_Time_In__c":$scope.visit.Customer_Time_In__c,"Customer_Time_Out__c":$scope.visit.Customer_Time_Out__c};
+
                     var year = 0
                     var month = 0;
                     var day = 0;
-                    if($scope.visit.GRE_Date_of_Birth__c !=undefined && $scope.visit.GRE_Date_of_Birth__c!=''){
-                        year = $scope.visit.GRE_Date_of_Birth__c.getUTCFullYear();
-                        month = $scope.visit.GRE_Date_of_Birth__c.getUTCMonth()+1;
-                        day = $scope.visit.GRE_Date_of_Birth__c.getDate();
+                    if($scope.forthVisitRecord.GRE_Date_of_Birth__c !=undefined && $scope.forthVisitRecord.GRE_Date_of_Birth__c!=''){
+                        year = $scope.forthVisitRecord.GRE_Date_of_Birth__c.getUTCFullYear();
+                        month = $scope.forthVisitRecord.GRE_Date_of_Birth__c.getUTCMonth()+1;
+                        day = $scope.forthVisitRecord.GRE_Date_of_Birth__c.getDate();
                     }
 
-                    $scope.visit.Id = $scope.visitId;
-                    delete($scope.visit.Date_Of_Birth__c);
-                    delete($scope.visit.Actual_visit_date__c);
-                    delete($scope.visit.GRE_Date_of_Birth__c);
-                    siteVisitFormController.updateGREDetails($scope.visit,$scope.leadId,day,month,year,function(result,event){
+                    var sHour = 0
+                    var sMin = 0;
+                    if ($scope.forthVisitRecord.Customer_Time_In__c != undefined && !angular.isNumber($scope.forthVisitRecord.Customer_Time_In__c)) {
+                        sHour = $scope.forthVisitRecord.Customer_Time_In__c.getHours();
+                        sMin = $scope.forthVisitRecord.Customer_Time_In__c.getMinutes();
+                    }
+
+                    var oHour = 0
+                    var oMin = 0;
+                    if ($scope.forthVisitRecord.Customer_Time_Out__c != undefined && !angular.isNumber($scope.forthVisitRecord.Customer_Time_Out__c)) {
+                        oHour = $scope.forthVisitRecord.Customer_Time_Out__c.getHours();
+                        oMin = $scope.forthVisitRecord.Customer_Time_Out__c.getMinutes();
+                    }
+
+                    $scope.forthVisitRecord.Id = $scope.visitId;
+                    delete($scope.forthVisitRecord.GRE_Date_of_Birth__c);
+                    delete($scope.forthVisitRecord.Customer_Time_In__c);
+                    delete($scope.forthVisitRecord.Customer_Time_Out__c);
+
+                    if($scope.oppId != null){
+                        $scope.forthVisitRecord.Opportunities__c = $scope.oppId;
+                    }else{
+                        $scope.forthVisitRecord.Lead__c = $scope.leadId;
+                    }
+                    siteVisitFormController.updateGREDetails($scope.forthVisitRecord,day,month,year,sHour,sMin,oHour,oMin,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -253,19 +344,31 @@
             $scope.finalSubmit = function(){
                     debugger;
 
+                    $scope.finalVisitRecord = {"Form_No__c":$scope.visit.Form_No__c,"Actual_visit_date__c":$scope.visit.Actual_visit_date__c,
+                    "Customer_Classicfication__c":$scope.visit.Customer_Classicfication__c,"Lead_Classification__c":$scope.visit.Lead_Classification__c,
+                    "Reason_Of_Lead_Closed__c":$scope.visit.Reason_Of_Lead_Closed__c,"Current_House_Ownership__c":$scope.visit.Current_House_Ownership__c,
+                    "Configuration__c":$scope.visit.Configuration__c,"Family_Size__c":$scope.visit.Family_Size__c,"Current_Floor_No__c":$scope.visit.Current_Floor_No__c,
+                    "Customer_s_Desired_Budget__c":$scope.visit.Customer_s_Desired_Budget__c,"Customer_s_Desired_Location_E_W__c":$scope.visit.Customer_s_Desired_Location_E_W__c,
+                    "Source_Of_Funding__c":$scope.visit.Source_Of_Funding__c,"Ethnicity__c":$scope.visit.Ethnicity__c};
+
                     var visitYear = 0
                     var visitMonth = 0;
                     var visitDay = 0;
-                    if($scope.visit.Actual_visit_date__c !=undefined && $scope.visit.Actual_visit_date__c!=''){
-                        visitYear = $scope.visit.Actual_visit_date__c.getUTCFullYear();
-                        visitMonth = $scope.visit.Actual_visit_date__c.getUTCMonth()+1;
-                        visitDay = $scope.visit.Actual_visit_date__c.getDate();
+                    if($scope.finalVisitRecord.Actual_visit_date__c !=undefined && $scope.finalVisitRecord.Actual_visit_date__c!=''){
+                        visitYear = $scope.finalVisitRecord.Actual_visit_date__c.getUTCFullYear();
+                        visitMonth = $scope.finalVisitRecord.Actual_visit_date__c.getUTCMonth()+1;
+                        visitDay = $scope.finalVisitRecord.Actual_visit_date__c.getDate();
                     }
 
-                    $scope.visit.Id = $scope.visitId;
-                    delete($scope.visit.Date_Of_Birth__c);
-                    delete($scope.visit.Actual_visit_date__c);
-                    siteVisitFormController.finalSubmit($scope.visit,$scope.leadId,visitYear,visitMonth,visitDay,function(result,event){
+                    $scope.finalVisitRecord.Id = $scope.visitId;
+                    delete($scope.finalVisitRecord.Actual_visit_date__c);
+
+                    if($scope.oppId != null){
+                        $scope.finalVisitRecord.Opportunities__c = $scope.oppId;
+                    }else{
+                        $scope.finalVisitRecord.Lead__c = $scope.leadId;
+                    }
+                    siteVisitFormController.finalSubmit($scope.finalVisitRecord,visitYear,visitMonth,visitDay,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -274,10 +377,10 @@
                             title: 'success',
                             text: 'To be filled by Sales Manager Details have been saved successfully..'
                         })
-                        $scope.showGRE = true;
+                        $scope.showGRE = false;
                         $scope.visitDet = false;
                         $scope.showCustReq = false;
-                        $scope.showVisitSection = false;
+                        $scope.showVisitSection = true;
                         $scope.showSalesManager = false;
                         $scope.$apply();
                     }
@@ -411,7 +514,7 @@
                             <div class="col-md-7 mt-4">
                                 <button class="button" ng-click="searchLead()">Search</button>
                                 <button class="button" ng-click="createLead()"><i class="fa fa-plus"></i>  Create New Lead</button>
-                                <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn" ng-click="OnClickcreateVisit()">Create Visit</button>
+                                <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn || showConvertedLead" ng-click="OnClickcreateVisit()">Create Visit</button>
                             </div>
                         </div>
 
@@ -439,25 +542,44 @@
                         </div>
 
                         <div class="row mt-5" ng-show="showConvertedLead">
-                            <h3 style="color: red; text-align:center;">Already visited site... Please check Visit Records !!</h3>
-                            <h4 style="text-align:center;">Below is the details.</h4>
-                            <div class="col-md-6">
+                            <h4 style="color: red; text-align:center;">Already visited site... Please check Visit Records !!</h4>
+                            <div class="col-md-4 mt-5">
                                 <label class="label pe-3 text-nowrap">Name</label>
                                 <input type="text" class="form-control" ng-model="oppDetails.Opportunity_Name__c" ng-disabled="true" /> 
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4 mt-5">
                                 <label class="label pe-3 text-nowrap">Email</label>
-                                <input type="text" class="form-control" ng-model="oppDetails.Email__c" ng-disabled="true" /> 
+                                <input type="email" class="form-control" ng-model="oppDetails.Email__c" ng-disabled="true" /> 
                             </div>
-                            <!-- <div class="row mt-3">
+                            <div class="col-md-4 mt-5">
+                                <label class="label pe-3 text-nowrap">Phone</label>
+                                <input type="tel" class="form-control" ng-model="oppDetails.Phone__c" ng-disabled="true" /> 
+                            </div>
+                            <h5 class="row mt-3 heading text-center">
                                 Visit Records
-                            </div>
-                            <table class="mt-3">
+                            </h5>
+                            <table class="table mt-3">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Booking Amount</th>
+                                    <th>S.No.</th>
+                                    <th>Actual Visit Date</th>
+                                    <th>Walkin Source</th>
+                                    <th>Channel Partner Name</th>
+                                    <th>Referral Name</th>
+                                    <th>GRE Email</th>
+                                    <th>Budget</th>
+                                    <th>Project</th>
                                 </tr>
-                            </table> -->
+                                <tr ng-repeat="rec in siteVisitList">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{rec.Actual_visit_date__c | date:'dd-MM-yyyy'}}</td>
+                                    <td>{{rec.Walkin_Source__c}}</td>
+                                    <td>{{rec.Channel_Partner_Name__c}}</td>
+                                    <td>{{rec.Referral_Name__c}}</td>
+                                    <td>{{rec.GRE_Email__c}}</td>
+                                    <td>{{rec.Budget__c}}</td>
+                                    <td>{{rec.Project__r.Name}}</td>
+                                </tr>
+                            </table>
                         </div>
 
                         <div ng-show="showCreateLead">
@@ -916,9 +1038,10 @@
                                                     <div class="row align-items-center mb-4">
                                                         <div class="col-md-4">
                                                             <label class="label">Channel partner<br/>not registered:</label>
+                                                            <!-- <input type="checkbox" class="" ng-model="visit.Channel_Partner_Not_registered__c" /> -->
                                                         </div>
-                                                        <div class="col-md-2">
-                                                            <input type="checkbox" class="form-control" ng-model="visit.Channel_Partner_Not_registered__c" />
+                                                        <div class="col-md-8">
+                                                            <input type="checkbox" class="" ng-model="visit.Channel_Partner_Not_registered__c" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1140,10 +1263,10 @@
                                             </div>
                                         </div>
                                         <div class="row align-items-center mb-4">
-                                            <div class="col-md-4">
+                                            <div class="col-md-2">
                                                 <label class="label">Date Of Birth:</label>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-4">
                                                 <input type="date" class="form-control" ng-model="visit.GRE_Date_of_Birth__c"/>
                                             </div>
                                         </div>

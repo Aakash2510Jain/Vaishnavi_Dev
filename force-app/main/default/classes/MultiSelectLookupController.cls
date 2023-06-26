@@ -20,7 +20,7 @@ public with sharing class MultiSelectLookupController {
             if ( String.isNotBlank( err.getMessage() ) && err.getMessage().contains( 'error:' ) ) {
                 throw new AuraHandledException(err.getMessage().split('error:')[1].split(':')[0] + '.');
             } else {
-                throw new AuraHandledException(err.getMessage());
+                throw new AuraHandledException(err.getMessage() + ' error Line Number '+ err.getLineNumber());
             }
         }
     }

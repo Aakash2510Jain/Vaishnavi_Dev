@@ -56,10 +56,11 @@ public without sharing class siteVisitFormController {
                     //converted lead exists and return opportunity and list of SVs
                     system.debug('Inside Is Converted TRUE.....');
                     List<Visit__C> relatedVisitRecords = new List<Visit__C>();
-                    Map<Id, Opportunity__c> opportunityIdByOpportunityRecordMap  = new Map<Id, Opportunity__c>([Select Id,Email__c,Opportunity_Name__c From Opportunity__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc]);
+                    Map<Id, Opportunity__c> opportunityIdByOpportunityRecordMap  = new Map<Id, Opportunity__c>([Select Id,Email__c,Opportunity_Name__c,Phone__c From Opportunity__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc]);
                     system.debug('opportunityIdByOpportunityRecordMap ==>>'+opportunityIdByOpportunityRecordMap);
                     if(!opportunityIdByOpportunityRecordMap.isEmpty()){
-                        relatedVisitRecords = [Select Project__c,Actual_visit_date__c,Planned_visit_date__c From Visit__C where Opportunities__c in : opportunityIdByOpportunityRecordMap.keyset()];
+                        relatedVisitRecords = [Select Name__c,Project__r.Name,Actual_visit_date__c,Planned_visit_date__c,Visiting_With__c,Email__c,Mobile_No__c,
+                        Walkin_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : opportunityIdByOpportunityRecordMap.keyset()];
                     }
                     leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, relatedVisitRecords, opportunityIdByOpportunityRecordMap.values()[0]);
                     return leadAndSVwrapInstance;
@@ -107,11 +108,11 @@ public without sharing class siteVisitFormController {
     }
     
     @RemoteAction
-    public static string insertVisitRecord(String visitString, string leadId, Integer year, Integer month, Integer day){
+    public static string insertVisitRecord(Visit__c visitRecord, string leadId, Integer year, Integer month, Integer day){
         try{
-            System.debug(' --- visitRecord:'+visitString);
-            Visit__c visitRecord = (Visit__c) JSON.deserialize(visitString, Visit__c.class);
-            visitRecord.Lead__c = leadId;
+            System.debug(' --- visitRecord:'+visitRecord);
+            // Visit__c visitRecord = (Visit__c) JSON.deserialize(visitString, Visit__c.class);
+            // visitRecord.Lead__c = leadId;
             if(day == 0 && month==0 && year==0){
                 
             }else{
@@ -129,9 +130,25 @@ public without sharing class siteVisitFormController {
             return e.getMessage()+e.getLineNumber();
         }
     }
+
+    @RemoteAction
+    public static string insertVisitRecordUnderOpportunity(Visit__c visitRecord, Integer year, Integer month, Integer day){
+        try{
+            System.debug(' --- visitRecord:'+visitRecord);
+            if(day == 0 && month==0 && year==0){
+                
+            }else{
+                visitRecord.Date_Of_Birth__c = Date.newInstance(year, month, day); 
+            }
+            insert visitRecord;            
+            return visitRecord.Id;
+        }catch(Exception e){
+            return e.getMessage()+e.getLineNumber();
+        }
+    }
     
     @RemoteAction
-    public static string updateVisitRecord(Visit__c visitRecord, string leadId){
+    public static string updateVisitRecord(Visit__c visitRecord){
         try{
             update visitRecord;
             return 'SUCCESS';
@@ -141,12 +158,18 @@ public without sharing class siteVisitFormController {
     }
     
     @RemoteAction
-    public static string updateGREDetails(Visit__c visitRecord,string leadId, Integer day, Integer month, Integer year){
+    public static string updateGREDetails(Visit__c visitRecord, Integer day, Integer month, Integer year, Integer shour, Integer sMin, Integer oHour, Integer oMin){
         try{
             if(day == 0 && month==0 && year==0){
                 
             }else{
                 visitRecord.GRE_Date_of_Birth__c = Date.newInstance(year, month, day); 
+            }
+            if(shour != null && sMin != null ){
+                visitRecord.Customer_Time_In__c = Time.newInstance(shour, sMin, 0, 0);
+            }
+            if(oHour != null && oMin != null ){
+                visitRecord.Customer_Time_Out__c = Time.newInstance(oHour, oMin, 0, 0);
             }
             update visitRecord;
             return 'SUCCESS';
@@ -156,7 +179,7 @@ public without sharing class siteVisitFormController {
     }
     
     @RemoteAction
-    public static string finalSubmit(Visit__c visitRecord, string leadId, Integer visityear, Integer visitmonth, Integer visitday){
+    public static string finalSubmit(Visit__c visitRecord, Integer visityear, Integer visitmonth, Integer visitday){
         try{
             if(visitday == 0 && visitmonth==0 && visityear==0){
                 

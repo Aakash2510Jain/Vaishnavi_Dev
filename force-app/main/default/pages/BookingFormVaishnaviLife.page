@@ -12,7 +12,7 @@
     
     <script>
     debugger;
-        var siteUrl = "{!$Label.BookingFormSiteURL}"; 
+    var siteUrl = "{!$Label.BookingFormSiteURL}"; 
         var opportunityId = '{!$CurrentPage.parameters.id}';
         var relationpickValue = JSON.parse('{!relationpickValue}');
         var citizenshipstatuspickValue = JSON.parse('{!citizenshipstatuspickValue}');
@@ -31,7 +31,7 @@
     app.controller('BookingCtlr', function ($scope) {
         debugger;
 
-        $scope.firstAppDet = true;
+            $scope.firstAppDet = true;
             $scope.firstAppDet2 = false;
             $scope.secondAppDet = false;
             $scope.secondAppDet2 = false;
@@ -58,25 +58,52 @@
             $scope.purposeOfPurchasepickValue = purposeOfPurchasepickValue;
             $scope.leadSourceType = leadSourceType;
             $scope.sourceOfBooking = sourceOfBooking;
-            // $scope.bookingFormCheckList = bookingFormCheckList;
-    
-            $scope.getOpportunityDetails = function(){
+
+            $scope.getFirstApplicantDetails = function(){
                 debugger;
-                
-                BookingFormLifeController.getOpportunityDetails($scope.oppId, function(result,event){
+                BookingFormLifeController.getFirstApplicantDetails($scope.oppId,function(result,event){
                     debugger;
-                    if(event.status && result != null){
-                        debugger;
+                    if(event.status && result){
+                        $scope.applicant1Details = result;
+                        if(result.Date_Of_Birth__c != null){
+                        $scope.applicant1Details.Date_Of_Birth__c = new Date(result.Date_Of_Birth__c);
+                        }
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.getFirstApplicantDetails();
+
+            $scope.getSecondApplicantDetails = function(){
+                debugger;
+                BookingFormLifeController.getSecondApplicantDetails($scope.oppId,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        $scope.applicant2Details = result;
+                        if(result.Date_Of_Birth__c != null){
+                        $scope.applicant2Details.Date_Of_Birth__c = new Date(result.Date_Of_Birth__c);
+                        }
+                        $scope.$apply();
+                    }
+                })
+            }
+            $scope.getSecondApplicantDetails();
+
+            $scope.getAllOpportunityDetails = function(){
+                debugger;
+                BookingFormLifeController.getAllOpportunityDetails($scope.oppId,function(result,event){
+                    debugger;
+                    if(event.status && result){
+                        $scope.opportunityDetails = result;
+
                         if(result.Booking_Form_Premiere_Submission_Date__c != null){
-                            result.Booking_Form_Premiere_Submission_Date__c = new Date(result.Booking_Form_Premiere_Submission_Date__c);
+                            $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c = new Date(result.Booking_Form_Premiere_Submission_Date__c);
                         }else{
                             result.Booking_Form_Premiere_Submission_Date__c = new Date();
                         }
-
                         if(result.Cheque_DD_Date__c != null){
                             result.Cheque_DD_Date__c = new Date(result.Cheque_DD_Date__c);
                         }
-
                         if(result.Card_Swipe_Transaction_Date__c != null){
                             result.Card_Swipe_Transaction_Date__c = new Date(result.Card_Swipe_Transaction_Date__c);
                         }
@@ -84,48 +111,11 @@
                         if(result.Online_Payment_Transaction_Date__c != null){
                             result.Online_Payment_Transaction_Date__c = new Date(result.Online_Payment_Transaction_Date__c);
                         }
-
-                        if(result.Applicants__r != undefined){
-                            if(result.Applicants__r[0] != undefined){
-                                if(result.Applicants__r[0].Date_Of_Birth__c != null){
-                                    result.Applicants__r[0].Date_Of_Birth__c = new Date(result.Applicants__r[0].Date_Of_Birth__c);
-                                }
-                                $scope.applicant1Details = result.Applicants__r[0];
-                            }
-                            if(result.Applicants__r[1] != undefined){
-                                if(result.Applicants__r[1].Date_Of_Birth__c != null){
-                                    result.Applicants__r[1].Date_Of_Birth__c = new Date(result.Applicants__r[1].Date_Of_Birth__c);
-                                }
-                                $scope.applicant2Details = result.Applicants__r[1];
-                            }
-                            delete (result.Applicants__r);
-                            $scope.opportunityDetails = result;
-                        }else{
-                            $scope.applicant1Details = {
-                                "Name__c":"",
-                                "Relation_With__c":"",
-                                "Occupation__c":"",
-                                "Designation__c":""
-                            };
-                            $scope.applicant2Details = {
-                                "Name__c":"",
-                                "Relation_With__c":"",
-                                "Occupation__c":"",
-                                "Designation__c":""
-                            }; 
-                            $scope.opportunityDetails = result;
-                        }
                         $scope.$apply();
-                    }else{
-                        swal({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Error'
-                        }) 
                     }
                 })
             }
-            $scope.getOpportunityDetails();
+            $scope.getAllOpportunityDetails();
 
             $scope.ChangeOfCitizenStatus1 = function(value){
                 debugger;
@@ -144,7 +134,11 @@
             
             $scope.ChangeOfOrgType1 = function(value){
                 debugger;
-                $scope.applicant1Details.Organization_Type__c = value;
+                if($scope.applicant1Details.Organization_Type__c == "Others"){
+                    $scope.applicant1Details.Organization_Type__c = "";
+                }else{
+                    $scope.applicant1Details.Organization_Type__c = value;
+                }
             }
 
             $scope.ChangeOfIndusSector1 = function(value){
@@ -258,99 +252,6 @@
             $scope.ChangeOfBookingChecklist = function(value){
                 debugger;
                 $scope.opportunityDetails.Booking_Form_Checklist__c = value;
-            }
-
-            $scope.submitDet = function(){
-                debugger;
-                
-                var birthyear=0;
-                var birthmonth=0;
-                var birthday=0;
-                if($scope.applicant1Details.Date_Of_Birth__c !=undefined && $scope.applicant1Details.Date_Of_Birth__c!=''){
-                    birthyear = $scope.applicant1Details.Date_Of_Birth__c.getUTCFullYear();
-                    birthmonth = $scope.applicant1Details.Date_Of_Birth__c.getUTCMonth()+1;
-                    birthday = $scope.applicant1Details.Date_Of_Birth__c.getDate();
-                }
-
-                var birthyear2=0;
-                var birthmonth2=0;
-                var birthday2=0;
-                if($scope.applicant2Details.Date_Of_Birth__c !=undefined && $scope.applicant2Details.Date_Of_Birth__c!=''){
-                    birthyear2 = $scope.applicant2Details.Date_Of_Birth__c.getUTCFullYear();
-                    birthmonth2 = $scope.applicant2Details.Date_Of_Birth__c.getUTCMonth()+1;
-                    birthday2 = $scope.applicant2Details.Date_Of_Birth__c.getDate();
-                }
-
-                var todayYear = 0;
-                var todayMonth = 0;
-                var todayDay = 0;
-                if($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c!=''){
-                    todayYear = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
-                    todayMonth = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
-                    todayDay = $scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
-                }
-
-                var chequeYear = 0
-                var chequeMonth = 0;
-                var chequeDay = 0;
-                if($scope.opportunityDetails.Cheque_DD_Date__c !=undefined && $scope.opportunityDetails.Cheque_DD_Date__c!=''){
-                    chequeYear = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCFullYear();
-                    chequeMonth = $scope.opportunityDetails.Cheque_DD_Date__c.getUTCMonth()+1;
-                    chequeDay = $scope.opportunityDetails.Cheque_DD_Date__c.getDate();
-                }
-
-                var cardSwipeYear = 0
-                var cardSwipeMonth = 0;
-                var cardSwipeDay = 0;
-                if($scope.opportunityDetails.Card_Swipe_Transaction_Date__c !=undefined && $scope.opportunityDetails.Card_Swipe_Transaction_Date__c!=''){
-                    cardSwipeYear = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCFullYear();
-                    cardSwipeMonth = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getUTCMonth()+1;
-                    cardSwipeDay = $scope.opportunityDetails.Card_Swipe_Transaction_Date__c.getDate();
-                }
-
-                var onlinePayYear = 0
-                var onlinePayMonth = 0;
-                var onlinePayDay = 0;
-                if($scope.opportunityDetails.Online_Payment_Transaction_Date__c !=undefined && $scope.opportunityDetails.Online_Payment_Transaction_Date__c!=''){
-                    onlinePayYear = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCFullYear();
-                    onlinePayMonth = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getUTCMonth()+1;
-                    onlinePayDay = $scope.opportunityDetails.Online_Payment_Transaction_Date__c.getDate();
-                }
-
-
-                $scope.applicantdateListWrapper = [{"year":birthyear,"month":birthmonth,"day":birthday,"firstApp":true},{"year":birthyear2,"month":birthmonth2,"day":birthday2,"firstApp":false}];
-                $scope.oppDateListWrapper = [{"dateyear":todayYear,"datemonth":todayMonth,"dateday":todayDay,"dateName":"today"},
-                                             {"dateyear":chequeYear,"datemonth":chequeMonth,"dateday":chequeDay,"dateName":"cheque"},
-                                             {"dateyear":cardSwipeYear,"datemonth":cardSwipeMonth,"dateday":cardSwipeDay,"dateName":"cardSwipe"},
-                                             {"dateyear":onlinePayYear,"datemonth":onlinePayMonth,"dateday":onlinePayDay,"dateName":"onlinePayment"}];
-
-                $scope.allApplicantDetails = [];
-                $scope.applicant1Details.Opportunity__c = $scope.oppId;
-                $scope.applicant1Details.First_Applicant__c = true;
-                $scope.applicant2Details.Opportunity__c = $scope.oppId;
-                $scope.applicant2Details.First_Applicant__c = false;
-                $scope.allApplicantDetails.push($scope.applicant1Details);
-                $scope.allApplicantDetails.push($scope.applicant2Details);
-
-                for(var i=0;i<$scope.allApplicantDetails.length;i++){
-                    delete ($scope.allApplicantDetails[i].Date_Of_Birth__c);
-                }
-                delete ($scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c);
-                delete ($scope.opportunityDetails.Cheque_DD_Date__c);
-                delete ($scope.opportunityDetails.Card_Swipe_Transaction_Date__c);
-                delete ($scope.opportunityDetails.Online_Payment_Transaction_Date__c);
-
-                BookingFormLifeController.submitDet($scope.allApplicantDetails,$scope.opportunityDetails,$scope.applicantdateListWrapper,$scope.oppDateListWrapper,function(result,event){
-                    debugger;
-                    if(event.status && result){
-                        swal({
-                            icon: 'success',
-                            title: 'success',
-                            text: 'Applicant Details have been saved successfully..'
-                        }) 
-                        $scope.$apply();
-                    }
-                })
             }
 
             $scope.showFA1 = function(){
@@ -469,6 +370,364 @@
                 $scope.termsCond = false;
                 $scope.checkList = true;
             }
+
+            $scope.firstSave = function(){
+                debugger;
+
+                $scope.appDetails = {"Name__c":$scope.applicant1Details.Name__c,"Date_Of_Birth__c":$scope.applicant1Details.Date_Of_Birth__c,
+                "Relation_With__c":$scope.applicant1Details.Relation_With__c,"Occupation__c":$scope.applicant1Details.Occupation__c,
+                "Designation__c":$scope.applicant1Details.Designation__c,"Citizenship_Status__c":$scope.applicant1Details.Citizenship_Status__c,
+                "GPA_if_any__c":$scope.applicant1Details.GPA_if_any__c,"Permanent_Address__c":$scope.applicant1Details.Permanent_Address__c,
+                "Correspondence_Address__c":$scope.applicant1Details.Correspondence_Address__c,"Customer_Mobile_No__c":$scope.applicant1Details.Customer_Mobile_No__c,
+                "Phone__c":$scope.applicant1Details.Phone__c,"Employee_Email_ID__c":$scope.applicant1Details.Employee_Email_ID__c,
+                "PAN_Number__c":$scope.applicant1Details.PAN_Number__c,"Aadhaar_Number__c":$scope.applicant1Details.Aadhaar_Number__c,
+                "Opportunity__c":$scope.oppId,"First_Applicant__c":true};
+
+                $scope.firstOppDetails = {"Opportunity_Name__c":$scope.opportunityDetails.Opportunity_Name__c,"Id":$scope.oppId,
+                "Apartment_No__c":$scope.opportunityDetails.Apartment_No__c};
+
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.appDetails.Date_Of_Birth__c !=undefined && $scope.appDetails.Date_Of_Birth__c!=''){
+                    birthyear = $scope.appDetails.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.appDetails.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.appDetails.Date_Of_Birth__c.getDate();
+                }
+
+                delete ($scope.appDetails.Date_Of_Birth__c);
+
+                BookingFormLifeController.saveAppDetails($scope.appDetails, $scope.firstOppDetails, birthyear, birthmonth, birthday, function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        $scope.firstApplicantId = result;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Applicant Details(Sole/First) have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = true;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+
+                    }
+                })
+
+            }
+
+            $scope.saveDetailsOfFirstAppli = function(){
+                debugger;
+                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Source_of_Income__c":$scope.applicant1Details.Source_of_Income__c,
+                "Name_of_the_Organization_Business__c":$scope.applicant1Details.Name_of_the_Organization_Business__c,"Office_Phone_No__c":$scope.applicant1Details.Office_Phone_No__c,
+                "Organization_Type__c":$scope.applicant1Details.Organization_Type__c,"Industry_Sector__c":$scope.applicant1Details.Industry_Sector__c,
+                "Work_Role__c":$scope.applicant1Details.Work_Role__c,"Annual_Income_INR__c":$scope.applicant1Details.Annual_Income_INR__c,
+                "Mode_of_Payment_Source__c":$scope.applicant1Details.Mode_of_Payment_Source__c,"Purpose_of_Purchase__c":$scope.applicant1Details.Purpose_of_Purchase__c,
+                "First_Applicant__c":true,"Id":$scope.firstApplicantId};
+
+                BookingFormLifeController.saveAppDetails2($scope.appDetails, function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details of the First Applicant have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = true;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+
+                    }
+                })
+
+            }
+
+            $scope.saveCoApplicantDetails = function(){
+                debugger;
+
+                $scope.appDetails = {"Name__c":$scope.applicant2Details.Name__c,"Date_Of_Birth__c":$scope.applicant2Details.Date_Of_Birth__c,
+                "Relation_With__c":$scope.applicant2Details.Relation_With__c,"Occupation__c":$scope.applicant2Details.Occupation__c,
+                "Designation__c":$scope.applicant2Details.Designation__c,"Citizenship_Status__c":$scope.applicant2Details.Citizenship_Status__c,
+                "GPA_if_any__c":$scope.applicant2Details.GPA_if_any__c,"Permanent_Address__c":$scope.applicant2Details.Permanent_Address__c,
+                "Correspondence_Address__c":$scope.applicant2Details.Correspondence_Address__c,"Customer_Mobile_No__c":$scope.applicant2Details.Customer_Mobile_No__c,
+                "Phone__c":$scope.applicant2Details.Phone__c,"Employee_Email_ID__c":$scope.applicant2Details.Employee_Email_ID__c,
+                "PAN_Number__c":$scope.applicant2Details.PAN_Number__c,"Aadhaar_Number__c":$scope.applicant2Details.Aadhaar_Number__c,
+                "Opportunity__c":$scope.oppId,"First_Applicant__c":false};
+
+                var birthyear=0;
+                var birthmonth=0;
+                var birthday=0;
+                if($scope.appDetails.Date_Of_Birth__c !=undefined && $scope.appDetails.Date_Of_Birth__c!=''){
+                    birthyear = $scope.appDetails.Date_Of_Birth__c.getUTCFullYear();
+                    birthmonth = $scope.appDetails.Date_Of_Birth__c.getUTCMonth()+1;
+                    birthday = $scope.appDetails.Date_Of_Birth__c.getDate();
+                }
+
+                delete ($scope.appDetails.Date_Of_Birth__c);
+
+                BookingFormLifeController.saveSecondAppDetails($scope.appDetails, birthyear, birthmonth, birthday, function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        $scope.secondApplicantId = result;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Co-Applicant Details(Second) have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = true;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+
+                    }
+                })
+
+            }
+
+            $scope.saveDetailsOfSecondAppli = function(){
+                debugger;
+
+                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Source_of_Income__c":$scope.applicant2Details.Source_of_Income__c,
+                "Name_of_the_Organization_Business__c":$scope.applicant2Details.Name_of_the_Organization_Business__c,"Office_Phone_No__c":$scope.applicant2Details.Office_Phone_No__c,
+                "Organization_Type__c":$scope.applicant2Details.Organization_Type__c,"Industry_Sector__c":$scope.applicant2Details.Industry_Sector__c,
+                "Work_Role__c":$scope.applicant2Details.Work_Role__c,"Annual_Income_INR__c":$scope.applicant2Details.Annual_Income_INR__c,
+                "Mode_of_Payment_Source__c":$scope.applicant2Details.Mode_of_Payment_Source__c,"Purpose_of_Purchase__c":$scope.applicant2Details.Purpose_of_Purchase__c,
+                "First_Applicant__c":false,"Id":$scope.secondApplicantId};
+
+                BookingFormLifeController.saveAppDetails2($scope.appDetails, function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details of the Co-Applicant have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = true;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+
+                    }
+                })
+            }
+
+            $scope.saveApartmentCostDetails = function(){
+                debugger;
+
+                $scope.apartmentCostDetails = {"Id":$scope.oppId,"Phase__c":$scope.opportunityDetails.Phase__c,"Plot_Number__c":$scope.opportunityDetails.Plot_Number__c,
+                "Plot_Facing__c":$scope.opportunityDetails.Plot_Facing__c,"Plot_area__c":$scope.opportunityDetails.Plot_area__c,
+                "Total_Rate__c":$scope.opportunityDetails.Total_Rate__c,"Sale_Value__c":$scope.opportunityDetails.Sale_Value__c};
+
+                BookingFormLifeController.saveApartmentCostDetails($scope.apartmentCostDetails,function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Apartment Cost Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = true;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+
+                    }
+                })
+
+            }
+
+            $scope.savePaymentDetails = function(){
+                debugger;
+
+                $scope.paymentDetails = {"Id":$scope.oppId,"Booking_Amount__c":$scope.opportunityDetails.Booking_Amount__c,
+                "Cheque_DD_No__c":$scope.opportunityDetails.Cheque_DD_No__c,"Cheque_DD_Date__c":$scope.opportunityDetails.Cheque_DD_Date__c,
+                "Drawn_On__c":$scope.opportunityDetails.Drawn_On__c,"Branch__c":$scope.opportunityDetails.Branch__c,
+                "Card_Swipe_Transaction_Number__c":$scope.opportunityDetails.Card_Swipe_Transaction_Number__c,
+                "Card_Swipe_Transaction_Date__c":$scope.opportunityDetails.Card_Swipe_Transaction_Date__c,
+                "Online_Payment_Transaction_Number__c":$scope.opportunityDetails.Online_Payment_Transaction_Number__c,
+                "Online_Payment_Transaction_Date__c":$scope.opportunityDetails.Online_Payment_Transaction_Date__c};
+
+                var chequeYear = 0
+                var chequeMonth = 0;
+                var chequeDay = 0;
+                if($scope.paymentDetails.Cheque_DD_Date__c !=undefined && $scope.paymentDetails.Cheque_DD_Date__c!=''){
+                    chequeYear = $scope.paymentDetails.Cheque_DD_Date__c.getUTCFullYear();
+                    chequeMonth = $scope.paymentDetails.Cheque_DD_Date__c.getUTCMonth()+1;
+                    chequeDay = $scope.paymentDetails.Cheque_DD_Date__c.getDate();
+                }
+
+                var cardSwipeYear = 0
+                var cardSwipeMonth = 0;
+                var cardSwipeDay = 0;
+                if($scope.paymentDetails.Card_Swipe_Transaction_Date__c !=undefined && $scope.paymentDetails.Card_Swipe_Transaction_Date__c!=''){
+                    cardSwipeYear = $scope.paymentDetails.Card_Swipe_Transaction_Date__c.getUTCFullYear();
+                    cardSwipeMonth = $scope.paymentDetails.Card_Swipe_Transaction_Date__c.getUTCMonth()+1;
+                    cardSwipeDay = $scope.paymentDetails.Card_Swipe_Transaction_Date__c.getDate();
+                }
+
+                var onlinePayYear = 0
+                var onlinePayMonth = 0;
+                var onlinePayDay = 0;
+                if($scope.paymentDetails.Online_Payment_Transaction_Date__c !=undefined && $scope.paymentDetails.Online_Payment_Transaction_Date__c!=''){
+                    onlinePayYear = $scope.paymentDetails.Online_Payment_Transaction_Date__c.getUTCFullYear();
+                    onlinePayMonth = $scope.paymentDetails.Online_Payment_Transaction_Date__c.getUTCMonth()+1;
+                    onlinePayDay = $scope.paymentDetails.Online_Payment_Transaction_Date__c.getDate();
+                }
+
+                $scope.oppDateListWrapper = [{"dateyear":chequeYear,"datemonth":chequeMonth,"dateday":chequeDay,"dateName":"cheque"},
+                                             {"dateyear":cardSwipeYear,"datemonth":cardSwipeMonth,"dateday":cardSwipeDay,"dateName":"cardSwipe"},
+                                             {"dateyear":onlinePayYear,"datemonth":onlinePayMonth,"dateday":onlinePayDay,"dateName":"onlinePayment"}];
+                delete ($scope.paymentDetails.Cheque_DD_Date__c);
+                delete ($scope.paymentDetails.Card_Swipe_Transaction_Date__c);
+                delete ($scope.paymentDetails.Online_Payment_Transaction_Date__c);
+
+                BookingFormLifeController.savePaymentDetails($scope.paymentDetails,$scope.oppDateListWrapper,function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Payment Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = true;
+                        $scope.termsCond = false;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+
+            }
+
+            $scope.saveSurveyDetails = function(){
+                debugger;
+
+                $scope.surveyDetails = {"Id":$scope.oppId,"Lead_Source_Type__c":$scope.opportunityDetails.Lead_Source_Type__c,
+                "Source_Of_Booking__c":$scope.opportunityDetails.Source_Of_Booking__c,"Existing_Customer_Referral__c":$scope.opportunityDetails.Existing_Customer_Referral__c,
+                "Vaishnavi_Referral__c":$scope.opportunityDetails.Vaishnavi_Referral__c,"Customer_Name__c":$scope.opportunityDetails.Customer_Name__c,
+                "Project_Name__c":$scope.opportunityDetails.Project_Name__c,"Unit_Plot_No__c":$scope.opportunityDetails.Unit_Plot_No__c,
+                "Customer_Mobile_No__c":$scope.opportunityDetails.Customer_Mobile_No__c,"Customer_Email_Id__c":$scope.opportunityDetails.Customer_Email_Id__c};
+
+                BookingFormLifeController.saveSurveyDetails($scope.surveyDetails, function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Survey Form Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = true;
+                        $scope.checkList = false;
+                        $scope.$apply();
+                    }
+                })
+            }
+
+            $scope.saveTermsCondsDetails = function(){
+                debugger;
+
+                $scope.firstAppDet = false;
+                $scope.firstAppDet2 = false;
+                $scope.secondAppDet = false;
+                $scope.secondAppDet2 = false;
+                $scope.apartmentCostDet = false;
+                $scope.paymentDet = false;
+                $scope.surveyDet = false;
+                $scope.termsCond = false;
+                $scope.checkList = true;
+
+            }
+
+            $scope.finalOpportunitySubmit = function(){
+                debugger;
+
+                $scope.finalOppDetails = {"Id":$scope.oppId,"Booking_Form_Premiere_Submission_Date__c":$scope.opportunityDetails.Booking_Form_Premiere_Submission_Date__c,
+                "Booking_Form_Checklist_Option__c":$scope.opportunityDetails.Booking_Form_Checklist_Option__c};
+
+                var todayYear = 0;
+                var todayMonth = 0;
+                var todayDay = 0;
+                if($scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c !=undefined && $scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c!=''){
+                    todayYear = $scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c.getUTCFullYear();
+                    todayMonth = $scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c.getUTCMonth()+1;
+                    todayDay = $scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c.getDate();
+                }
+
+                delete ($scope.finalOppDetails.Booking_Form_Premiere_Submission_Date__c);
+
+                BookingFormLifeController.finalOpportunitySubmit($scope.finalOppDetails,todayYear,todayMonth,todayDay,function(result,event){
+                    debugger;
+                    if(event.status){
+                        debugger;
+                        swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Details have been saved successfully..'
+                        })
+                        $scope.firstAppDet = false;
+                        $scope.firstAppDet2 = false;
+                        $scope.secondAppDet = false;
+                        $scope.secondAppDet2 = false;
+                        $scope.apartmentCostDet = false;
+                        $scope.paymentDet = false;
+                        $scope.surveyDet = false;
+                        $scope.termsCond = false;
+                        $scope.checkList = true;
+                        $scope.$apply();
+
+                    }
+                })
+            }
         
     });
      
@@ -582,7 +841,10 @@
                                                     <label class="label">Relation With:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="applicant1Details.Relation_With__c" />
+                                                    <select class="form-control" aria-label="Default select example" ng-model="applicant1Details.Relation_With__c">
+                                                        <option ng-repeat="staff in relationpickValue">{{staff}}</option>
+                                                    </select>
+                                                    <!-- <input type="text" class="form-control" ng-model="applicant1Details.Relation_With__c" /> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -730,7 +992,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showFA2()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="firstSave()">Save and Next</button>
                                         </div>
                                     </div>
                                 </div>
@@ -925,7 +1187,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSA1()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveDetailsOfFirstAppli()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showFA1()">Back</button>
                                         </div>
                                     </div>
@@ -1016,12 +1278,7 @@
                                                     <label class="label">Date of Birth:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <!-- <div class="datepicker date input-group"> -->
-                                                        <input type="date" class="form-control" id="date" ng-model="applicant2Details.Date_Of_Birth__c" />
-                                                        <!-- <div class="input-group-append">
-                                                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                                        </div>
-                                                    </div> -->
+                                                    <input type="date" class="form-control" id="date" ng-model="applicant2Details.Date_Of_Birth__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1031,7 +1288,10 @@
                                                     <label class="label">Relation With:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="applicant2Details.Relation_With__c" />
+                                                    <select class="form-control" aria-label="Default select example" ng-model="applicant2Details.Relation_With__c">
+                                                        <option ng-repeat="staff in relationpickValue">{{staff}}</option>
+                                                    </select>
+                                                    <!-- <input type="text" class="form-control" ng-model="applicant2Details.Relation_With__c" /> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -1179,7 +1439,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSA2()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveCoApplicantDetails()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showFA2()">Back</button>
                                         </div>
                                     </div>
@@ -1351,7 +1611,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showApartment()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveDetailsOfSecondAppli()">Save and Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showSA1()">Back</button>
                                         </div>
                                     </div>
@@ -1526,7 +1786,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showPayment()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveApartmentCostDetails()">Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showSA2()">Back</button>
                                         </div>
                                     </div>    
@@ -1715,7 +1975,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showSurvey()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="savePaymentDetails()">Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showApartment()">Back</button>
                                         </div>
                                     </div>
@@ -1746,12 +2006,7 @@
                         <div class="col-md-3">
                             <div class="d-flex align-items-center">
                                 <label for="Date" class="label pe-3 text-nowrap">Date</label>
-                                <!-- <div class="datepicker date input-group"> -->
-                                    <input type="date" class="form-control" id="date" placeholder="DD/MM/YYYY" ng-model="opportunityDetails.Booking_Form_Premiere_Submission_Date__c"/>
-                                    <!-- <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                    </div>
-                                </div> -->
+=                                    <input type="date" class="form-control" id="date" placeholder="DD/MM/YYYY" ng-model="opportunityDetails.Booking_Form_Premiere_Submission_Date__c"/>
                             </div>
                         </div>
                     </div>
@@ -1813,144 +2068,146 @@
                                         </div>
                                     </div>
             
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h4 class="label">If Channel Partner(CP):</h4>
+                                    <div ng-show="opportunityDetails.Source_Of_Booking__c == 'Channel Partner'">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4 class="label">If Channel Partner(CP):</h4>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-            
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">CP Name/Company:</label>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">CP Name/Company:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text"/>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Mobile No:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text"/>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Mobile No:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">RERA Regn No:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text"/>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">RERA Regn No:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text"/>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Seal And Signature</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-            
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h4 class="label">If Customer Referral:</h4>
-                                        </div>
-                                    </div>
-            
-                                    <div class="row align-items-center mb-4 mt-3">
-                                        <div class="col-md-8">
-                                            <label class="label">Are you an existing customer of Vaishnavi Group?</label>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <span ng-repeat="value in gpapickValue">
-                                                <input type="radio" ng-model="opportunityDetails.Existing_Customer_Referral__c" ng-value="value" ng-change="ChangeOfCustomerGPA(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
-                                        </div>
-                                    </div>
-            
-                                    <div class="row align-items-center mb-4">
-                                        <div class="col-md-8">
-                                            <label class="label">Are you referred by a Vaishnavi Group Customer?</label>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <span ng-repeat="value in gpapickValue">
-                                                <input type="radio" ng-model="opportunityDetails.Vaishnavi_Referral__c" ng-value="value" ng-change="ChangeOfVaishnaviRef(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
-                                        </div>
-                                    </div>
-            
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Customer Name:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text" ng-model="opportunityDetails.Customer_Name__c"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Project Name:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text" ng-model="opportunityDetails.Project_Name__c"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Unit/Plot No:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="text" ng-model="opportunityDetails.Unit_Plot_No__c"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="row align-items-center mb-4">
-                                                <div class="col-md-4">
-                                                    <label class="label">Mobile No.:</label>
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="opportunityDetails.Customer_Mobile_No__c"/>
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Seal And Signature</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text"/>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
             
-                                    <div class="row align-items-center mb-4">
-                                        <div class="col-md-2">
-                                            <label class="label">Email ID:</label>
+                                    <div ng-show="opportunityDetails.Source_Of_Booking__c == 'Referral'">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4 class="label">If Customer Referral:</h4>
+                                            </div>
                                         </div>
-                                        <div class="col-md-10">
-                                                <input class="form-control" type="email" ng-model="opportunityDetails.Customer_Email_Id__c"/>
+                
+                                        <div class="row align-items-center mb-4 mt-3">
+                                            <div class="col-md-8">
+                                                <label class="label">Are you an existing customer of Vaishnavi Group?</label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span ng-repeat="value in gpapickValue">
+                                                    <input type="radio" ng-model="opportunityDetails.Existing_Customer_Referral__c" ng-value="value" ng-change="ChangeOfCustomerGPA(value)" />
+                                                    <label>{{value}}</label>
+                                                </span>
+                                            </div>
+                                        </div>
+                
+                                        <div class="row align-items-center mb-4">
+                                            <div class="col-md-8">
+                                                <label class="label">Are you referred by a Vaishnavi Group Customer?</label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span ng-repeat="value in gpapickValue">
+                                                    <input type="radio" ng-model="opportunityDetails.Vaishnavi_Referral__c" ng-value="value" ng-change="ChangeOfVaishnaviRef(value)" />
+                                                    <label>{{value}}</label>
+                                                </span>
+                                            </div>
+                                        </div>
+                
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Customer Name:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text" ng-model="opportunityDetails.Customer_Name__c"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Project Name:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text" ng-model="opportunityDetails.Project_Name__c"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Unit/Plot No:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="text" ng-model="opportunityDetails.Unit_Plot_No__c"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row align-items-center mb-4">
+                                                    <div class="col-md-4">
+                                                        <label class="label">Mobile No.:</label>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" type="tel" ng-model="opportunityDetails.Customer_Mobile_No__c"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                
+                                        <div class="row align-items-center mb-4">
+                                            <div class="col-md-2">
+                                                <label class="label">Email ID:</label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                    <input class="form-control" type="email" ng-model="opportunityDetails.Customer_Email_Id__c"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="showTerms()">Next</button>
+                                            <button type="button" class="button float-end" ng-click="saveSurveyDetails()">Next</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showPayment()">Back</button>
                                         </div>
                                     </div>
@@ -2031,7 +2288,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <button type="button" class="button float-end" ng-click="showcheckList()">Next</button>
+                                    <button type="button" class="button float-end" ng-click="saveTermsCondsDetails()">Next</button>
                                     <button type="button" class="cancelbutton float-end me-2" ng-click="showSurvey()">Back</button>
                                 </div>
                             </div>
@@ -2153,7 +2410,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="button" class="button float-end" ng-click="submitDet()">Submit</button>
+                                            <button type="button" class="button float-end" ng-click="finalOpportunitySubmit()">Submit</button>
                                             <button type="button" class="cancelbutton float-end me-2" ng-click="showTerms()">Back</button>
                                         </div>
                                     </div>

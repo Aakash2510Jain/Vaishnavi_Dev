@@ -28,7 +28,11 @@ public class API_SendTextMessage {
         
         System.debug('httpRequest--'+httpRequest);
         Http http = new Http();
-        HttpResponse httpResponse = http.send(httpRequest);
+        HttpResponse httpResponse = new HttpResponse();
+        if(Test.isRunningTest()){
+             httpResponse = http.send(httpRequest);
+        }
+       
         if (httpResponse.getStatusCode() == 200) {
             Messages__c msgRecToInsert = new Messages__c();
             msgRecToInsert.Message_Body__c = message;
@@ -53,5 +57,5 @@ public class API_SendTextMessage {
         requestParams.put('dltContentId', SMS_dltContentId);
         return requestParams;
     } 
-
+    
 }
