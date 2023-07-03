@@ -24,6 +24,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         return null;
         
     }
+   
     @AuraEnabled
     public Static void updateExistinglead(string recid,Lead__c leadRec){
         try{
@@ -32,6 +33,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
     }
+    
     @AuraEnabled
     public Static void createNewLead(string recid,Lead__c createleadRec){
         try{
@@ -43,6 +45,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
     }
+    
     @AuraEnabled 
     public static Map<String, List<String>> getDependentMap(sObject objDetail, string contrfieldApiName,string depfieldApiName) {
         String controllingField = contrfieldApiName.toLowerCase();
@@ -88,7 +91,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
     }
     
     public static String decimalToBinary(Integer val) {
-        String bits = '';
+        String bits = ''; 
         while (val > 0) {
             Integer remainder = Math.mod(val, 2);
             val = Integer.valueOf(Math.floor(val / 2));
@@ -133,6 +136,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         }
         
     }
+   
     @AuraEnabled
     public Static void createVisitUnderCurrentLead(string recid,Visit__c newVisitRec,Company__c selectedCompanyRec ){
         try{
@@ -155,6 +159,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
             system.debug('Error Message==>'+e.getMessage()+ 'Erro in Line==>'+e.getLineNumber());
         }
     }
+    
     @AuraEnabled
     public Static List<Visit__c> fetchvisitRecord(string leadid ){
         try{
@@ -167,6 +172,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         }
         return null;
     }
+    
     public static List<String> getPickListValuesIntoList(string strObjectName, string strPicklistField){
         List<String> pickListValuesList= new List<String>();
         Map<String, String> mapPickListValues = new Map<String, String>();
@@ -180,6 +186,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
         }      
         return pickListValuesList;
     }
+    
     @AuraEnabled
     public Static getAllPicklisValues fetchAllThePickValues(){
         try{
@@ -248,5 +255,7 @@ public without sharing class CreateLeadAndShowExistingOnVisiteForm {
             this.leadSource = leadSource;
             this.companiesList = companiesList;
         }
+    
+    
     }
 }

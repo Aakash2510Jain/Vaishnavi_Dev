@@ -67,15 +67,8 @@ mapofGroupNameBySourceIntent.put(signMeta.Group_Name__c,signMeta.Source_Intent__
                 system.debug('userTrackRec::'+userTrackRec.Id);
                 string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
                 system.debug('queueId::'+queueId);
-                list<Lead> queueLeadListTobePass = new list<Lead>();
-                queueLeadListTobePass = [SELECT Address,City,Company,Country,CreatedById,CreatedDate,
-                                         Email,FirstName,
-                                         GeocodeAccuracy,HasOptedOutOfEmail,Id,Industry,
-                                         IsConverted,IsDeleted,IsUnreadByOwner,LastActivityDate,LastModifiedById,LastModifiedDate,LastName,LastReferencedDate,
-                                         LastViewedDate,Latitude,LeadSource,MasterRecordId,
-                                         MiddleName,MobilePhone,Name,NumberOfEmployees,OwnerId,Phone,
-                                         PhotoUrl,PostalCode,Rating,Salutation,
-                                         State,Status,Street,Suffix,SystemModstamp,Title,Website FROM Lead where ownerid  =: queueId];
+                list<Lead__c> queueLeadListTobePass = new list<Lead__c>();
+                queueLeadListTobePass = [SELECT Id,OwnerId, Lead_Source__c FROM Lead__c where ownerid  =: queueId];
                 
                 system.debug('queueLeadListTobePass::'+queueLeadListTobePass);
                 

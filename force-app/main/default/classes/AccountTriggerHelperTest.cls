@@ -1,5 +1,6 @@
 @isTest
 public class AccountTriggerHelperTest {
+
 	@isTest
     static void testAfterInsert(){
         Lead__c leadrec = new Lead__c(Name__c='TestLead');

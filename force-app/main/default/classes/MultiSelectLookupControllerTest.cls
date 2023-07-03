@@ -1,29 +1,55 @@
 @isTest
 public class MultiSelectLookupControllerTest {
-	@isTest
-    static void testfetchRecords(){
+    @isTest
+    static void testFetchRecords() {
         
-        Account testAccount = new Account(Name = 'Test Account');
-        insert testAccount;
+        Account testAccount1 = new Account(Name = 'Test Account 1');
+        Account testAccount2 = new Account(Name = 'Test Account 2');
+        insert new List<Account>{testAccount1, testAccount2};
+            
+        String objectName = 'Account';
+        String filterField = 'Name';
+        String searchString = 'Test';
+        List<String> selectedValues = new List<String>{testAccount1.Id};
+        String values = JSON.serialize(selectedValues);
         
-        List<String> slist = new List<String>{testAccount.Id};
+        Test.startTest();
+        List<MultiSelectLookupController.RecordsData> result = MultiSelectLookupController.fetchRecords(objectName, filterField, searchString, values);
+       // List<MultiSelectLookupController.RecordsData> result1 = MultiSelectLookupController.fetchRecords(null, null, null, null);
         
-        List<MultiSelectLookupController.RecordsData> recordsDataList = MultiSelectLookupController.fetchRecords('Account', 'Name', 'Test', 'slist');
+        Test.stopTest(); 
         
-         MultiSelectLookupController.RecordsData recordsData = recordsDataList[0];
     }
     
-     @isTest
-     static void testAssignCriteriaToGroup() {
+    @isTest
+    static void testAssignCriteriaToGroup() {
         
-        Assignment_Group__c testAssignmentGroup = new Assignment_Group__c();
+        List<String> selectedGroupIds = new List<String>{'groupId1', 'groupId2'};
+        String assCriteriaId = 'criteriaId';
+        
+        List<Assignment_Group__c> assGroupList = new List<Assignment_Group__c>{
+            new Assignment_Group__c(Name = 'groupId1'),
+            new Assignment_Group__c(Name = 'groupId2')
+        };
+        insert assGroupList;
+        
+        Test.startTest();
+        MultiSelectLookupController.assignCriteriaToGroup(selectedGroupIds, assCriteriaId);
+        Test.stopTest();
+    }
+    
+    /*
+    @isTest
+    static void testAssignCriteriaToGroup() {
+        
+        Assignment_Group__c testAssignmentGroup = new Assignment_Group__c(Name = 'test Assignment');
         insert testAssignmentGroup;
+        
         List<String> selectedGroupIds = new List<String>();
         selectedGroupIds.add(testAssignmentGroup.Id);
         
-        String result = MultiSelectLookupController.assignCriteriaToGroup(selectedGroupIds, 'a0V1m000004toc7EAA');
-             
-        Assignment_Group__c updatedAssignmentGroup = [SELECT Lead_Assigning_Criteria__c FROM Assignment_Group__c WHERE Id = :testAssignmentGroup.Id];
+        MultiSelectLookupController.assignCriteriaToGroup(selectedGroupIds, 'a0V1m000004toc7EAA');
         
-    }
+        
+    }  */
 }

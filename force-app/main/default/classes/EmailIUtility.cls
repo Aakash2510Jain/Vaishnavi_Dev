@@ -8,6 +8,7 @@ public class EmailIUtility {
             
             if(!leadList.isEmpty()){
                 for(Lead__c leadRec : leadList){
+                    System.debug('leadRec:::'+leadRec);
                     Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                     
                     List<String> recipients = new List<String>();
@@ -27,7 +28,7 @@ public class EmailIUtility {
                         htmlBody = htmlBody.replace('{!Lead.Email}', leadRec.Email__c);
                     if(leadRec.Phone__c != null)
                         htmlBody = htmlBody.replace('{!Lead.Phone}', leadRec.Phone__c);
-                    htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', leadRec.Owner.Email);
+                        htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', leadRec.Owner.Email);
                     
                     mail.setSubject(subject);
                     mail.setHtmlBody(htmlBody);

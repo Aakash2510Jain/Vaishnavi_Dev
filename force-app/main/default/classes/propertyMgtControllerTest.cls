@@ -5,7 +5,7 @@ public class propertyMgtControllerTest {
         
         List<Property_Block__c> blocks = new List<Property_Block__c>{
             new Property_Block__c(Name = 'Block 1'),
-                new Property_Block__c(Name = 'Block 2')
+            new Property_Block__c(Name = 'Block 2')
                 };
                     insert blocks;
         

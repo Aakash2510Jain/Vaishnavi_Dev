@@ -4,7 +4,7 @@ public without sharing class  RoundRobinLeadAssignment{
     public static map<string,string> mapofCouseByGroupName = new map<string,string>();
     @future
     public static void assignLeadsToBDS(String courseName,set<String> LeadIdList){
-        
+        system.debug('courseName ====> ' + courseName);
         boolean withinWorkingHour = false;
         string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
         List<Lead__c> updateLeadList = new List<Lead__c>();
@@ -51,11 +51,19 @@ public without sharing class  RoundRobinLeadAssignment{
                             currentRRid = 1;
                             LastRRid = 0;
                         }
+                        system.debug('currentRRid ====> ' + currentRRid);
+                        
                         QnameAndRRid = qName + String.valueOf(currentRRid);
+                        system.debug('QnameAndRRid ====> ' + QnameAndRRid);
+                        
                         qMemberID = QnameAndRRidToMemberIDMap.get(QnameAndRRid);
+                        system.debug('qMemberID ====> ' + qMemberID);
+                        
                         boolean test = true;
                         if(assignmentConditionSatisfied(qName,qMemberID)){
+                            system.debug('userIdToUserAvailablityMap.get(qMemberID) ====> ' + userIdToUserAvailablityMap.get(qMemberID));
                             if(userIdToUserAvailablityMap.get(qMemberID) == true){
+                                system.debug('Owner is going to Change!!!');
                                 ld.ownerId = Id.valueOf(qMemberID);
                                 ld.Lead_Assigned_Date_Time__c = system.now();
                                 updateLeadList.add(ld); 
@@ -101,6 +109,7 @@ public without sharing class  RoundRobinLeadAssignment{
                 QtoBeUpdated.add(q);
             }
         }
+        system.debug('updateLeadList ====> ' + updateLeadList);
         if(!updateLeadList.isEmpty()){
             reccuringTrigger = false;
             try{
@@ -127,9 +136,9 @@ public without sharing class  RoundRobinLeadAssignment{
     public static boolean assignmentConditionSatisfied(string qName,string qMemberID){
         system.debug('qMemberID--->'+qMemberID);
         boolean isconditionapproved = false;
-        if(qMemberID != null){
+        /*if(qMemberID != null){
             return false;
-        }
+        }*/
         if(BuildMaps.mapofMemidByAssignedLead.get(qMemberID) == null){
             isconditionapproved = true;
         }else if(BuildMaps.mapofMemidByAssignedLead.get(qMemberID) != null && BuildMaps.mapofMemidbyMaxLeadCountFromUser.get(qMemberID) != null &&  BuildMaps.mapofMemidByAssignedLead.get(qMemberID) < BuildMaps.mapofMemidbyMaxLeadCountFromUser.get(qMemberID)){
@@ -224,6 +233,7 @@ public without sharing class  RoundRobinLeadAssignment{
     }
     
     public static Map<String, String> makeQnameAndRRidToMemberID(String groupName){
+        system.debug('groupName ====> ' + groupName);
         //Map<String, Map<String, Integer>> qNameAndMemberIdTORoundRobinIDMaP = new Map<String, Map<String, Integer>>();  
         Map<String, String> QnameAndRRidToMemberIDMap = new Map<String, String>();
         list<Assignment_Group_Member__c> agmList = new list<Assignment_Group_Member__c>();
@@ -240,6 +250,7 @@ public without sharing class  RoundRobinLeadAssignment{
                 } 
             }
         }
+        system.debug('QnameAndRRidToMemberIDMap ====> ' + QnameAndRRidToMemberIDMap);
         
         return QnameAndRRidToMemberIDMap;        
     }

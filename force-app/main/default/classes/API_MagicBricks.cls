@@ -29,7 +29,8 @@ global class API_MagicBricks {
             String body = req.requestBody.toString();
             Map<String, Object> requestBodyMap = (Map<String, Object>) JSON.deserializeUntyped(body);
             system.debug('requestBodyMap---->'+requestBodyMap);
-
+			
+            system.debug('string.isBlank((string)requestBodyMap.get---->'+string.isBlank((string)requestBodyMap.get('leadid')));
             if(string.isBlank((string)requestBodyMap.get('leadid')) || string.isEmpty((string)requestBodyMap.get('leadid'))){
                 //Create New Lead
                 String urlValue = (string)requestBodyMap.get('url');
@@ -78,7 +79,7 @@ global class API_MagicBricks {
                 responseData.success_code = '200';
                 responseData.success_message = 'Lead Updated Successfully';
                 responseData.status = 'Success';
-                responseData.lead_id = leadRecToUpdate.Id;
+                responseData.lead_id = leadRecToUpdate.Id;  
             }
         }catch(Exception ex){
             system.debug('Error -->'+ex.getMessage());

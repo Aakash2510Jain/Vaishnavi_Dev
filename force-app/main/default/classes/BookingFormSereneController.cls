@@ -129,7 +129,7 @@ public without sharing class BookingFormSereneController {
      @RemoteAction
      public static Applicant__c getFirstApplicantDetails(string oppId){
          try{
-             Applicant__c appDetails = [SELECT Id,Name__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
+             Applicant__c appDetails = [SELECT Id,Name__c,Extension__c,Mobile__c,Email_Id__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
              Phone__c,Employee_Email_ID__c,PAN_Number__c,Aadhaar_Number__c,Name_of_the_Organization_Business__c,Office_Phone_No__c,Source_of_Income__c,Organization_Type__c,Industry_Sector__c,
              Work_Role__c,Annual_Income_INR__c,Mode_of_Payment_Source__c,Purpose_of_Purchase__c FROM Applicant__c WHERE Opportunity__c =: oppId AND First_Applicant__c = true];
              return appDetails;
@@ -141,7 +141,7 @@ public without sharing class BookingFormSereneController {
      @RemoteAction
      public static Applicant__c getSecondApplicantDetails(string oppId){
          try{
-             Applicant__c appDetails = [SELECT Id,Name__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
+             Applicant__c appDetails = [SELECT Id,Name__c,Extension__c,Mobile__c,Email_Id__c,First_Applicant__c,Opportunity__c,Date_Of_Birth__c,Relation_With__c,Occupation__c,Designation__c,Citizenship_Status__c,GPA_if_any__c,Permanent_Address__c,Correspondence_Address__c,Customer_Mobile_No__c,
              Phone__c,Employee_Email_ID__c,PAN_Number__c,Aadhaar_Number__c,Name_of_the_Organization_Business__c,Office_Phone_No__c,Source_of_Income__c,Organization_Type__c,Industry_Sector__c,
              Work_Role__c,Annual_Income_INR__c,Mode_of_Payment_Source__c,Purpose_of_Purchase__c FROM Applicant__c WHERE Opportunity__c =: oppId AND First_Applicant__c = false];
              return appDetails;
@@ -159,7 +159,7 @@ public without sharing class BookingFormSereneController {
              Existing_Employee_Referral__c,Employee_Vaishnavi_Referral__c,Employee_Name__c,Employee_Id__c,Employee_Email_Id__c,Employee_Mobile_No__c,
              Lead_Source_Type__c,Apartment_No__c,Floor_No__c,Super_Built_Up_Area__c,Base_Rate__c,Floor_Rise_Rate__c,PLC_Charges__c,Total_Rate__c,
              Clubhouse_Charges__c,Car_Park_Cost__c,No_of_Car_Parks__c,Sale_Value__c,Booking_Amount__c,Cheque_DD_No__c,Branch__c,Card_Swipe_Transaction_Number__c,
-             Online_Payment_Transaction_Number__c From Opportunity__c WHERE Id =: oppId];
+             Online_Payment_Transaction_Number__c,CP_Name_Company__c,Channel_Partner_Mobile_No__c,RERA_Regn_No__c From Opportunity__c WHERE Id =: oppId];
              return oppDetails;
          }catch(Exception e){
              return null;
@@ -174,7 +174,11 @@ public without sharing class BookingFormSereneController {
              }else{
                  appDetails.Date_Of_Birth__c = Date.newInstance(year, month, day); 
              }
-             insert appDetails;
+            if(appDetails.Id != null){
+                update appDetails;
+            }else{
+                insert appDetails;
+            }
              update oppDetails;
              return appDetails.Id;
  
@@ -201,7 +205,11 @@ public without sharing class BookingFormSereneController {
              }else{
                  appDetails.Date_Of_Birth__c = Date.newInstance(year, month, day); 
              }
-             insert appDetails;
+             if(appDetails.Id != null){
+                update appDetails;
+            }else{
+                insert appDetails;
+            }
              return appDetails.Id;
  
          }catch(Exception e){

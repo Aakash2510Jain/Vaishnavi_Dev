@@ -145,16 +145,18 @@ public class LeadTriggerHandler {
         
         if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
             existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet ) AND isConverted__c = false];
-            system.debug('existingLeadsList-->'+existingLeadsList);
+            system.debug('existingLeadsList--01>'+existingLeadsList);
             
             if(!existingLeadsList.isEmpty()){
                 for(Lead__c lead : existingLeadsList){
-                    system.debug('lead.Email__c--->'+lead.Email__c);
-                    system.debug('lead.Phone__c--->'+lead.Phone__c);
+                    system.debug('lead.Email__c---02>'+lead.Email__c);
+                    system.debug('lead.Phone__c---3>'+lead.Phone__c);
                     if(lead.Email__c != null){
                         leadRecByEmailMap.put(lead.Email__c, lead);
+                        	system.debug('lead.Email__c-::4>'+lead.Email__c);
                     }else if(lead.Phone__c != null){
                         leadRecByPhoneMap.put(lead.Phone__c, lead);
+                        	system.debug('lead.Phone__c-::5>'+lead.Phone__c);
                     }
                 }
                 system.debug('leadRecByPhoneMap-->'+leadRecByPhoneMap);
@@ -168,7 +170,7 @@ public class LeadTriggerHandler {
                             if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
                                 if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
                                     leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                    leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                    leadRec.RecordTypeId  = ConstantClass.ReEnquiryLeadRT;
                                 }else{
                                     leadRec.To_Be_Deleted__c = true;
                                     existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
@@ -184,7 +186,7 @@ public class LeadTriggerHandler {
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id, leadRec);
                                     }
                                 }
-                            }
+                            } 
                         }
                         else if(leadRec.Email__c != null){
                             system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
@@ -237,6 +239,7 @@ public class LeadTriggerHandler {
             insert taskListToInsert;
         }
     }
+    
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         List<Task> taskListToInsertforFollowup = new List<Task>();
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
@@ -244,12 +247,17 @@ public class LeadTriggerHandler {
         set<Id> leadIds = new Set<Id>();
         
         for(Lead__c leadRec : newLeadMap.values()){
+           
+            
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
             }
+             System.debug('newLeadMap.values():::::'+newLeadMap.values());
+             System.debug('oldLeadMap.values():::::'+oldLeadMap.values());
             if(leadRec.isQualified__c == false && leadRec.isQualified__c != oldLeadMap.get(leadRec.Id).isQualified__c){
                 leadRec.isQualified__c = true;
             }
+           
             if(leadRec.isQualified__c && leadRec.Qualified_Date_Time__c == null){
                 leadRec.Qualified_Date_Time__c = system.now();
             }
@@ -440,6 +448,7 @@ EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcom
             insert taskListToInsertforFollowup;
         }
     }
+    
     public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         set<Id> leadIds =  new Set<Id>();
         set<Id> salesTeamLeadIds =  new Set<Id>();

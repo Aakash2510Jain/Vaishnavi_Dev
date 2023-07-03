@@ -6,7 +6,7 @@ import checkin_check from '@salesforce/apex/UserTracking.OnpageLoad';
 	
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class Usertracking extends LightningElement {
-    userId = uId;
+    userRecId = uId;
     disable_checkin = false;
     disable_checkout = false;
     constructor(){
@@ -19,7 +19,7 @@ export default class Usertracking extends LightningElement {
     }
     checkin_check(){
         debugger;
-        checkin_check({userId : uId}).then(result =>{
+        checkin_check({userId : this.userRecId}).then(result =>{
             this.disable_checkin = result.checkin;
             this.disable_checkout = result.checkout;
         }).catch(err =>{

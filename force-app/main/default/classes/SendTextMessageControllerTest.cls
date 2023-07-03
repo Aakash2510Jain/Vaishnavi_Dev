@@ -1,5 +1,16 @@
 @isTest
 public class SendTextMessageControllerTest {
+    
+    public class ExampleCalloutMock implements HttpCalloutMock{
+        public HttpResponse respond(HTTPRequest req){
+            HttpResponse res = new HttpResponse();
+            res.setStatus('OK');
+            res.setStatusCode(200);
+            res.setBody('Salesforcescool');
+            return res;
+        }
+    }
+    
 	@isTest
     static void testgetPreviousTextMessages(){
         Lead__c leadRec = new Lead__c(Phone__c='8208472038');
@@ -19,13 +30,14 @@ public class SendTextMessageControllerTest {
     @isTest
     static void testSendSMS() {
         
-        Lead__c lead = new Lead__c(Phone__c = '9860680699');
-        insert lead;
+        Lead__c leadRecord = new Lead__c(Phone__c = '9860680699');
+        insert leadRecord;
         String messageBody = 'Test Message';
         String smsTempId = 'TestTemplateId';
         
-        Test.startTest();  
-        SendTextMessageController.sendSMS(lead.Id, messageBody, smsTempId);
+        Test.startTest(); 
+        Test.setMock(HttpCalloutMock.class, new ExampleCalloutMock());
+        SendTextMessageController.sendSMS(leadRecord.Id, messageBody, smsTempId);
         Test.stopTest();
         
         

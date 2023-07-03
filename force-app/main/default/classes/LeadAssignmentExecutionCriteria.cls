@@ -1,19 +1,21 @@
 public class LeadAssignmentExecutionCriteria {
     public Static Boolean runLeadAssignment = true;
     
-    public static void validateEntryCriteria(list<Lead> newLeadList){
+    public static void validateEntryCriteria(list<Lead__c> newLeadList){
         //Getting the Validated Leads : 
-        List<Lead> leadListToBeProcessed = validatemanuallyCreatedLead(newLeadList);
-        Set<Lead> assignedLead = new Set<Lead>();
+        //List<Lead__c> leadListToBeProcessed = validatemanuallyCreatedLead(newLeadList);
+        List<Lead__c> leadListToBeProcessed = new List<Lead__c>();
+        leadListToBeProcessed.addall(newLeadList);
+        Set<Lead__c> assignedLead = new Set<Lead__c>();
         if(leadListToBeProcessed != Null){
             system.debug('leadListToBeProcessed'+leadListToBeProcessed.size());
         }
         
         Boolean IsLeadAssigned = False;
-        list<lead> newLeadListTemp 												= new list<lead>();
-        list<lead> DefaultQueueList 												= new list<lead>();
+        list<lead__c> newLeadListTemp 												= new list<lead__c>();
+        list<lead__c> DefaultQueueList 												= new list<lead__c>();
         list<String> matchedCriterias 											= new list<String>();
-        map<string,list<Lead>> mapofExecutionIdByListLead 						= new map<String,List<Lead>>();
+        map<string,list<Lead__c>> mapofExecutionIdByListLead 						= new map<String,List<Lead__c>>();
         map<String,integer> mapofExeIdByEntryCount								= new map<string,Integer>();
         map<String,String> mapofExeIdByEvaluaationExp 							= new map<string,String>();
         map<String,List<String>> mapByallFields 		            	        = new map<String,List<String>>();
@@ -21,7 +23,7 @@ public class LeadAssignmentExecutionCriteria {
         map<String,map<String,Map<String,String>>> matchingTypeFieldByCriteria = new map<String,map<String,Map<String,String>>>();
         map<string,map<string,List<String>>> multipleCriteriasForFields 	    = new map<string,map<string,List<String>>>();
         map<string,map<string,List<Decimal>>> allotedFieldbySequenceList	= new map<string, map<string,List<Decimal>>>();
-        map<String,List<Lead>> mapofRMGroupNameByLeadList 						= new map<String,List<Lead>>();
+        map<String,List<Lead__c>> mapofRMGroupNameByLeadList 						= new map<String,List<Lead__c>>();
         map<string,map<string,String>> expectedValuebyCriteria 					= new map<string,map<string,String>>();
         map<String,String> leadIdByMatchedCriterias 							= new map<String,String>();
         map<string,map<string,Decimal>> allotedFieldbySequence 					= new map<string,map<string,Decimal>>();
@@ -38,7 +40,7 @@ public class LeadAssignmentExecutionCriteria {
         set<String> newLeadsSet = new set<String>();
         
         if(leadListToBeProcessed != null){
-            for(Lead leadRec:leadListToBeProcessed){
+            for(Lead__c leadRec:leadListToBeProcessed){
                 newLeadListTemp.add(leadRec);
                 newLeadsSet.add(leadRec.Id);
             }
@@ -48,14 +50,7 @@ public class LeadAssignmentExecutionCriteria {
         list<Default_Assignment_Group__mdt> defaultGroupName = [select id,Group_Name__c from Default_Assignment_Group__mdt];
         List<Execution_Criteria__c> AvailableCriterias = [SELECT Enabled__c,Evaluation_Expression_For_Execution__c,Id,Name ,(SELECT Execution_Criteria__c,serial__c,Field_Name__c,Field_Type__c,Matching_Type__c,Matching_Value__c,Related_Object__c,Scorecard_Execution_Criteria_Name__c,Scorecard__c,Sequence__c FROM Execution_Criteria_Entry__r WHERE Execution_Criteria__c != null ORDER BY Sequence__c ASC)FROM Execution_Criteria__c where Enabled__c = true];
         
-        list<lead> queueLeads = [SELECT Address,City,Company,Country,CreatedById,CreatedDate,
-                                 Email,FirstName,
-                                 GeocodeAccuracy,HasOptedOutOfEmail,Id,Industry,
-                                 IsConverted,IsDeleted,IsUnreadByOwner,LastActivityDate,LastModifiedById,LastModifiedDate,LastName,LastReferencedDate,
-                                 LastViewedDate,Latitude,LeadSource,MasterRecordId,
-                                 MiddleName,MobilePhone,Name,NumberOfEmployees,OwnerId,Phone,
-                                 PhotoUrl,PostalCode,Rating,Salutation, 
-                                 State,Status,Street,Suffix,SystemModstamp,Title,Website FROM Lead where id not in: newLeadsSet and ownerId =: queueId ];
+        list<lead__c> queueLeads = [SELECT Id,OwnerId FROM Lead__c where id not in: newLeadsSet and ownerId =: queueId ];
         if(!queueLeads.isEmpty()){
             //newLeadListTemp.addAll(queueLeads);
             System.debug(queueLeads.size()); 
@@ -129,7 +124,7 @@ public class LeadAssignmentExecutionCriteria {
         
         String logicalValues = '';
         
-        for(Lead ld:newLeadListTemp){
+        for(Lead__c ld:newLeadListTemp){
             boolean leadTemp = false;
             List<String> matchedCriteriasName = new List<String>();
             for(String criteriaName : expectedValuebyCriteria.keyset()){
@@ -192,6 +187,7 @@ public class LeadAssignmentExecutionCriteria {
                             }
                         }
                         else{
+                            system.debug('fieldByMatchingType.get(criteriaName).get(field) ====> ' + fieldByMatchingType.get(criteriaName).get(field));
                             for(String str : fieldByMatchingType.get(criteriaName).get(field)){
                                 if(str == '=='){
                                     if(expectedValuebyCriteria.get(criteriaName).get(field).contains(',')){
@@ -201,10 +197,14 @@ public class LeadAssignmentExecutionCriteria {
                                                 matchedValues++;
                                                 Booleanvalues = Booleanvalues.replace(string.valueOf(recursionValue),'True');
                                                 matchedCriteriasName.add(getLabelNameOfField(field)+' '+str+' '+expectedValuebyCriteria.get(criteriaName).get(field));
+                                                break;
                                             } 
                                         }
                                     }else{
-                                        
+                                        system.debug('field ====> ' + field);
+                                        system.debug('expectedValuebyCriteria.get(criteriaName) ====> ' + expectedValuebyCriteria.get(criteriaName));
+                                        system.debug('expectedValuebyCriteria.get(criteriaName).get(field) ====> ' + expectedValuebyCriteria.get(criteriaName).get(field));
+                                        system.debug('String.valueOf(ld.get(field)) ====> ' + String.valueOf(ld.get(field)));
                                         if(expectedValuebyCriteria.get(criteriaName).get(field) == String.valueOf(ld.get(field))){
                                             matchedValues++;
                                             Booleanvalues = Booleanvalues.replace(string.valueOf(recursionValue),'True');
@@ -422,13 +422,13 @@ public class LeadAssignmentExecutionCriteria {
             }
             if(matchedCriterias.size() > 0){
                 system.debug('matchedCriterias'+matchedCriterias);
-                mapofExecutionIdByListLead.put(criteriaNameById.get(matchedCriterias[0]),new list<lead>(assignedLead));    
+                mapofExecutionIdByListLead.put(criteriaNameById.get(matchedCriterias[0]),new list<lead__c>(assignedLead));    
             }
             
         }
         
         system.debug('DefaultQueueList-Size :::'+DefaultQueueList.size()+'@@@The List :::::'+DefaultQueueList);
-        map<String,List<Lead>> mapofGlobalGroupNameByLeadList = new map<String,List<Lead>>();
+        map<String,List<Lead__c>> mapofGlobalGroupNameByLeadList = new map<String,List<Lead__c>>();
         DefaultGroupAssignment__c dgc = [Select id,Name,Group_Id__c from DefaultGroupAssignment__c where name = 'Global Lead Team'][0];
         
         if(DefaultQueueList.size() > 0 && DefaultQueueList != null){
@@ -439,12 +439,12 @@ public class LeadAssignmentExecutionCriteria {
         getGroupNameByLeads(mapofExecutionIdByListLead,mapofGlobalGroupNameByLeadList);
     }
     
-    public static void getGroupNameByLeads(map<string,list<lead>> mapofExecutionIdByLeadList,map<String,List<Lead>> mapofGlobalGroupNameByLeadList){
+    public static void getGroupNameByLeads(map<string,list<lead__c>> mapofExecutionIdByLeadList,map<String,List<Lead__c>> mapofGlobalGroupNameByLeadList){
         system.debug('mapofExecutionIdByLeadList::'+mapofExecutionIdByLeadList);
         system.debug('mapofFBGroupNameByLeadList::'+mapofGlobalGroupNameByLeadList);
        
         list<Assignment_Group__c> agList = [SELECT id,name,Lead_Assigning_Criteria__c from assignment_group__c where Lead_Assigning_Criteria__c in: mapofExecutionIdByLeadList.keySet()];
-        map<string,list<lead>> mapOfGroupNameByListLead = new map<string,list<lead>>();
+        map<string,list<lead__c>> mapOfGroupNameByListLead = new map<string,list<lead__c>>();
         
         
         if(!agList.isEmpty()){
@@ -454,7 +454,7 @@ public class LeadAssignmentExecutionCriteria {
             list<String> leadIdList = new list<String>();
             map<string,list<String>> mapofGroupnameByLeadIdList = new map<String,list<String>>();
             for(String mapKey : mapOfGroupNameByListLead.keySet()){
-                for(lead ld : mapOfGroupNameByListLead.get(mapKey)){
+                for(lead__c ld : mapOfGroupNameByListLead.get(mapKey)){
                     if(mapofGroupnameByLeadIdList.containsKey(mapKey)){
                         mapofGroupnameByLeadIdList.get(mapKey).add(ld.Id);
                     }else{
@@ -462,24 +462,24 @@ public class LeadAssignmentExecutionCriteria {
                     }
                 }
                 Set<string> tempId = new Set<String>(mapofGroupnameByLeadIdList.get(mapKey));
-               // RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
+               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
             }
         }
         //this is else Part.....
         if(!mapofGlobalGroupNameByLeadList.isEmpty()){
             set<String> tempId = new set<String>();
             for(string mapKey : mapofGlobalGroupNameByLeadList.keySet()){
-                for(Lead ld : mapofGlobalGroupNameByLeadList.get(mapKey)){
+                for(Lead__c ld : mapofGlobalGroupNameByLeadList.get(mapKey)){
                     tempId.add(ld.id);
                 }
-               // RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
+               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
             }
         }
     }
     
-    public  static List<Lead> validatemanuallyCreatedLead(List<Lead> newLeads){
-        List<Lead> leadsToBeProcessedForAssignment = new List<Lead>();
-        for(Lead ld:newLeads){
+    public  static List<Lead__c> validatemanuallyCreatedLead(List<Lead__c> newLeads){
+        List<Lead__c> leadsToBeProcessedForAssignment = new List<Lead__c>();
+        for(Lead__c ld:newLeads){
            // if(ld.IsManuallyCreated__c == false){
               //  leadsToBeProcessedForAssignment.add(ld);
            // }
@@ -511,7 +511,7 @@ public class LeadAssignmentExecutionCriteria {
     }
     
     public static string getLabelNameOfField(string apiName){
-        String type='Lead';
+        String type='Lead__c';
         Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
         Schema.SObjectType leadSchema = schemaMap.get(type);
         Map<String, Schema.SObjectField> fieldMap = leadSchema.getDescribe().fields.getMap();

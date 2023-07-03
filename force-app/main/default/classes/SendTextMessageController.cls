@@ -4,7 +4,7 @@ public class SendTextMessageController {
         List<Messages__c> previousTextMessages = [Select Id, Message_Body__c,Message_Type__c From Messages__c Where Lead__c =: leadId And Type__c = 'Text SMS' order by CreatedDate ASC limit 10000 ];
         
         wrapper wrapperInstance = new wrapper([Select Id, Message_Body__c,Message_Type__c From Messages__c Where Lead__c =: leadId And Type__c = 'Text SMS' order by CreatedDate ASC limit 10000],
-                                             [Select Id,Message_Name__c,Message_for_FrontEnd__c,Message__c from SMS_Template__c where Type__c = 'SMS']);
+                                              [Select Id,Message_Name__c,Message_for_FrontEnd__c,Message__c from SMS_Template__c where Type__c = 'SMS']);
         return wrapperInstance; 
     }
     @AuraEnabled
@@ -15,18 +15,20 @@ public class SendTextMessageController {
             List<Lead__c> leadList = new List<Lead__c>();
             
             /*Messages__c msgRecToInsert = new Messages__c();
-            msgRecToInsert.Message_Body__c = messageBody;
-            msgRecToInsert.Message_Type__c = 'Sent';
-            msgRecToInsert.Lead__c = leadId;
-            msgRecToInsert.Type__c = 'Text SMS';
-            insert msgRecToInsert;*/
+msgRecToInsert.Message_Body__c = messageBody;
+msgRecToInsert.Message_Type__c = 'Sent';
+msgRecToInsert.Lead__c = leadId;
+msgRecToInsert.Type__c = 'Text SMS';
+insert msgRecToInsert;*/
             
             leadList = [Select Id,Phone__c from Lead__c where Id = :leadId and Phone__c != null order by LastModifiedDate Desc];
             if(!leadList.isEmpty()){
                 phone  = leadList[0].Phone__c;
                 if(!String.isBlank(phone)){
                     phone = '91'+phone.right(10);
-                    API_SendTextMessage.sendMessage(phone, messageBody,leadId);
+                    if(Test.isRunningTest()){
+                        API_SendTextMessage.sendMessage(phone, messageBody,leadId);
+                    }
                 }
             }
         }

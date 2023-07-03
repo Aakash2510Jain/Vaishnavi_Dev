@@ -26,9 +26,47 @@
         var purposeOfPurchasepickValue = JSON.parse('{!purposeOfPurchasepickValue}');
         var leadSourceType = JSON.parse('{!leadSourceType}');
         var sourceOfBooking = JSON.parse('{!sourceOfBooking}');
-        // var bookingFormCheckList = JSON.parse('{!bookingFormCheckList}');
+
+
+        angular.module('number', [])
+    .directive('number', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
+
+angular.module('decimal', [])
+    .directive('decimal', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9/.]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
     
-        var app = angular.module('myApp', []);
+        var app = angular.module('myApp', ['number','decimal']);
         app.controller('myCtrl', function ($scope) {
             
             $scope.firstAppDet = true;
@@ -375,12 +413,12 @@
             $scope.firstSave = function(){
                 debugger;
 
-                $scope.appDetails = {"Name__c":$scope.applicant1Details.Name__c,"Date_Of_Birth__c":$scope.applicant1Details.Date_Of_Birth__c,
+                $scope.appDetails = {"Id":$scope.applicant1Details.Id,"Name__c":$scope.applicant1Details.Name__c,"Date_Of_Birth__c":$scope.applicant1Details.Date_Of_Birth__c,
                 "Relation_With__c":$scope.applicant1Details.Relation_With__c,"Occupation__c":$scope.applicant1Details.Occupation__c,
                 "Designation__c":$scope.applicant1Details.Designation__c,"Citizenship_Status__c":$scope.applicant1Details.Citizenship_Status__c,
                 "GPA_if_any__c":$scope.applicant1Details.GPA_if_any__c,"Permanent_Address__c":$scope.applicant1Details.Permanent_Address__c,
-                "Correspondence_Address__c":$scope.applicant1Details.Correspondence_Address__c,"Customer_Mobile_No__c":$scope.applicant1Details.Customer_Mobile_No__c,
-                "Phone__c":$scope.applicant1Details.Phone__c,"Employee_Email_ID__c":$scope.applicant1Details.Employee_Email_ID__c,
+                "Correspondence_Address__c":$scope.applicant1Details.Correspondence_Address__c,"Mobile__c":$scope.applicant1Details.Mobile__c,
+                "Phone__c":$scope.applicant1Details.Phone__c,"Email_Id__c":$scope.applicant1Details.Email_Id__c,
                 "PAN_Number__c":$scope.applicant1Details.PAN_Number__c,"Aadhaar_Number__c":$scope.applicant1Details.Aadhaar_Number__c,
                 "Opportunity__c":$scope.oppId,"First_Applicant__c":true};
 
@@ -403,6 +441,7 @@
                     if(event.status){
                         debugger;
                         $scope.firstApplicantId = result;
+                        $scope.applicant1Details.Id = result;
                         swal({
                             icon: 'success',
                             title: 'success',
@@ -426,7 +465,7 @@
 
             $scope.saveDetailsOfFirstAppli = function(){
                 debugger;
-                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Source_of_Income__c":$scope.applicant1Details.Source_of_Income__c,
+                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Extension__c":$scope.applicant1Details.Extension__c,"Source_of_Income__c":$scope.applicant1Details.Source_of_Income__c,
                 "Name_of_the_Organization_Business__c":$scope.applicant1Details.Name_of_the_Organization_Business__c,"Office_Phone_No__c":$scope.applicant1Details.Office_Phone_No__c,
                 "Organization_Type__c":$scope.applicant1Details.Organization_Type__c,"Industry_Sector__c":$scope.applicant1Details.Industry_Sector__c,
                 "Work_Role__c":$scope.applicant1Details.Work_Role__c,"Annual_Income_INR__c":$scope.applicant1Details.Annual_Income_INR__c,
@@ -461,12 +500,12 @@
             $scope.saveCoApplicantDetails = function(){
                 debugger;
 
-                $scope.appDetails = {"Name__c":$scope.applicant2Details.Name__c,"Date_Of_Birth__c":$scope.applicant2Details.Date_Of_Birth__c,
+                $scope.appDetails = {"Id":$scope.applicant2Details.Id,"Name__c":$scope.applicant2Details.Name__c,"Date_Of_Birth__c":$scope.applicant2Details.Date_Of_Birth__c,
                 "Relation_With__c":$scope.applicant2Details.Relation_With__c,"Occupation__c":$scope.applicant2Details.Occupation__c,
                 "Designation__c":$scope.applicant2Details.Designation__c,"Citizenship_Status__c":$scope.applicant2Details.Citizenship_Status__c,
                 "GPA_if_any__c":$scope.applicant2Details.GPA_if_any__c,"Permanent_Address__c":$scope.applicant2Details.Permanent_Address__c,
-                "Correspondence_Address__c":$scope.applicant2Details.Correspondence_Address__c,"Customer_Mobile_No__c":$scope.applicant2Details.Customer_Mobile_No__c,
-                "Phone__c":$scope.applicant2Details.Phone__c,"Employee_Email_ID__c":$scope.applicant2Details.Employee_Email_ID__c,
+                "Correspondence_Address__c":$scope.applicant2Details.Correspondence_Address__c,"Mobile__c":$scope.applicant2Details.Mobile__c,
+                "Phone__c":$scope.applicant2Details.Phone__c,"Email_Id__c":$scope.applicant2Details.Email_Id__c,
                 "PAN_Number__c":$scope.applicant2Details.PAN_Number__c,"Aadhaar_Number__c":$scope.applicant2Details.Aadhaar_Number__c,
                 "Opportunity__c":$scope.oppId,"First_Applicant__c":false};
 
@@ -486,6 +525,7 @@
                     if(event.status){
                         debugger;
                         $scope.secondApplicantId = result;
+                        $scope.applicant2Details.Id = result;
                         swal({
                             icon: 'success',
                             title: 'success',
@@ -510,7 +550,7 @@
             $scope.saveDetailsOfSecondAppli = function(){
                 debugger;
 
-                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Source_of_Income__c":$scope.applicant2Details.Source_of_Income__c,
+                $scope.appDetails = {"Opportunity__c":$scope.oppId,"Extension__c":$scope.applicant2Details.Extension__c,"Source_of_Income__c":$scope.applicant2Details.Source_of_Income__c,
                 "Name_of_the_Organization_Business__c":$scope.applicant2Details.Name_of_the_Organization_Business__c,"Office_Phone_No__c":$scope.applicant2Details.Office_Phone_No__c,
                 "Organization_Type__c":$scope.applicant2Details.Organization_Type__c,"Industry_Sector__c":$scope.applicant2Details.Industry_Sector__c,
                 "Work_Role__c":$scope.applicant2Details.Work_Role__c,"Annual_Income_INR__c":$scope.applicant2Details.Annual_Income_INR__c,
@@ -788,31 +828,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li class="active">
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -933,7 +973,7 @@
                                                     <label class="label">Mobile:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant1Details.Customer_Mobile_No__c"/>
+                                                    <input class="form-control" type="text" number="applicant1Details.Mobile__c" ng-model="applicant1Details.Mobile__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -943,7 +983,7 @@
                                                     <label class="label">(R)Phone:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant1Details.Phone__c"/>
+                                                    <input class="form-control" type="text" number="applicant1Details.Phone__c" ng-model="applicant1Details.Phone__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -955,7 +995,7 @@
                                                     <label class="label">Email ID:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant1Details.Employee_Email_ID__c"/>
+                                                    <input class="form-control" type="email" ng-model="applicant1Details.Email_Id__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -965,7 +1005,7 @@
                                                     <label class="label">PAN No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant1Details.PAN_Number__c"/>
+                                                    <input class="form-control" type="text" ng-model="applicant1Details.PAN_Number__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -976,7 +1016,7 @@
                                             <label class="label">Aadhar Number:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" ng-model="applicant1Details.Aadhaar_Number__c" />
+                                            <input type="text" number="applicant1Details.Aadhaar_Number__c" class="form-control" ng-model="applicant1Details.Aadhaar_Number__c" />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -1035,31 +1075,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -1092,7 +1132,7 @@
                                                     <label class="label">Office Phone No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="tel" class="form-control" ng-model="applicant1Details.Office_Phone_No__c" />
+                                                    <input type="text" number="applicant1Details.Office_Phone_No__c" class="form-control" ng-model="applicant1Details.Office_Phone_No__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1102,7 +1142,7 @@
                                                     <label class="label">Extn:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="" />
+                                                    <input type="text" number="applicant1Details.Extension__c" class="form-control" ng-model="applicant1Details.Extension__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1236,31 +1276,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -1379,7 +1419,7 @@
                                                     <label class="label">Mobile:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant2Details.Customer_Mobile_No__c"/>
+                                                    <input class="form-control" type="text" number="applicant2Details.Mobile__c" ng-model="applicant2Details.Mobile__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1389,7 +1429,7 @@
                                                     <label class="label">(R)Phone:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant2Details.Phone__c"/>
+                                                    <input class="form-control" type="text" number="applicant2Details.Phone__c" ng-model="applicant2Details.Phone__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1401,7 +1441,7 @@
                                                     <label class="label">Email ID:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant2Details.Employee_Email_ID__c"/>
+                                                    <input class="form-control" type="email" ng-model="applicant2Details.Email_Id__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1411,7 +1451,7 @@
                                                     <label class="label">PAN No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="tel" ng-model="applicant2Details.PAN_Number__c"/>
+                                                    <input class="form-control" type="text" ng-model="applicant2Details.PAN_Number__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1422,7 +1462,7 @@
                                             <label class="label">Aadhar Number:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <input type="text" class="form-control" ng-model="applicant2Details.Aadhaar_Number__c" />
+                                            <input type="text" number="applicant2Details.Aadhaar_Number__c" class="form-control" ng-model="applicant2Details.Aadhaar_Number__c" />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -1488,31 +1528,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -1545,7 +1585,7 @@
                                                     <label class="label">Office Phone No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                        <input type="tel" class="form-control" ng-model="applicant2Details.Office_Phone_No__c" />
+                                                        <input type="text" number="applicant2Details.Office_Phone_No__c" class="form-control" ng-model="applicant2Details.Office_Phone_No__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1555,7 +1595,7 @@
                                                     <label class="label">Extn:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="" />
+                                                    <input type="text" number="applicant2Details.Extension__c" class="form-control" ng-model="applicant1Details.Extension__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1655,31 +1695,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -1693,7 +1733,7 @@
                                                     <label class="label">Apartment No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                        <input type="text" class="form-control" id="date" ng-model="opportunityDetails.Apartment_No__c" />
+                                                        <input type="text" class="form-control" ng-model="opportunityDetails.Apartment_No__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1703,13 +1743,13 @@
                                                     <label class="label">Floor No.:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="opportunityDetails.Floor_No__c" />
+                                                    <input type="text" number="opportunityDetails.Floor_No__c" class="form-control" ng-model="opportunityDetails.Floor_No__c" />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="row align-items-center mb-4">
                                                 <div class="col-md-4">
                                                     <label class="label">Super Built Up<br/>Area:</label>
@@ -1719,7 +1759,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 mt-2">
+                                    </div>
+                                        <!-- <div class="col-md-4 mt-2">
                                             <div class="row align-items-center mb-4">
                                                 <div class="col-md-4">
                                                     <input type="text" class="form-control" ng-model="" />
@@ -1739,7 +1780,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
             
                                     <div class="row">
                                         <div class="col-md-6">
@@ -1748,7 +1789,7 @@
                                                     <label class="label">Base Rate(Rs):</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="number" ng-model="opportunityDetails.Base_Rate__c"/>
+                                                    <input class="form-control" type="text" decimal="opportunityDetails.Base_Rate__c" ng-model="opportunityDetails.Base_Rate__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1767,7 +1808,7 @@
                                                     <label class="label">Floor Rise Rate(Rs):</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="number" ng-model="opportunityDetails.Floor_Rise_Rate__c"/>
+                                                    <input class="form-control" type="text" decimal="opportunityDetails.Floor_Rise_Rate__c" ng-model="opportunityDetails.Floor_Rise_Rate__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1786,7 +1827,7 @@
                                                     <label class="label">PLC Charges(Rs):</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="number" ng-model="opportunityDetails.PLC_Charges__c"/>
+                                                    <input class="form-control" type="text" decimal="opportunityDetails.PLC_Charges__c" ng-model="opportunityDetails.PLC_Charges__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1805,7 +1846,7 @@
                                                     <label class="label">Total Rate(Rs):</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="number" ng-model="opportunityDetails.Total_Rate__c"/>
+                                                    <input class="form-control" type="text" decimal="opportunityDetails.Total_Rate__c" ng-model="opportunityDetails.Total_Rate__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1831,7 +1872,7 @@
                                             <label class="label">Clubhouse <br/>Charges:(Rs)</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <input class="form-control" style="width: 70%;" type="number" ng-model="opportunityDetails.Clubhouse_Charges__c"/>
+                                            <input class="form-control" style="width: 70%;" type="text" decimal="opportunityDetails.Clubhouse_Charges__c" ng-model="opportunityDetails.Clubhouse_Charges__c"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -1841,7 +1882,7 @@
                                                     <label class="label">Car Park<br/>Cost:(Rs.)</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" id="date" ng-model="opportunityDetails.Car_Park_Cost__c" />
+                                                    <input type="text" decimal="opportunityDetails.Car_Park_Cost__c" class="form-control" ng-model="opportunityDetails.Car_Park_Cost__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1851,7 +1892,7 @@
                                                     <label class="label">No. of Car<br/>Parks:</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" ng-model="opportunityDetails.No_of_Car_Parks__c" />
+                                                    <input type="text" number="opportunityDetails.No_of_Car_Parks__c" class="form-control" ng-model="opportunityDetails.No_of_Car_Parks__c" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1863,7 +1904,7 @@
                                                     <label class="label">Sales Value(Rs):</label>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <input class="form-control" type="number" ng-model="opportunityDetails.Sale_Value__c"/>
+                                                    <input class="form-control" type="text" decimal="opportunityDetails.Car_Park_Cost__c" ng-model="opportunityDetails.Sale_Value__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1924,31 +1965,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -1960,7 +2001,7 @@
                                             <label class="label">Booking Amount:(Rs.)</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <input class="form-control" type="number" ng-model="opportunityDetails.Booking_Amount__c"/>
+                                            <input class="form-control" type="text" decimal="opportunityDetails.Booking_Amount__c" ng-model="opportunityDetails.Booking_Amount__c"/>
                                         </div>
                                     </div>
             
@@ -2114,31 +2155,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -2183,7 +2224,7 @@
                                                         <label class="label">CP Name/Company:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input class="form-control" type="text"/>
+                                                        <input class="form-control" type="text" ng-model="opportunityDetails.CP_Name_Company__c" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -2193,7 +2234,7 @@
                                                         <label class="label">Mobile No:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input class="form-control" type="text"/>
+                                                        <input class="form-control" type="text" number="opportunityDetails.Channel_Partner_Mobile_No__c" ng-model="opportunityDetails.Channel_Partner_Mobile_No__c" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -2205,11 +2246,11 @@
                                                         <label class="label">RERA Regn No:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input class="form-control" type="text"/>
+                                                        <input class="form-control" type="text" ng-model="opportunityDetails.RERA_Regn_No__c"/>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <!-- <div class="col-md-6">
                                                 <div class="row align-items-center mb-4">
                                                     <div class="col-md-4">
                                                         <label class="label">Seal And Signature</label>
@@ -2218,7 +2259,7 @@
                                                         <input class="form-control" type="text"/>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
             
@@ -2292,7 +2333,7 @@
                                                         <label class="label">Mobile No.:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input class="form-control" type="tel" ng-model="opportunityDetails.Customer_Mobile_No__c"/>
+                                                        <input class="form-control" type="text" number="opportunityDetails.Customer_Mobile_No__c" ng-model="opportunityDetails.Customer_Mobile_No__c"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2349,31 +2390,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
@@ -2428,31 +2469,31 @@
                         <div class="sidebar col-md-auto">
                             <ul>
                                 <li>
-                                    <a ng-click="showFA1()">Applicant Details (Sole/First)</a>
+                                    <a ng-click="">Applicant Details (Sole/First)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showFA2()">Details of the first applicant</a>
+                                    <a ng-click="">Details of the first applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA1()">Co-applicant details (second)</a>
+                                    <a ng-click="">Co-applicant details (second)</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSA2()">Details of the co-applicant</a>
+                                    <a ng-click="">Details of the co-applicant</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showApartment()">apartment Cost Details</a>
+                                    <a ng-click="">apartment Cost Details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showPayment()">Payment details</a>
+                                    <a ng-click="">Payment details</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showSurvey()">survey form</a>
+                                    <a ng-click="">survey form</a>
                                 </li>
                                 <li>
-                                    <a ng-click="showTerms()">terms and conditions</a>
+                                    <a ng-click="">terms and conditions</a>
                                 </li>
                                 <li class="active">
-                                    <a ng-click="showcheckList()">checklist for booking form</a>
+                                    <a ng-click="">checklist for booking form</a>
                                 </li>
                             </ul>
                         </div>
