@@ -83,11 +83,11 @@ mapofGroupNameBySourceIntent.put(signMeta.Group_Name__c,signMeta.Source_Intent__
                     update agmList;
                     
                     if(!queueLeadListTobePass.isEmpty()){
-                        LeadAssignmentExecutionCriteria.validateEntryCriteria(queueLeadListTobePass); 
+                        LeadAssignmentExecutionCriteria.validateEntryCriteria(); 
                     }
                     /*for(Assignment_Group_Member__c agm : agmList){
-RoundRobinLeadAssignment.assignLeadsToBDS(mapofGroupNameBySourceIntent.get(agm.Assignment_Group__r.name));
-}*/
+						RoundRobinLeadAssignment.assignLeadsToBDS(mapofGroupNameBySourceIntent.get(agm.Assignment_Group__r.name));
+					}*/
                     
                 }
                 

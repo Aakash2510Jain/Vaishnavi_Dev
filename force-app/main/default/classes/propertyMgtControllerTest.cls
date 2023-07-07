@@ -53,8 +53,13 @@ public class propertyMgtControllerTest {
     
     @isTest
     static void testGetAvailableRooms() {
+        Property_Block__c block = new Property_Block__c(Name = 'Block 1');
+        insert block; 
         
-        Property_Floor__c floor = new Property_Floor__c(Name = 'Floor 1',Property_Tower__c = 'a0F1m000004WBfcEAG');
+        Property_Tower__c tower = new Property_Tower__c(Name = 'Tower 1',Property_Block__c = block.Id);
+        insert tower;
+        
+        Property_Floor__c floor = new Property_Floor__c(Name = 'Floor 1',Property_Tower__c = tower.Id);
         insert floor;
         
         List<Property_Room__c> rooms = new List<Property_Room__c>{

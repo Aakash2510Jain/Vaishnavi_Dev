@@ -688,7 +688,9 @@ angular.module('decimal', [])
                 "Source_Of_Booking__c":$scope.opportunityDetails.Source_Of_Booking__c,"Existing_Customer_Referral__c":$scope.opportunityDetails.Existing_Customer_Referral__c,
                 "Vaishnavi_Referral__c":$scope.opportunityDetails.Vaishnavi_Referral__c,"Customer_Name__c":$scope.opportunityDetails.Customer_Name__c,
                 "Project_Name__c":$scope.opportunityDetails.Project_Name__c,"Unit_Plot_No__c":$scope.opportunityDetails.Unit_Plot_No__c,
-                "Customer_Mobile_No__c":$scope.opportunityDetails.Customer_Mobile_No__c,"Customer_Email_Id__c":$scope.opportunityDetails.Customer_Email_Id__c};
+                "Customer_Mobile_No__c":$scope.opportunityDetails.Customer_Mobile_No__c,"Customer_Email_Id__c":$scope.opportunityDetails.Customer_Email_Id__c
+                "CP_Name_Company__c":$scope.opportunityDetails.CP_Name_Company__c,"Channel_Partner_Mobile_No__c":$scope.opportunityDetails.Channel_Partner_Mobile_No__c,
+                "RERA_Regn_No__c":$scope.opportunityDetails.RERA_Regn_No__c};
 
                 BookingFormLifeController.saveSurveyDetails($scope.surveyDetails, function(result,event){
                     debugger;

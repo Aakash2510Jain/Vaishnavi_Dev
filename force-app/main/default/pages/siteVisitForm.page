@@ -8,7 +8,20 @@
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script> 
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+            <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet"/>
         </head>
+
+        <style>
+            .dropdown.dropdown-scroll .dropdown-menu {
+            max-height: 200px;
+            width: 60px;
+            overflow: auto;
+            }
+
+            .search-control {
+            padding: 5px 10px;
+            }
+        </style>
 
         <script>
             var ageGroup = JSON.parse('{!ageGroup}');
@@ -27,10 +40,51 @@
             var ownership = JSON.parse('{!ownership}');
             var sourceOfFunding = JSON.parse('{!sourceOfFunding}');
             var ethnicity = JSON.parse('{!ethnicity}');
+            var flatType = JSON.parse('{!flatType}');
+            var UserId = '{!UserId}';
+
+            angular.module('number', [])
+    .directive('number', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
+
+angular.module('decimal', [])
+    .directive('decimal', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9/.]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
 
             var app = angular.module('visit_app', []);
             app.controller('visit_ctrl', function ($scope) {
                 debugger;
+                $scope.isDisabled = false;
                 $scope.subSource = ['99 Acres','Commonfloor','Housing','Magicbricks'];
                 $scope.today = new Date();
                 var dateTime = $scope.today.toLocaleString();
@@ -58,6 +112,8 @@
                 $scope.ownership = ownership;
                 $scope.sourceOfFunding = sourceOfFunding;
                 $scope.ethnicity = ethnicity;
+                $scope.flatType = flatType;
+                $scope.UserId = UserId;
                 $scope.visit = {};
                 
                 $scope.errorMsg = false;
@@ -65,12 +121,45 @@
                 $scope.showCreateLead = false;
                 $scope.showVisitAfterCreatn = false;
                 $scope.showConvertedLead = false;
+
+                $scope.showProjectsErrMsg = false;
+                $scope.showErrmsgOppSV = false;
                 
                 $scope.showVisitSection = false;
                 $scope.showCustReq = false;
                 $scope.visitDet = false;
                 $scope.showGRE = false;
                 $scope.showSalesManager = false;
+                $scope.listOfLocation = [];
+
+                $scope.getLocationList = function(){
+                    debugger;
+                    siteVisitFormController.getLocationList(function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.listOfLocation = result;
+                            // for(var i=0;i<result.length;i++){
+                            //     $scope.listOfLocation.push(result[i].Name);
+                            // }
+                            $scope.$apply();
+                        }
+                    })
+                }
+                $scope.getLocationList();
+
+                $scope.getProjectsData = function(){
+                    debugger;
+                    siteVisitFormController.getProjectsData($scope.UserId,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.projectId = result;
+                            $scope.$apply();
+                        }
+                    })
+                }
+                $scope.getProjectsData();
 
                 $scope.searchLead = function(){
                     debugger;
@@ -84,6 +173,7 @@
                                 $scope.showLeadDetails = true;
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
+                                $scope.$apply();
                             }else{
                                 console.log('success....');
                                 $scope.oppDetails = result.oppRec;
@@ -102,6 +192,11 @@
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
                                 $scope.showConvertedLead = true;
+                                $scope.showVisitSection = false;
+                                $scope.showCustReq = false;
+                                $scope.visitDet = false;
+                                $scope.showGRE = false;
+                                $scope.showSalesManager = false;
                                 $scope.$apply();
                             }
                             
@@ -109,6 +204,11 @@
                             $scope.errorMsg = true;
                             $scope.showLeadDetails = false;
                             $scope.showCreateLead = false;
+                            $scope.showVisitSection = false;
+                            $scope.showCustReq = false;
+                            $scope.visitDet = false;
+                            $scope.showGRE = false;
+                            $scope.showSalesManager = false;
                         }
                         $scope.getleadDet();
 						$scope.$apply();
@@ -120,12 +220,25 @@
                     $scope.showCreateLead = true;
                     $scope.errorMsg = false;
                     $scope.showLeadDetails = false;
+                    $scope.showVisitSection = false;
+                    $scope.showCustReq = false;
+                    $scope.visitDet = false;
+                    $scope.showGRE = false;
+                    $scope.showSalesManager = false;
                 }
 
                 $scope.createLeadRecord = function(){
                     debugger;
+                    // $scope.isDisabled = true;
+                    // $scope.showSpinner = true;
+                    $("#btnSubmit").hide();
+                    $("#btnPleaseWait").show();
                     siteVisitFormController.createLeadRecord($scope.ledDetails,function(result,event){
                        debugger;
+                       $("#btnPleaseWait").hide();
+                       $("#btnSubmit").show(); 
+                    //    $scope.isDisabled = false;
+                    //    $scope.showSpinner = false;
                        if(event.status && result){
                             debugger;
                             $scope.leadId = result;
@@ -162,14 +275,120 @@
 
                 }
 
+                $scope.createCloneVisit = function(){
+                    debugger;
+                    $("#btnSubmit1").hide();
+                    $("#btnPleaseWait1").show();
+                    siteVisitFormController.createCloneVisit($scope.latestVisitId,function(result,event){
+                        debugger;
+                        $("#btnPleaseWait1").hide();
+                        $("#btnSubmit1").show();
+                        if(event.status && result){
+                            debugger;
+                            $scope.errorMsg = false;
+                            $scope.showLeadDetails = false;
+                            $scope.showCreateLead = false;
+                            $scope.showVisitAfterCreatn = false;
+                            $scope.showConvertedLead = false;
+
+                            $scope.showProjectsErrMsg = true;
+
+                            $scope.showVisitSection = false;
+                            $scope.showCustReq = false;
+                            $scope.visitDet = false;
+                            $scope.showGRE = false;
+                            $scope.showSalesManager = false;
+                            $scope.$apply();
+                        }
+                    })
+                }
+
+                $scope.cloneOpportunityAndSV = function(){
+                    debugger;
+                    $("#btnSubmit1").hide();
+                    $("#btnPleaseWait1").show();
+                    siteVisitFormController.cloneOpportunityAndSV($scope.oppDetails.Id,$scope.latestVisitId,function(result,event){
+                        debugger;
+                        $("#btnPleaseWait1").hide();
+                        $("#btnSubmit1").show();
+                        if(event.status && result){
+                            $scope.errorMsg = false;
+                            $scope.showLeadDetails = false;
+                            $scope.showCreateLead = false;
+                            $scope.showVisitAfterCreatn = false;
+                            $scope.showConvertedLead = false;
+
+                            $scope.showProjectsErrMsg = false;
+                            $scope.showErrmsgOppSV = true;
+
+                            $scope.showVisitSection = false;
+                            $scope.showCustReq = false;
+                            $scope.visitDet = false;
+                            $scope.showGRE = false;
+                            $scope.showSalesManager = false;
+                            $scope.$apply(); 
+                        }
+                    })
+                }
+
+                $scope.cloneOppForDiffProject = function(){
+                    debugger;
+                    $("#btnSubmit1").hide();
+                    $("#btnPleaseWait1").show();
+                    siteVisitFormController.cloneOppForDiffProject($scope.oppId,$scope.projectId,function(result,event){
+                        debugger;
+                        $("#btnPleaseWait1").hide();
+                        $("#btnSubmit1").show();
+                        if(event.status && result){
+                            $scope.oppId = result;
+                            $scope.showVisitSection = true;
+                            $scope.errorMsg = false;
+                            $scope.showLeadDetails = false;
+                            $scope.showCreateLead = false;
+                            $scope.showVisitAfterCreatn = false;
+                            $scope.showConvertedLead = false; 
+                            $scope.$apply();
+                            }
+                    })
+                }
+
                 $scope.OnClickcreateVisit = function(){
                     debugger;
-                    $scope.showVisitSection = true;
-                    $scope.errorMsg = false;
-                    $scope.showLeadDetails = false;
-                    $scope.showCreateLead = false;
-                    $scope.showVisitAfterCreatn = false;
-                    $scope.showConvertedLead = false;
+                    if($scope.oppDetails != undefined){
+                        if($scope.oppDetails.Project__c == $scope.projectId){
+                            $scope.lengthofVisit = $scope.siteVisitList.length;
+                            $scope.visitDate = new Date($scope.siteVisitList[$scope.lengthofVisit-1].Actual_visit_date__c);
+                            // if($scope.siteVisitList.length > 0){
+                            // for(var i=0; i<$scope.siteVisitList.length;i++){
+                            //     debugger;
+                            //     if($scope.siteVisitList[i].Actual_visit_date__c != null){
+                            //         $scope.visitDate = new Date($scope.siteVisitList[i].Actual_visit_date__c);
+                            //     }
+                            // }
+                            // }
+                            var timeDiff = Math.abs($scope.today.getTime() - $scope.visitDate.getTime());
+                            $scope.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                            $scope.latestVisitId = $scope.siteVisitList[$scope.lengthofVisit-1].Id;
+                            if($scope.oppDetails.Stage__c == 'Lost'){
+                                $scope.cloneOppForDiffProject();
+                            }else if($scope.days < 90){
+                            $scope.createCloneVisit();                       
+                            }else if($scope.days > 90){
+                                $scope.cloneOpportunityAndSV();
+                            }
+                        }else if($scope.oppDetails.Project__c != $scope.projectId){
+                            $scope.cloneOppForDiffProject();
+                        }
+
+                    }else{
+                        $scope.showVisitSection = true;
+                        $scope.errorMsg = false;
+                        $scope.showLeadDetails = false;
+                        $scope.showCreateLead = false;
+                        $scope.showVisitAfterCreatn = false;
+                        $scope.showConvertedLead = false;
+                    }
+                    $scope.$apply();
                 }
 
                 $scope.changeOfAgeGroup = function(value){
@@ -181,6 +400,8 @@
                     debugger;
                     $scope.visit.Employment_Type__c = value;
                 }
+
+                $scope.location1;
 
                 $scope.saveCustomerDet = function(){
                     debugger;
@@ -212,7 +433,7 @@
                     "Residential_Address__c":$scope.visit.Residential_Address__c,"City__c":$scope.visit.City__c,
                     "Pincode__c":$scope.visit.Pincode__c,"Employment_Type__c":$scope.visit.Employment_Type__c,"Company_Name__c":$scope.visit.Company_Name__c,
                     "Industry__c":$scope.visit.Industry__c,"Office_Address__c":$scope.visit.Office_Address__c,"Office_PinCode__c":$scope.visit.Office_PinCode__c,
-                    "Actual_visit_date__c":$scope.today};
+                    "Actual_visit_date__c":$scope.today,"Alternate_Phone__c":$scope.visit.Alternate_Phone__c};
                     var year = 0
                     var month = 0;
                     var day = 0;
@@ -236,7 +457,7 @@
                     }
 
                     if($scope.leadId != undefined){
-                        siteVisitFormController.insertVisitRecord($scope.firstVisitRecord,$scope.leadId,year,month,day,visityear,visitmonth,visitday,function(result,event){
+                        siteVisitFormController.insertVisitRecord($scope.firstVisitRecord,$scope.leadId,year,month,day,visityear,visitmonth,visitday,$scope.visit.Location__c,function(result,event){
                         debugger;
                         if(event.status && result){
                             debugger;
@@ -582,12 +803,21 @@
                             <div class="col-md-7 mt-4">
                                 <button class="button" ng-click="searchLead()">Search</button>
                                 <button class="button" ng-click="createLead()"><i class="fa fa-plus"></i>  Create New Lead</button>
-                                <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn || showConvertedLead" ng-click="OnClickcreateVisit()">Create Visit</button>
+                                <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn || showConvertedLead" id="btnSubmit1" ng-click="OnClickcreateVisit()">Create Visit</button>
+                                <button class="button" id="btnPleaseWait1" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                             </div>
                         </div>
 
                         <div class="row mt-5" ng-show="errorMsg">
                             <h3 style="color: red; text-align:center;">No such record available ! Try Again.....</h3>
+                        </div>
+
+                        <div class="row mt-5" ng-show="showProjectsErrMsg">
+                            <h3 style="color: red; text-align:center;">Visit Created..</h3>
+                        </div>
+
+                        <div class="row mt-5" ng-show="showErrmsgOppSV">
+                            <h3 style="color: red; text-align:center;">Opportunity and Visit Created..</h3>
                         </div>
 
                         <div class="row mt-5" ng-show="showLeadDetails">
@@ -670,8 +900,12 @@
                             </div>
 
                             <div class="row mt-5">
+                                <!-- <div class="d-grid gap-2">
+                                    <button class="btn btn-success btn-block" id="btnSubmit" ng-click="saveContact()" type="submit">Submit</button>
+                                </div> -->
                                 <div class="col-md-12">
-                                    <button class="button" style="text-align: center;" ng-click="createLeadRecord()">Create</button>
+                                    <button class="button" id="btnSubmit" style="text-align: center;" ng-click="createLeadRecord()">Create</button>
+                                    <button class="button" id="btnPleaseWait" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                                 </div>
                             </div>
                         </div>
@@ -687,10 +921,10 @@
 
                         <div class="row justify-content-between">
                             <div class="col-md-3">
-                                <div class="d-flex align-items-center">
+                                <!-- <div class="d-flex align-items-center">
                                     <label class="label pe-3 text-nowrap">Form No.</label>
                                     <input type="text" class="form-control" ng-model="visit.Form_No__c"/>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="col-md-3">
                                 
@@ -742,7 +976,7 @@
                                                         <label class="label">Mobile No.:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="tel" class="form-control" ng-model="leadRecord[0].Phone__c"/>
+                                                        <input type="tel" number="leadRecord[0].Phone__c" class="form-control" ng-model="leadRecord[0].Phone__c"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -774,7 +1008,7 @@
                                                         <label class="label">Alternate Phone:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="tel" class="form-control" ng-model="visit.Alternate_Phone__c" />
+                                                        <input type="tel" number="visit.Alternate_Phone__c" class="form-control" ng-model="visit.Alternate_Phone__c" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -794,7 +1028,7 @@
                                             <div class="col-md-10">
                                                 <div class="row">
                                                     <div class="col-md-4 pt-3" ng-repeat="value in ageGroup">
-                                                        <input type="radio" ng-model="visit.Age_Group__c" ng-value="value" ng-change="changeOfAgeGroup(value)" />
+                                                        <input type="radio" number="visit.Age_Group__c" ng-model="visit.Age_Group__c" ng-value="value" ng-change="changeOfAgeGroup(value)" />
                                                         <label>{{value}}</label>
                                                     </div>
                                                 </div>
@@ -825,7 +1059,9 @@
                                                         <label class="label">Locality:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="text" class="form-control" ng-model="visit.Locality__c" />
+                                                        <select class="form-control" aria-label="Default select example" ng-model="visit.Location__c">
+                                                            <option ng-repeat="location in listOfLocation">{{location.Name}}</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -835,7 +1071,7 @@
                                                 <label class="label">Pin Code:</label>
                                             </div>
                                             <div class="col-md-10">
-                                                <input class="form-control" ng-model="visit.Pincode__c"/>
+                                                <input class="form-control" type="text" ng-model="visit.Pincode__c"/>
                                             </div>
                                         </div>
                                         <div class="row align-items-center mb-4">
@@ -977,7 +1213,7 @@
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
-                                                    <div class="col-md-4 pt-3" ng-repeat="value in area">
+                                                    <div class="col-md-4 pt-3" ng-repeat="value in flatType">
                                                         <input type="radio" ng-model="visit.Area__c" ng-value="value" ng-change="changeOfArea(value)" />
                                                         <label>{{value}}</label>
                                                     </div>
@@ -1096,7 +1332,7 @@
                                         </div> -->
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Walking Source:</label>
+                                                <label class="label">Walkin Source:</label>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1182,7 +1418,7 @@
                                                             <label class="label">Mobile No.:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="tel" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
+                                                            <input type="tel" number="visit.Channel_Partner_Mobile_No__c" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1231,7 +1467,7 @@
                                                             <label class="label">Mobile No.:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="tel" class="form-control" ng-model="visit.Referral_Mobile_No__c" />
+                                                            <input type="tel" number="visit.Referral_Mobile_No__c" class="form-control" ng-model="visit.Referral_Mobile_No__c" />
                                                         </div>
                                                     </div>
                                                 </div>

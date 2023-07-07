@@ -59,7 +59,8 @@ public class LeadTriggerHandlerTest {
         updateleadRec.Lead_Stage__c = 'Converted';
         update updateleadRec;
         
-        updateleadRec.Lead_Substage__c = 'Site Visit Planned';
+        //updateleadRec.Lead_Substage__c = 'Site Visit Planned';
+        updateleadRec.Lead_Substage__c = 'Site Visit Proposed';
         update updateleadRec;
         
         updateleadRec.Lead_Source_Type__c = 'Hoarding';

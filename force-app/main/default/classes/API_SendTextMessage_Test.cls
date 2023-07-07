@@ -3,9 +3,12 @@ public class API_SendTextMessage_Test {
     @isTest
     public static void testSendMessage() {
         // Test data
+        Lead__c leadRec = new Lead__c(Name__c='Test');
+        insert leadRec;
+        
         String recipientNumber = '1234567890';
         String message = 'Test message';
-        String leadId = 'a041m00000ch06AAAQ';
+        String leadId = leadRec.Id;
         
         // Mock the HTTP callout
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());

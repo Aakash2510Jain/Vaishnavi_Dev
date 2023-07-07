@@ -1,23 +1,25 @@
 @isTest
 public class EmailIUtilityTest {
-    @isTest
+    @isTest(seeAllData=true)
     static void testNotifyPreSalesTeamOnLeadAssignment(){
         
         List<Lead__c> ldList = new List<Lead__c>();
+        /*
+        Folder folderRec =[SELECT Id, Name,DeveloperName,AccessType FROM Folder Where Name = 'Service Dashboards' Limit 1];  
                
         EmailTemplate et = new EmailTemplate();
         System.runAs (new User(Id = UserInfo.getUserId()) ){
        	et.Name = 'test_Email_Tempate';
         et.DeveloperName = 'xyz';
-       // et.FolderName = 'aaa';
+        //et.FolderName = folderRec.Name;
         et.Subject = 'Test Subject';
         et.TemplateType = 'text';
-        et.FolderId = '00D1m0000008pgzEAA';
+        et.FolderId = folderRec.Id;
         et.Body = 'test Record';
         et.HtmlValue = '<html><body>{!Lead.Name}</body></html>';
         insert et;
         }
-        
+        */        
         Lead__c testLead = new Lead__c( Name__c = 'Test Lead', Email__c = 'testlead@test.com', Phone__c = '1234567890');
         insert testLead;
         
@@ -26,15 +28,17 @@ public class EmailIUtilityTest {
        // Set<Id> leadIds = new Set<Id>{ ldList[0].Id };
             
         Test.startTest();
-        EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIds,et.Name);
+        EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIds,'Pre-sales Team welcome email');
         Test.stopTest();
     }
     
     
-    @isTest
+    @isTest(seeAllData=true)
     static void testnotifySalesTeamOnLeadAssignment(){
         
         List<Lead__c> ldList = new List<Lead__c>();
+        /*
+        Folder folderRec2 =[SELECT Id, Name,DeveloperName,AccessType FROM Folder Limit 1];
                
         EmailTemplate et = new EmailTemplate();
         System.runAs (new User(Id = UserInfo.getUserId()) ){
@@ -43,12 +47,12 @@ public class EmailIUtilityTest {
        // et.FolderName = 'aaa';
         et.Subject = 'Test Subject';
         et.TemplateType = 'text';
-        et.FolderId = '00D1m0000008pgzEAA';
+        et.FolderId = folderRec2.Id;
         et.Body = 'test Record';
         et.HtmlValue = '<html><body>{!Lead.Name}</body></html>';
         insert et;
         }
-        
+        */
         Lead__c testLead = new Lead__c( Name__c = 'Test Lead', Email__c = 'testlead@test.com', Phone__c = '1234567890');
         insert testLead;
         
@@ -57,7 +61,7 @@ public class EmailIUtilityTest {
        // Set<Id> leadIds = new Set<Id>{ ldList[0].Id };
             
         Test.startTest();
-        EmailIUtility.notifySalesTeamOnLeadAssignment(leadIds,et.Name);
+        EmailIUtility.notifySalesTeamOnLeadAssignment(leadIds,'Sales Lead Verified Notification');
         Test.stopTest();
     }
     	

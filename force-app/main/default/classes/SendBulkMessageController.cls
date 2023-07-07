@@ -42,6 +42,7 @@ public withOut sharing class SendBulkMessageController {
             leadIds.add(lastLeadIds[0]);
 
         system.debug('leadIds--'+leadIds);
+        
         Set<String> SobjectFields = Schema.getGlobalDescribe().get('Lead__c').getDescribe().fields.getMap().keySet();
         String queryString='SELECT ' + String.join(new List<String>(SobjectFields), ',') + ' FROM Lead__c WHERE Id IN (\''+String.join(leadIds,'\',\'')+'\') Order by Name asc';
         return Database.query(queryString);

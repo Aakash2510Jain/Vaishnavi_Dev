@@ -1,15 +1,17 @@
 public class LeadAssignmentExecutionCriteria {
     public Static Boolean runLeadAssignment = true;
     
-    public static void validateEntryCriteria(list<Lead__c> newLeadList){
+    
+    public static void validateEntryCriteria(){ //list<Lead__c> newLeadList
+        Set<Lead__c> assignedLead = new Set<Lead__c>();
         //Getting the Validated Leads : 
         //List<Lead__c> leadListToBeProcessed = validatemanuallyCreatedLead(newLeadList);
-        List<Lead__c> leadListToBeProcessed = new List<Lead__c>();
+        /*List<Lead__c> leadListToBeProcessed = new List<Lead__c>();
         leadListToBeProcessed.addall(newLeadList);
-        Set<Lead__c> assignedLead = new Set<Lead__c>();
+        
         if(leadListToBeProcessed != Null){
             system.debug('leadListToBeProcessed'+leadListToBeProcessed.size());
-        }
+        }*/
         
         Boolean IsLeadAssigned = False;
         list<lead__c> newLeadListTemp 												= new list<lead__c>();
@@ -39,21 +41,22 @@ public class LeadAssignmentExecutionCriteria {
         map<string,Decimal> allotedMarksbySequence = new Map<String,Decimal>();
         set<String> newLeadsSet = new set<String>();
         
-        if(leadListToBeProcessed != null){
+        /*if(leadListToBeProcessed != null){
             for(Lead__c leadRec:leadListToBeProcessed){
                 newLeadListTemp.add(leadRec);
                 newLeadsSet.add(leadRec.Id);
             }
-        }
+        }*/
         
         string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
         list<Default_Assignment_Group__mdt> defaultGroupName = [select id,Group_Name__c from Default_Assignment_Group__mdt];
         List<Execution_Criteria__c> AvailableCriterias = [SELECT Enabled__c,Evaluation_Expression_For_Execution__c,Id,Name ,(SELECT Execution_Criteria__c,serial__c,Field_Name__c,Field_Type__c,Matching_Type__c,Matching_Value__c,Related_Object__c,Scorecard_Execution_Criteria_Name__c,Scorecard__c,Sequence__c FROM Execution_Criteria_Entry__r WHERE Execution_Criteria__c != null ORDER BY Sequence__c ASC)FROM Execution_Criteria__c where Enabled__c = true];
         
-        list<lead__c> queueLeads = [SELECT Id,OwnerId FROM Lead__c where id not in: newLeadsSet and ownerId =: queueId ];
-        if(!queueLeads.isEmpty()){
+       // list<lead__c> queueLeads = [SELECT Id,OwnerId FROM Lead__c where id not in: newLeadsSet and ownerId =: queueId ];
+       newLeadListTemp = [SELECT Id,OwnerId, Lead_Source__c FROM Lead__c where  ownerId =: queueId ];
+        if(!newLeadListTemp.isEmpty()){
             //newLeadListTemp.addAll(queueLeads);
-            System.debug(queueLeads.size()); 
+            System.debug(newLeadListTemp.size()); 
         }
         
         

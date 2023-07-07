@@ -9,6 +9,7 @@ global class API_WhatsAppIncomingMSG {
         Map<String, Object> jsonMap = (Map<String, Object>) JSON.deserializeUntyped(body);
         
         String mobileNumber = (String) jsonMap.get('mobile');
+        System.debug('mobileNumber::::>>'+mobileNumber);
         
         //List<List<SObject>> searchResults = [FIND '7042458620' IN ALL FIELDS RETURNING Lead__c(Id, Phone__c, Phone_Alternative__c),Opportunity__C(Id,Name,Phone__c)];
         

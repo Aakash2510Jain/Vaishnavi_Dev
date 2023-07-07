@@ -18,12 +18,6 @@ private class API_CreateLead_Test {
          
         API_CreateLead.doPost();
         
-        RestResponse res = RestContext.response;
-        IntegrationWrapper.APIResponseWrapper responseWrapper = (IntegrationWrapper.APIResponseWrapper)JSON.deserialize(
-            res.responseBody.toString(),
-            IntegrationWrapper.APIResponseWrapper.class
-        );
-        
     }
     
     @IsTest

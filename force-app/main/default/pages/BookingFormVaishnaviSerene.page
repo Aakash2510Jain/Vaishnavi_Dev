@@ -683,7 +683,9 @@ angular.module('decimal', [])
                 "Source_Of_Booking__c":$scope.opportunityDetails.Source_Of_Booking__c,"Existing_Customer_Referral__c":$scope.opportunityDetails.Existing_Customer_Referral__c,
                 "Vaishnavi_Referral__c":$scope.opportunityDetails.Vaishnavi_Referral__c,"Customer_Name__c":$scope.opportunityDetails.Customer_Name__c,
                 "Project_Name__c":$scope.opportunityDetails.Project_Name__c,"Unit_Plot_No__c":$scope.opportunityDetails.Unit_Plot_No__c,
-                "Customer_Mobile_No__c":$scope.opportunityDetails.Customer_Mobile_No__c,"Customer_Email_Id__c":$scope.opportunityDetails.Customer_Email_Id__c};
+                "Customer_Mobile_No__c":$scope.opportunityDetails.Customer_Mobile_No__c,"Customer_Email_Id__c":$scope.opportunityDetails.Customer_Email_Id__c,
+                "CP_Name_Company__c":$scope.opportunityDetails.CP_Name_Company__c,"Channel_Partner_Mobile_No__c":$scope.opportunityDetails.Channel_Partner_Mobile_No__c,
+                "RERA_Regn_No__c":$scope.opportunityDetails.RERA_Regn_No__c};
 
                 BookingFormSereneController.saveSurveyDetails($scope.surveyDetails, function(result,event){
                     debugger;
@@ -1104,10 +1106,12 @@ angular.module('decimal', [])
                                 <div class="col-md-12">
                                     <div class="row align-items-center mb-4">
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in sourceIncomepickValue">
-                                                <input type="radio" name="sourceIncome" ng-model="applicant1Details.Source_of_Income__c" ng-value="value" ng-change="ChangeOfSourceIncome1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-3" ng-repeat="value in sourceIncomepickValue">
+                                                    <input type="radio" name="sourceIncome" ng-model="applicant1Details.Source_of_Income__c" ng-value="value" ng-change="ChangeOfSourceIncome1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1147,21 +1151,28 @@ angular.module('decimal', [])
                                             <label class="label">Organization Type:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in orgTypepickValue">
-                                                <input type="radio" ng-model="applicant1Details.Organization_Type__c" ng-value="value" ng-change="ChangeOfOrgType1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
-                                        </div>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in orgTypepickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Organization_Type__c" ng-value="value" ng-change="ChangeOfOrgType1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                                <!-- <div class="col-md-4 pt-3" ng-if="applicant1Details.Organization_Type__c == 'Others'">
+                                                    <input type="text" ng-model="applicant1Details.Organization_Type__c" class="form-control" />
+                                                </div> -->
+                                            </div>
+                                        </div>    
                                     </div>
                                     <div class="row align-items-center mb-4">
                                         <div class="col-md-2">
                                             <label class="label">Industry Sector:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in industrypickValue">
-                                                <input type="radio" ng-model="applicant1Details.Industry_Sector__c" ng-value="value" ng-change="ChangeOfIndusSector1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in industrypickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Industry_Sector__c" ng-value="value" ng-change="ChangeOfIndusSector1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1169,10 +1180,12 @@ angular.module('decimal', [])
                                             <label class="label">Work Role:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in workRolepickValue">
-                                                <input type="radio" ng-model="applicant1Details.Work_Role__c" ng-value="value" ng-change="ChangeOfWorkRole1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in workRolepickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Work_Role__c" ng-value="value" ng-change="ChangeOfWorkRole1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1180,10 +1193,12 @@ angular.module('decimal', [])
                                             <label class="label">Annual Income<br/>(INR):</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in annualIncomepickValue">
-                                                <input type="radio" ng-model="applicant1Details.Annual_Income_INR__c" ng-value="value" ng-change="ChangeOfAnnualIncome1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in annualIncomepickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Annual_Income_INR__c" ng-value="value" ng-change="ChangeOfAnnualIncome1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1191,10 +1206,12 @@ angular.module('decimal', [])
                                             <label class="label">Mode Of<br/>Payment/Source:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in modeOfPaymentpickValue">
-                                                <input type="radio" ng-model="applicant1Details.Mode_of_Payment_Source__c" ng-value="value" ng-change="ChangeOfPaymentMode1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in modeOfPaymentpickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Mode_of_Payment_Source__c" ng-value="value" ng-change="ChangeOfPaymentMode1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1202,10 +1219,12 @@ angular.module('decimal', [])
                                             <label class="label">Purpose Of<br/>Purchase:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in purposeOfPurchasepickValue">
-                                                <input type="radio" ng-model="applicant1Details.Purpose_of_Purchase__c" ng-value="value" ng-change="ChangeOfPurchasePurpose1(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in purposeOfPurchasepickValue">
+                                                    <input type="radio" ng-model="applicant1Details.Purpose_of_Purchase__c" ng-value="value" ng-change="ChangeOfPurchasePurpose1(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -1545,10 +1564,12 @@ angular.module('decimal', [])
                                 <div class="col-md-12">
                                     <div class="row align-items-center mb-4">
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in sourceIncomepickValue">
-                                                <input type="radio" name="sourceIncome" ng-model="applicant2Details.Source_of_Income__c" ng-value="value" ng-change="ChangeOfSourceIncome2(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-3" ng-repeat="value in sourceIncomepickValue">
+                                                    <input type="radio" name="sourceIncome" ng-model="applicant2Details.Source_of_Income__c" ng-value="value" ng-change="ChangeOfSourceIncome2(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1588,10 +1609,12 @@ angular.module('decimal', [])
                                             <label class="label">Organization Type:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in orgTypepickValue">
-                                                <input type="radio" ng-model="applicant2Details.Organization_Type__c" ng-value="value" ng-change="ChangeOfOrgType2(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in orgTypepickValue">
+                                                    <input type="radio" ng-model="applicant2Details.Organization_Type__c" ng-value="value" ng-change="ChangeOfOrgType2(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1599,10 +1622,12 @@ angular.module('decimal', [])
                                             <label class="label">Industry Sector:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in industrypickValue">
-                                                <input type="radio" ng-model="applicant2Details.Industry_Sector__c" ng-value="value" ng-change="ChangeOfIndusSector2(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in industrypickValue">
+                                                    <input type="radio" ng-model="applicant2Details.Industry_Sector__c" ng-value="value" ng-change="ChangeOfIndusSector2(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1610,10 +1635,12 @@ angular.module('decimal', [])
                                             <label class="label">Work Role:</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in workRolepickValue">
-                                                <input type="radio" ng-model="applicant2Details.Work_Role__c" ng-value="value" ng-change="ChangeOfWorkRole2(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in workRolepickValue">
+                                                    <input type="radio" ng-model="applicant2Details.Work_Role__c" ng-value="value" ng-change="ChangeOfWorkRole2(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row align-items-center mb-4">
@@ -1621,10 +1648,12 @@ angular.module('decimal', [])
                                             <label class="label">Annual Income<br/>(INR):</label>
                                         </div>
                                         <div class="col-md-10">
-                                            <span ng-repeat="value in annualIncomepickValue">
-                                                <input type="radio" ng-model="applicant2Details.Annual_Income_INR__c" ng-value="value" ng-change="ChangeOfAnnualIncome2(value)" />
-                                                <label>{{value}}</label>
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 pt-3" ng-repeat="value in annualIncomepickValue">
+                                                    <input type="radio" ng-model="applicant2Details.Annual_Income_INR__c" ng-value="value" ng-change="ChangeOfAnnualIncome2(value)" />
+                                                    <label>{{value}}</label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">

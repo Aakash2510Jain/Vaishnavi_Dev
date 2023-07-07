@@ -30,7 +30,7 @@ public without Sharing class BuildMaps {
         list<Lead__c> listOfNewLeads = new list<Lead__c>();
         list<Lead__c> listOfAssignedTodayLeads = new list<Lead__c>();
         
-        listOfGroupMember = [select id,Assignment_Group__r.Minimum_Lead_Volume__c,Assignment_Group__r.Name,Group_Member__r.Id,Assignment_Group__r.Lead_Stage__c,Assignment_Group__r.Lead_Stage_Exceed_Count__c,Max_Lead_Per_Day__c from Assignment_Group_Member__c where active__c = true and assignment_group__r.name =: groupName];
+        listOfGroupMember = [select id,Assignment_Group__r.Minimum_Lead_Volume__c,Assignment_Group__r.Name,Group_Member__r.Id,Assignment_Group__r.Lead_Stage__c,Assignment_Group__r.Lead_Stage_Exceed_Count__c,Max_Lead_Per_Day__c,Group_Member__r.Max_Lead_Per_Day__c  from Assignment_Group_Member__c where active__c = true and assignment_group__r.name =: groupName];
         listOfTodayLeads = [select id,ownerId,Lead_Stage__c from Lead__c where Lead_Assigned_Date_Time__c > today];
         listOfNewLeads = [select id,Lead_Assigned_Date__c,ownerId,Lead_Stage__c from Lead__c where Lead_Stage__c = 'New Enquiry'];
         listOfAssignedTodayLeads = [select id,Lead_Assigned_Date__c,ownerId,Lead_Stage__c from Lead__c where Lead_Assigned_Date__c = today];
@@ -49,8 +49,9 @@ public without Sharing class BuildMaps {
             mapofMemIdByExceedCount.put(agm.Group_Member__r.Id,Integer.valueOf(agm.Assignment_Group__r.Lead_Stage_Exceed_Count__c));
             mapofMemIdByMaxLeadCountPerDay.put(agm.Group_Member__r.Id,Integer.valueOf(agm.Max_Lead_Per_Day__c));
             mapofMemidByMinLeadsCount.put(agm.Group_Member__r.Id,Integer.valueOf(agm.Assignment_Group__r.Minimum_Lead_Volume__c));
+            mapofMemidbyMaxleadCountFromUser.put(agm.Group_Member__r.Id, Integer.valueOf(agm.Group_Member__r.Max_Lead_Per_Day__c));
         }
-        
+        system.debug('listOfAssignedTodayLeads ====> ' + listOfAssignedTodayLeads.size());
         if(!listOfAssignedTodayLeads.isEmpty()){
             for(Lead__c ld : listOfAssignedTodayLeads){
                 if(mapofMemidByAssignedLead.containsKey(ld.ownerId)){

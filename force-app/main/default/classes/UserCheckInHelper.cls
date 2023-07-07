@@ -65,13 +65,13 @@ public with sharing class UserCheckInHelper {
                     }
 
                     update agmList;
-
+					
                   
                     /*BatchToAssignLeadsFromQueue batchInstance = new BatchToAssignLeadsFromQueue();
                      database.executeBatch(batchInstance);*/
 
                 }
-
+				LeadAssignmentExecutionCriteria.validateEntryCriteria(); 
                 eventStatus = 'Checkin successful';
             } else{
                 eventStatus = 'Your checkin was already created.';

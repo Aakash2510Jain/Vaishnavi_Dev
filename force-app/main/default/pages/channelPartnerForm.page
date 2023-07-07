@@ -1,0 +1,185 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="channelPartnerFormController">
+    <html>
+        <head>
+            <apex:stylesheet value="{!$Resource.BookingFormCSS}" />
+            <c:Libraries ></c:Libraries>
+            <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script> 
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+            <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet"/>
+        </head>
+
+        <script>
+            var siteUrl = "{!$Label.BookingFormSiteURL}"; 
+            var cpId = '{!$CurrentPage.parameters.id}';
+
+            angular.module('number', [])
+    .directive('number', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
+
+angular.module('decimal', [])
+    .directive('decimal', function () {
+        return {
+            require: 'ngModel',
+            restrict: 'A',
+            link: function (scope, element, attrs, ctrl) {
+                ctrl.$parsers.push(function (input) {
+                    if (input == undefined) return ''
+                    var inputNumber = input.toString().replace(/[^0-9/.]/g, '');
+                    if (inputNumber != input) {
+                        ctrl.$setViewValue(inputNumber);
+                        ctrl.$render();
+                    }
+                    return inputNumber;
+                });
+            }
+        };
+});
+
+            var app = angular.module('cp_app', ['number','decimal']);
+            app.controller('cpCtrl', function ($scope){
+                debugger;
+
+                $scope.cpId = cpId;
+
+                $scope.getChannelPartnerDetails = function(){
+                    debugger;
+                    channelPartnerFormController.getChannelPartnerDetails($scope.cpId,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.channelPartnerDet = result;
+                            $scope.$apply();
+                        }
+                    })
+                }
+
+                $scope.getChannelPartnerDetails();
+
+                $scope.saveChannelPartnerRecord = function(){
+                    debugger;
+                    channelPartnerFormController.saveChannelPartnerRecord($scope.channelPartnerDet,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            swal({
+                            icon: 'success',
+                            title: 'success',
+                            text: 'Channel partner details have been updated successfully..'
+                        })
+                        $scope.$apply();
+                        }
+                    })
+                }
+            });
+            
+        </script>
+
+        <div ng-app="cp_app" ng-controller="cpCtrl" style="overflow-x: hidden;">
+            <body>
+                <div class="header-bgCP">
+                    <h3 class="header-text text-center">VAISHNAVI</h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-4" style="padding-left: 4%;">
+                        <apex:image url="{!$Resource.New}" />
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="heading text-center"><b>VAISHNAVI 81 INFRASTRUCTURES LLP</b></h5>
+                        <h5 class="heading-loc text-center">Yelahanka, Bengaluru</h5>
+                    </div>
+                    <div class="col-md-4" style="padding-right: 2%;">
+                        <h6 class="header-address">#2/2,Waltaon Road Off Vittal Mallya Road<br/>
+                            Bengaluru - 560 001<br/>
+                            +91 80 6696 6696<br/>
+                            www.vaishnavilife.com</h6>
+                    </div>
+                </div>
+                <hr class="border" />
+
+                <div class="booking-form">
+                    <div class="container mb-5">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="label">Name:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="channelPartnerDet.Channel_Partner_Name__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="label">Email:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="email" class="form-control" ng-model="channelPartnerDet.Email__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="label">Phone:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="tel" number="channelPartnerDet.Phone__c" class="form-control" ng-model="channelPartnerDet.Phone__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="label">Adhaar no.:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" number="channelPartnerDet.Aadhar_Card_No__c" class="form-control" ng-model="channelPartnerDet.Aadhar_Card_No__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-4">
+                                        <div class="col-md-2">
+                                            <label class="label">Rera Application No.:</label>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" ng-model="channelPartnerDet.RERA_Application_No__c" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" class="button float-end" ng-click="saveChannelPartnerRecord()">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </body>
+        </div>
+    </html>
+</apex:page>

@@ -15,7 +15,9 @@ public class ScoreCardTriggerHelper {
         system.debug('ListTobeUpdated'+ListTobeUpdated);
         update ListTobeUpdated;
     }
-     
+    
+    /*
+    
     public Static void TestCoverage(){
         integer i =0;
         i++;
@@ -745,4 +747,6 @@ public class ScoreCardTriggerHelper {
         i++;
         i++;
     }
+
+    */
 }
