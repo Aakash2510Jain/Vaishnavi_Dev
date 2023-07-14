@@ -50,7 +50,9 @@ public without Sharing class BuildMaps {
             mapofMemIdByMaxLeadCountPerDay.put(agm.Group_Member__r.Id,Integer.valueOf(agm.Max_Lead_Per_Day__c));
             mapofMemidByMinLeadsCount.put(agm.Group_Member__r.Id,Integer.valueOf(agm.Assignment_Group__r.Minimum_Lead_Volume__c));
             mapofMemidbyMaxleadCountFromUser.put(agm.Group_Member__r.Id, Integer.valueOf(agm.Group_Member__r.Max_Lead_Per_Day__c));
+            mapofMemIdByMaxLeadCountByGroupPerDay.put(agm.Group_Member__r.Id, Integer.valueOf(agm.Max_Lead_Per_Day__c));
         }
+        system.debug('mapofMemIdByExceedCount =====> ' + mapofMemIdByExceedCount);
         system.debug('listOfAssignedTodayLeads ====> ' + listOfAssignedTodayLeads.size());
         if(!listOfAssignedTodayLeads.isEmpty()){
             for(Lead__c ld : listOfAssignedTodayLeads){

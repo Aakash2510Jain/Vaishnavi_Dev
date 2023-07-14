@@ -70,24 +70,30 @@ public with sharing class siteVisitFromControllerTest {
         insert visitRec;
 
         siteVisitFormController.cloneOpportunityAndSV(oppRec.Id,visitRec.id);
+    }
 
-        // Opportunity__c getOppRec = [Select Id,AccountId__c,Opportunity_Name__c,Stage__c,Email__c,Phone__c FROM Opportunity__c WHERE Id =: oppRec.Id];
+    @isTest
+    static void testcloneOppForDiffProject(){
 
-        // Opportunity__c clonedRecord = getOppRec.clone(false, false, false, false);
-        // insert clonedRecord;
+        Account accRec = New Account();
+        accRec.Name = 'test Account';
+        insert accRec;
 
-        // Visit__c getvisitRec = [Select Id,Form_No__c,Date_Of_Birth__c,Age_Group__c,Residential_Address__c,City__c,Pincode__c,Employment_Type__c,
-        //     Company_Name__c,Industry__c,Office_Address__c,Office_PinCode__c,Actual_visit_date__c,Budget__c,Area__c,Construction_Status__c,Purpose_Of_Buying__c,
-        //     Walkin_Source__c,Walkin_Sub_Source__c,Projects__c,GR_Code__c,Channel_Partner_Not_registered__c,Firm_Name__c,Channel_Partner_Name__c,
-        //     Apartment_No__c,Channel_Partner_Mobile_No__c,RERA_No__c,Channel_Partner_Email__c,Referral_Name__c,Referral_Mobile_No__c,Sales_Manager__c,
-        //     Facilitated_By__c,Customer_Time_In__c,Customer_Time_Out__c,Opportunities__c From Visit__c where Id =: visitRec.Id];
+        Project__c project = New Project__c();
+        project.Name = 'Test Project';
+        insert project;
 
-        // Visit__c visitclonedRecord = getvisitRec.clone(false, false, false, false);
-        // visitclonedRecord.Actual_visit_date__c = system.today();
-        // visitclonedRecord.Opportunities__c = clonedRecord.Id;
-        // visitclonedRecord.Visit_Type__c = 'Revisit';
+        Opportunity__c oppRec = New Opportunity__c();
+        oppRec.AccountId__c = accRec.Id;
+        oppRec.Opportunity_Name__c = 'Test Opportunity';
+        oppRec.Stage__c = 'Lost';
+        oppRec.Project__c = project.Id;
+        oppRec.Email__c = 'isha@gmail.com';
+        oppRec.Phone__c = '9599845667';
+        
+        insert oppRec;
 
-        // insert visitclonedRecord;
+        siteVisitFormController.cloneOppForDiffProject(oppRec.Id,project.Id);
     }
 
     @isTest
@@ -249,11 +255,15 @@ public with sharing class siteVisitFromControllerTest {
         Lead__c leadRec1 = new Lead__c();
         leadRec1.Email__c = 'test1@mailinator.com';
         leadRec1.isConverted__c = true;
-        insert leadRec1; 
+        insert leadRec1;
         
-        siteVisitFormController.searchLead('test@mailinator.com');
-        siteVisitFormController.searchLead('test1@mailinator.com');
-         siteVisitFormController.searchLead(NULL);
+        Project__c project = New Project__c();
+        project.Name = 'Test Project';
+        insert project;
+        
+        siteVisitFormController.searchLead('test@mailinator.com',project.Id);
+        siteVisitFormController.searchLead('test1@mailinator.com',project.Id);
+        siteVisitFormController.searchLead(NULL,NULL);
     }
     @isTest
     static void testConstructor() {

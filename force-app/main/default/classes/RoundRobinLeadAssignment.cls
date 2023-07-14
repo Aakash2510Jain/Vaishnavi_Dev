@@ -111,6 +111,7 @@ public without sharing class  RoundRobinLeadAssignment{
                 QtoBeUpdated.add(q);
             }
         }
+        system.debug('updateLeadList size ====> ' + updateLeadList.size());
         system.debug('updateLeadList ====> ' + updateLeadList);
         if(!updateLeadList.isEmpty()){
             reccuringTrigger = false;
@@ -149,6 +150,8 @@ public without sharing class  RoundRobinLeadAssignment{
         system.debug('BuildMaps.mapofMemidByTodayLeadCount.get(qMemberID) ====> ' + BuildMaps.mapofMemidByTodayLeadCount.get(qMemberID));
         system.debug('BuildMaps.mapofMemIdByMaxLeadCountPerDay.get(qMemberID) ====> ' + BuildMaps.mapofMemIdByMaxLeadCountPerDay.get(qMemberID)); 
         system.debug('BuildMaps.mapofMemIdByMaxLeadCountByGroupPerDay.get(qMemberID) ====> ' + BuildMaps.mapofMemIdByMaxLeadCountByGroupPerDay.get(qMemberID));
+        
+        system.debug('BuildMaps.mapofMemidByMinLeadsCount.get(qMemberID) ====> ' + BuildMaps.mapofMemidByMinLeadsCount.get(qMemberID));
         if(BuildMaps.mapofMemidByAssignedLead.get(qMemberID) == null){
             isconditionapproved = true;
         }else if(BuildMaps.mapofMemidByAssignedLead.get(qMemberID) != null && BuildMaps.mapofMemidbyMaxLeadCountFromUser.get(qMemberID) != null &&  BuildMaps.mapofMemidByAssignedLead.get(qMemberID) < BuildMaps.mapofMemidbyMaxLeadCountFromUser.get(qMemberID)){

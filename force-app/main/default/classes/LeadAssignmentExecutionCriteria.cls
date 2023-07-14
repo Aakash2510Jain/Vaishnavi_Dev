@@ -216,7 +216,8 @@ public class LeadAssignmentExecutionCriteria {
                                             Booleanvalues = Booleanvalues.replace(string.valueOf(recursionValue),'False');
                                         }   
                                     }    
-                                }else if(str == '!='){
+                                }
+                                else if(str == '!='){
                                     if(expectedValuebyCriteria.get(criteriaName).get(field) == 'null'){
                                         
                                         if(ld.get(field) == null){
@@ -239,7 +240,8 @@ public class LeadAssignmentExecutionCriteria {
                                             Booleanvalues = Booleanvalues.replace(string.valueOf(recursionValue),'False');
                                         }     
                                     }
-                                }else if(str == 'CONTAINS'){
+                                }
+                                else if(str == 'CONTAINS'){
                                     system.debug('Coming Here');
                                     if(String.valueOf(ld.get(field)) != null){
                                         if(String.valueOf(expectedValuebyCriteria.get(criteriaName).get(field)).contains(String.valueOf(ld.get(field)))){

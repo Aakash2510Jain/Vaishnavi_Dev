@@ -23,9 +23,11 @@ public class LeadTriggerHandler {
         List<Lead__c> existingLeadWithPhones = new List<Lead__c>();
         List<Lead__c> existingLeadWithEmails = new List<Lead__c>();
         List<Campaign> campaignList = new List<Campaign>();
+        List<Project__c> projectList = new List<Project__c>();
         Map<String,Lead__c> leadRecByPhoneMap = new Map<String, Lead__c>();
         Map<String,Lead__c> leadRecByEmailMap = new Map<String, Lead__c>();
         Map<string, Campaign> campaignSourceByCampaignRecMap = new map<String, Campaign>();
+        Map<string, Project__c> projectNameByProjectRecMap = new map<String, Project__c>();
         
         Date todayDate = system.today();
         campaignList = [Select id,Lead_Source_Type__c,Lead_Sub_Source__c,Lead_Source__c,IsActive,StartDate,EndDate From Campaign where IsActive = true And StartDate <= : todayDate and EndDate >= : todayDate and Lead_Source_Type__c != null];
@@ -35,8 +37,26 @@ public class LeadTriggerHandler {
                 campaignSourceByCampaignRecMap.put(campaignRec.Lead_Source_Type__c, campaignRec);
             }
         }
+        projectList = [Select Id,Name From Project__c];
+        if(!projectList.isEmpty()){
+            for(Project__c projectRec : projectList){
+                projectNameByProjectRecMap.put(projectRec.Name, projectRec);
+            }
+        }
         
+        string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
         for(Lead__c leadRec : newLeadList){
+            leadRec.OwnerId = queueId;
+            if(!string.isBlank(leadRec.Project_Name__c)){
+                for(string projectName : projectNameByProjectRecMap.keyset()){
+                    if(projectName.containsIgnoreCase(leadRec.Project_Name__c)){
+                        leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
+                    }
+                }
+            }
+            if(string.isEmpty(leadRec.Project__c) && string.isEmpty(leadRec.Project_Name__c)){
+                leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+            }
             if(leadRec.Phone__c != null){
                 phonesSet.add(leadRec.Phone__c);
             }
@@ -243,21 +263,46 @@ public class LeadTriggerHandler {
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         List<Task> taskListToInsertforFollowup = new List<Task>();
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
+        List<Project__c> projectList = new List<Project__c>();
+        Map<string, Project__c> projectNameByProjectRecMap = new map<String, Project__c>();
+
         String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
         set<Id> leadIds = new Set<Id>();
         
+        projectList = [Select Id,Name From Project__c];
+        system.debug('projectList--->'+projectList);
+        if(!projectList.isEmpty()){
+            for(Project__c projectRec : projectList){
+                projectNameByProjectRecMap.put(projectRec.Name, projectRec);
+            }
+        }
+        system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
         for(Lead__c leadRec : newLeadMap.values()){
-           
-            
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
             }
-             System.debug('newLeadMap.values():::::'+newLeadMap.values());
-             System.debug('oldLeadMap.values():::::'+oldLeadMap.values());
+            
+            system.debug('leadRec.Project_Name__c--->'+leadRec.Project_Name__c);
+            
+            if(!string.isBlank(leadRec.Project_Name__c)){
+                for(string projectName : projectNameByProjectRecMap.keyset()){
+                    system.debug('projectName--->'+projectName);
+                    system.debug('leadRec.Project_Name__c--->'+leadRec.Project_Name__c);
+                    system.debug('projectName.containsIgnoreCase(leadRec.Project_Name__c)--->'+projectName.containsIgnoreCase(leadRec.Project_Name__c));
+                    if(leadRec.Project_Name__c.containsIgnoreCase(projectName)){
+                        leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
+                    }
+                }
+            }
+            if(string.isEmpty(leadRec.Project__c) && string.isEmpty(leadRec.Project_Name__c)){
+                leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+            }
+            System.debug('newLeadMap.values():::::'+newLeadMap.values());
+            System.debug('oldLeadMap.values():::::'+oldLeadMap.values());
             if(leadRec.isQualified__c == false && leadRec.isQualified__c != oldLeadMap.get(leadRec.Id).isQualified__c){
                 leadRec.isQualified__c = true;
             }
-           
+            
             if(leadRec.isQualified__c && leadRec.Qualified_Date_Time__c == null){
                 leadRec.Qualified_Date_Time__c = system.now();
             }

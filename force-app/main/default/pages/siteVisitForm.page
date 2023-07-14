@@ -4,9 +4,9 @@
             <apex:stylesheet value="{!$Resource.BookingFormCSS}" />
             <c:Libraries ></c:Libraries>
             <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+            <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script> 
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  -->
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
             <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet"/>
         </head>
@@ -43,43 +43,43 @@
             var flatType = JSON.parse('{!flatType}');
             var UserId = '{!UserId}';
 
-            angular.module('number', [])
-    .directive('number', function () {
-        return {
-            require: 'ngModel',
-            restrict: 'A',
-            link: function (scope, element, attrs, ctrl) {
-                ctrl.$parsers.push(function (input) {
-                    if (input == undefined) return ''
-                    var inputNumber = input.toString().replace(/[^0-9]/g, '');
-                    if (inputNumber != input) {
-                        ctrl.$setViewValue(inputNumber);
-                        ctrl.$render();
-                    }
-                    return inputNumber;
-                });
-            }
-        };
-});
+//             angular.module('number', [])
+//     .directive('number', function () {
+//         return {
+//             require: 'ngModel',
+//             restrict: 'A',
+//             link: function (scope, element, attrs, ctrl) {
+//                 ctrl.$parsers.push(function (input) {
+//                     if (input == undefined) return ''
+//                     var inputNumber = input.toString().replace(/[^0-9]/g, '');
+//                     if (inputNumber != input) {
+//                         ctrl.$setViewValue(inputNumber);
+//                         ctrl.$render();
+//                     }
+//                     return inputNumber;
+//                 });
+//             }
+//         };
+// });
 
-angular.module('decimal', [])
-    .directive('decimal', function () {
-        return {
-            require: 'ngModel',
-            restrict: 'A',
-            link: function (scope, element, attrs, ctrl) {
-                ctrl.$parsers.push(function (input) {
-                    if (input == undefined) return ''
-                    var inputNumber = input.toString().replace(/[^0-9/.]/g, '');
-                    if (inputNumber != input) {
-                        ctrl.$setViewValue(inputNumber);
-                        ctrl.$render();
-                    }
-                    return inputNumber;
-                });
-            }
-        };
-});
+// angular.module('decimal', [])
+//     .directive('decimal', function () {
+//         return {
+//             require: 'ngModel',
+//             restrict: 'A',
+//             link: function (scope, element, attrs, ctrl) {
+//                 ctrl.$parsers.push(function (input) {
+//                     if (input == undefined) return ''
+//                     var inputNumber = input.toString().replace(/[^0-9/.]/g, '');
+//                     if (inputNumber != input) {
+//                         ctrl.$setViewValue(inputNumber);
+//                         ctrl.$render();
+//                     }
+//                     return inputNumber;
+//                 });
+//             }
+//         };
+// });
 
             var app = angular.module('visit_app', []);
             app.controller('visit_ctrl', function ($scope) {
@@ -94,6 +94,7 @@ angular.module('decimal', [])
 
                 var hours = $scope.today.getHours();
                 var minutes = $scope.today.getMinutes();
+                debugger;
                 $scope.timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`+' '+rightTwoChars;  
                 // document.getElementById('timeInput').value = $scope.timeString;              
                 $scope.ageGroup = ageGroup;
@@ -139,9 +140,6 @@ angular.module('decimal', [])
                         if(event.status && result){
                             debugger;
                             $scope.listOfLocation = result;
-                            // for(var i=0;i<result.length;i++){
-                            //     $scope.listOfLocation.push(result[i].Name);
-                            // }
                             $scope.$apply();
                         }
                     })
@@ -163,7 +161,7 @@ angular.module('decimal', [])
 
                 $scope.searchLead = function(){
                     debugger;
-                    siteVisitFormController.searchLead($scope.searchValue,function(result,event){
+                    siteVisitFormController.searchLead($scope.searchValue,$scope.projectId,function(result,event){
                         debugger;
                         if(event.status && result){
                             if(result.leadRec != null){
@@ -401,11 +399,20 @@ angular.module('decimal', [])
                     $scope.visit.Employment_Type__c = value;
                 }
 
-                $scope.location1;
+                // $scope.location1;
 
                 $scope.saveCustomerDet = function(){
                     debugger;
-
+                    if($scope.visit.Date_Of_Birth__c == undefined || $scope.visit.Date_Of_Birth__c == ""){
+                            debugger;
+                            swal('info','Please Enter Date of Birth.','info');
+                            return;
+                        }
+                    if($scope.visit.Date_Of_Birth__c >= $scope.today){
+                        debugger;
+                        swal('info','Date of Birth cannot be future date.','info');
+                            return;
+                    }
                     if($scope.visit.Employment_Type__c == 'Salaried' || $scope.visit.Employment_Type__c == 'Business' || $scope.visit.Employment_Type__c == 'Professional'){
                         if($scope.visit.Company_Name__c == undefined || $scope.visit.Company_Name__c == ""){
                             debugger;
@@ -433,7 +440,7 @@ angular.module('decimal', [])
                     "Residential_Address__c":$scope.visit.Residential_Address__c,"City__c":$scope.visit.City__c,
                     "Pincode__c":$scope.visit.Pincode__c,"Employment_Type__c":$scope.visit.Employment_Type__c,"Company_Name__c":$scope.visit.Company_Name__c,
                     "Industry__c":$scope.visit.Industry__c,"Office_Address__c":$scope.visit.Office_Address__c,"Office_PinCode__c":$scope.visit.Office_PinCode__c,
-                    "Actual_visit_date__c":$scope.today,"Alternate_Phone__c":$scope.visit.Alternate_Phone__c};
+                    "Actual_visit_date__c":$scope.today,"Alternate_Phone__c":$scope.visit.Alternate_Phone__c,"Project__c":$scope.leadRecord[0].Project__c};
                     var year = 0
                     var month = 0;
                     var day = 0;
@@ -452,9 +459,16 @@ angular.module('decimal', [])
 
                     if($scope.oppId != null){
                         $scope.firstVisitRecord.Opportunities__c = $scope.oppId;
+                        $scope.firstVisitRecord.Project__c = $scope.oppDetails.Project__c;
                     }else{
                         $scope.firstVisitRecord.Lead__c = $scope.leadId;
+                        $scope.firstVisitRecord.Project__c = $scope.leadRecord[0].Project__c;
                     }
+
+                    if($scope.visit.Location__c == undefined){
+                        $scope.visit.Location__c = "";
+                    }
+
 
                     if($scope.leadId != undefined){
                         siteVisitFormController.insertVisitRecord($scope.firstVisitRecord,$scope.leadId,year,month,day,visityear,visitmonth,visitday,$scope.visit.Location__c,function(result,event){
@@ -785,7 +799,7 @@ angular.module('decimal', [])
                     <div class="col-md-4" style="padding-right: 2%;">
                         <h6 class="header-address">#2/2,Waltaon Road Off Vittal Mallya Road<br/>
                             Bengaluru - 560 001<br/>
-                            +91 80 6696 6696<br/>
+                            <!-- +91 80 6696 6696<br/> -->
                             www.vaishnavilife.com</h6>
                     </div>
                 </div>
@@ -976,7 +990,7 @@ angular.module('decimal', [])
                                                         <label class="label">Mobile No.:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="tel" number="leadRecord[0].Phone__c" class="form-control" ng-model="leadRecord[0].Phone__c"/>
+                                                        <input type="tel" class="form-control" ng-model="leadRecord[0].Phone__c"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -995,7 +1009,7 @@ angular.module('decimal', [])
                                             <div class="col-md-6">
                                                 <div class="row align-items-center mb-4">
                                                     <div class="col-md-4">
-                                                        <label class="label">Date of Birth:</label>
+                                                        <label class="label">Date of Birth:</label><span class="required-asterisk" style="color:red;">*</span>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <input type="date" class="form-control" ng-model="visit.Date_Of_Birth__c" />
@@ -1008,7 +1022,7 @@ angular.module('decimal', [])
                                                         <label class="label">Alternate Phone:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="tel" number="visit.Alternate_Phone__c" class="form-control" ng-model="visit.Alternate_Phone__c" />
+                                                        <input type="tel" class="form-control" ng-model="visit.Alternate_Phone__c" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1021,19 +1035,19 @@ angular.module('decimal', [])
                                                 <input type="date" class="form-control" ng-model="visit.Date_Of_Birth__c" />
                                             </div>
                                         </div> -->
-                                        <div class="row align-items-center mb-4">
+                                        <!-- <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
                                                 <label class="label">Age(in years):</label>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
                                                     <div class="col-md-4 pt-3" ng-repeat="value in ageGroup">
-                                                        <input type="radio" number="visit.Age_Group__c" ng-model="visit.Age_Group__c" ng-value="value" ng-change="changeOfAgeGroup(value)" />
+                                                        <input type="radio" ng-model="visit.Age_Group__c" ng-value="value" ng-change="changeOfAgeGroup(value)" />
                                                         <label>{{value}}</label>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
                                                 <label class="label">Residential Address:</label>
@@ -1418,7 +1432,7 @@ angular.module('decimal', [])
                                                             <label class="label">Mobile No.:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="tel" number="visit.Channel_Partner_Mobile_No__c" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
+                                                            <input type="tel" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1467,7 +1481,7 @@ angular.module('decimal', [])
                                                             <label class="label">Mobile No.:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="tel" number="visit.Referral_Mobile_No__c" class="form-control" ng-model="visit.Referral_Mobile_No__c" />
+                                                            <input type="tel" class="form-control" ng-model="visit.Referral_Mobile_No__c" />
                                                         </div>
                                                     </div>
                                                 </div>

@@ -2,7 +2,7 @@ public without Sharing class transferToSalesTeamHelper {
     @auraEnabled
     public static void shareAndTagSalesTeamMember(string leadId){
         system.debug('leadId--->'+leadId);
-        Assignment_Group_Member__c salesTeamMemberRecord = [Select Id,Group_Member__c,Last_Sequence__c From Assignment_Group_Member__c where Assignment_Group__c = 'a0A1m000003of4HEAQ' order by LastModifiedDate limit 1];  
+        /*Assignment_Group_Member__c salesTeamMemberRecord = [Select Id,Group_Member__c,Last_Sequence__c From Assignment_Group_Member__c where Assignment_Group__c = 'a0A1m000003of4HEAQ' order by LastModifiedDate limit 1];  
         salesTeamMemberRecord.Last_Sequence__c = 1;
         update salesTeamMemberRecord;
         
@@ -17,7 +17,12 @@ public without Sharing class transferToSalesTeamHelper {
         leadShareRec.AccessLevel = 'EDIT';
         insert leadShareRec;
         
-        transferToSalesTeamHelper.sendEmailToLead(leadId);
+        transferToSalesTeamHelper.sendEmailToLead(leadId);*/
+        set<String> LeadIdList = new Set<String>();
+        LeadIdList.add(leadId);
+        String courseName = 'Manual sales Team';
+        RoundRobinLeadAssignment.assignLeadsToBDS(courseName, LeadIdList);
+        
     }
     
     @AuraEnabled

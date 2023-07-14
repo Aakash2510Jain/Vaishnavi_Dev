@@ -33,4 +33,13 @@ global without sharing class ResponseClass {
         global string error_message;
         global string lead_id;
     }
+
+    global class ReponseWrapperforWebsiteLeadCreation{
+        global string status;
+        global string success_code;
+        global string success_message;
+        global string error_code;
+        global string error_message;
+        global string lead_id;
+    }
 }

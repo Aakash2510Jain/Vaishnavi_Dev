@@ -145,7 +145,7 @@ public without sharing class siteVisitFormController {
             if(searchkey != null){
                 
                 string phonestring = '%' +searchkey;
-                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
+                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
                 system.debug('leadRec===>>'+leadList);
                 system.debug('leadList[0].isConverted__c ==>> '+leadList[0].isConverted__c);
                 if(!leadList.isEmpty() && leadList[0].isConverted__c == false){
@@ -194,7 +194,7 @@ public without sharing class siteVisitFormController {
     public static List<Lead__c> getLeadRecords(string searchkey){
         try{
             string phonestring = '%' +searchkey;
-            List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
+            List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Project__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
             return leadList;
         }catch(Exception e){
             return null;
@@ -235,12 +235,14 @@ public without sharing class siteVisitFormController {
         try{
             System.debug(' --- visitRecord:'+visitRecord);
             System.debug(' --- location:'+location);
-            Location__c locationrec = [Select Id,name From Location__c WHERE Name =: location];
-            system.debug('locationrec ==> '+locationrec);
-            if(locationrec != null){
-                visitRecord.Location__c = locationrec.Id;
+            if(location != null || location != ''){
+                Location__c locationrec = [Select Id,name From Location__c WHERE Name =: location];
+                system.debug('locationrec ==> '+locationrec);
+                if(locationrec != null){
+                    visitRecord.Location__c = locationrec.Id;
+                }
+                system.debug('visitRecord.Location__c ==> '+visitRecord.Location__c);
             }
-            system.debug('visitRecord.Location__c ==> '+visitRecord.Location__c);
             // Visit__c visitRecord = (Visit__c) JSON.deserialize(visitString, Visit__c.class);
             // visitRecord.Lead__c = leadId;
             if(day == 0 && month==0 && year==0){
