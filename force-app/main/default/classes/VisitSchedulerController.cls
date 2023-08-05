@@ -230,11 +230,11 @@ public class VisitSchedulerController {
     @future (callout= true)
     public static void updateLeadGeoLocation(Set<Id> ledIdSet){
         System.debug('ledIdSet :::'+ledIdSet);
-        List<Lead__c> ledListToUpdate = [SELECT Id,Name,Street__c,City__c,State_Province__c,Postal_Code__c,Country__c FROM Lead__c WHERE ID IN:ledIdSet];
+        List<Lead__c> ledListToUpdate = [SELECT Id,Name__c,Street__c,City__c,State_Province__c,Country__c FROM Lead__c WHERE ID IN:ledIdSet];
         
         for(Lead__c led : ledListToUpdate){
-            if(!String.isBlank(led.Street__c) && !String.isBlank(led.City__c) && !String.isBlank(led.State_Province__c) && !String.isBlank(led.Postal_Code__c) && !String.isBlank(led.Country__c)){
-                String address = led.Street__c + ', '+led.City__c+ ', '+led.State_Province__c+ ', '+ led.Postal_Code__c + ', '+led.Country__c;
+            if(!String.isBlank(led.Street__c) && !String.isBlank(led.City__c) && !String.isBlank(led.State_Province__c) && !String.isBlank(led.Name__c) && !String.isBlank(led.Country__c)){
+                String address = led.Street__c + ', '+led.City__c+ ', '+led.State_Province__c+ ', '+ led.Name + ', '+led.Country__c;
                 System.debug('Lead__c Address :: '+address);
                 Map<String,String> geoResponseMap = VisitSchedulerController.getLongandLat(address);
                 Double lat = Double.valueOf(geoResponseMap.get('lat'));

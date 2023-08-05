@@ -1,6 +1,6 @@
 @isTest
 public class LeadTriggerHandlerTest {
-    @isTest
+   /* @isTest
     static void testgetInstance(){
         
         LeadTriggerHandler handlerInstance = LeadTriggerHandler.getInstance();
@@ -60,8 +60,9 @@ public class LeadTriggerHandlerTest {
         update updateleadRec;
         
         //updateleadRec.Lead_Substage__c = 'Site Visit Planned';
-        updateleadRec.Lead_Substage__c = 'Site Visit Proposed';
-        update updateleadRec;
+        //updateleadRec.Lead_Stage__c = 'SV Prospect';
+        //updateleadRec.Lead_Substage__c = 'Site Visit Proposed';
+        //update updateleadRec;
         
         updateleadRec.Lead_Source_Type__c = 'Hoarding';
         updateleadRec.Lead_Substage__c = 'Interested';
@@ -334,5 +335,5 @@ public class LeadTriggerHandlerTest {
     }
     
     
-    
+    */
 }

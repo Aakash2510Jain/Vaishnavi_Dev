@@ -3,7 +3,7 @@ public without sharing class  RoundRobinLeadAssignment{
     public static string groupName = '';
     public static map<string,string> mapofCouseByGroupName = new map<string,string>();
     @future
-    public static void assignLeadsToBDS(String courseName,set<String> LeadIdList){
+    public static void assignLeadsToBDS(String courseName,set<String> LeadIdList,boolean preSalesToSalesTransfer){
         system.debug('courseName ====> ' + courseName);
         system.debug('LeadIdList ====> ' + LeadIdList.size());
         boolean withinWorkingHour = false;
@@ -17,12 +17,18 @@ public without sharing class  RoundRobinLeadAssignment{
         Map<String, Integer> qNameAndMemberIdTORoundRobinIDMaP = new Map<String, Integer>();
         Map<String, Integer> qNameToLastAssignedQmemberRRid = new Map<String, Integer>();
         Map<String, String> QnameAndRRidToMemberIDMap = new Map<String, String>();
+
+        List<Lead__Share> leadShareRecords = new List<Lead__Share>();
         String Assignee = '';
         
         If(LeadIdList.size() > 0){
-            List<Lead__c> LeadData =  [SELECT ID,OWNERID,Lead_Stage__c,Lead_Assigned_Date__c FROM Lead__c WHERE  id IN:LeadIdList  limit 50000]; //and Lead_Stage__c != null
+            List<Lead__c> LeadData =  [SELECT ID,OWNERID,Lead_Stage__c,Lead_Assigned_Date__c, Sales_Team_Member__c FROM Lead__c WHERE  id IN:LeadIdList  limit 50000]; //and Lead_Stage__c != null
             qNameToListOfLeadsMap.put(courseName,LeadData);
+            System.debug('LeadData ====> ' + LeadData);
+        System.debug('LeadData ====> ' + LeadData.size());
         }
+        
+
 
         QueueNameToQmemberIdList = makeCustomQueueNameToListOfUserId(courseName); // group by group member
         userIdToUserAvailablityMap = makeuserIdToUserAvailablityMap(courseName); // group by group member availability
@@ -32,10 +38,15 @@ public without sharing class  RoundRobinLeadAssignment{
         
         for(String qName: qNameToListOfLeadsMap.keySet()){
             if(qName != null){
+                System.debug('qNameToListOfLeadsMap.get(qName).size() =====> ' + qNameToListOfLeadsMap.get(qName).size());
                 for(Lead__c ld: qNameToListOfLeadsMap.get(qName)){
+                    System.debug('Lead Owner ====> ' + ld.OwnerId);
                     Boolean isAssigned = false;
                     Integer qMemberSize = 1;
+                    Integer i =0;
+                    System.debug('i =====> ' + i);
                     While(QueueNameToQmemberIdList != null && qMemberSize != null && QueueNameToQmemberIdList.get(qName) != null && isAssigned == false && qMemberSize <= QueueNameToQmemberIdList.get(qName).size()){
+                        i++;
                         Assignee = QueueNameToQmemberIdList.get(qName)[0];
                         Integer currentRRid, LastRRid; 
                         String QnameAndRRid, qMemberID;
@@ -65,10 +76,29 @@ public without sharing class  RoundRobinLeadAssignment{
                             system.debug('userIdToUserAvailablityMap.get(qMemberID) ====> ' + userIdToUserAvailablityMap.get(qMemberID));
                             if(userIdToUserAvailablityMap.get(qMemberID) == true){
                                 system.debug('Owner is going to Change!!!');
-                                ld.ownerId = Id.valueOf(qMemberID);
-                                ld.Lead_Assigned_Date_Time__c = system.now();
-                                ld.Lead_Assigned_Date__c = system.today();
-                                updateLeadList.add(ld); 
+                                if (preSalesToSalesTransfer == false) {
+                                    ld.ownerId = Id.valueOf(qMemberID);
+                                    ld.Lead_Assigned_Date_Time__c = system.now();
+                                    ld.Lead_Assigned_Date__c = system.today();
+                                    updateLeadList.add(ld); 
+                                }
+                                else if (preSalesToSalesTransfer == true) {
+                                    ld.Pre_Sales_Team_Member__c = ld.OwnerId;
+                                    ld.OwnerId = Id.valueOf(qMemberID);
+                                    ld.Sales_Team_Member__c = Id.valueOf(qMemberID);
+                                    Lead__Share leadShareRec = new Lead__Share();
+                                    leadShareRec.ParentId = ld.Id;
+                                    leadShareRec.UserOrGroupId = Id.valueOf(ld.Pre_Sales_Team_Member__c);
+                                    leadShareRec.AccessLevel = 'VIEW';
+                                    leadShareRecords.add(leadShareRec);
+
+                                    if (ld.Sales_Team_Member__c != null) {
+                                        ld.isQualified__c = true;
+                                        ld.Qualified_Date_Time__c = system.now();
+                                        updateLeadList.add(ld); 
+                                    }
+                                }
+                                
                                 isAssigned = true;
                                 if(BuildMaps.mapofMemidByTodayLeadCount.get(qMemberID) == null)
                                     BuildMaps.mapofMemidByTodayLeadCount.put(qMemberID,0);
@@ -95,7 +125,11 @@ public without sharing class  RoundRobinLeadAssignment{
                             qNameToLastAssignedQmemberRRid.remove(qName);
                             qNameToLastAssignedQmemberRRid.put(qName, LastRRid);
                             qMemberSize ++;
-                            ld.OwnerId = queueId;
+                            //ld.OwnerId = queueId;
+                            if (!String.valueOf((ld.OwnerId)).startsWith('005')) {
+                                ld.OwnerId = queueId;
+                            }
+                            
                             //DefaultQueueLeadList.add(ld);
                         }
                     }
@@ -120,6 +154,14 @@ public without sharing class  RoundRobinLeadAssignment{
             }catch(exception e){
                 system.debug('Exception'+ e.getMessage() +'@@@@'+e.getLineNumber());
             }
+        }
+        if (!leadShareRecords.isEmpty()) {
+            try{
+                insert leadShareRecords;  
+            }catch(exception e){
+                system.debug('Exception'+ e.getMessage() +'@@@@'+e.getLineNumber());
+            }
+            
         }
         
         if(!QtoBeUpdated.isEmpty()){

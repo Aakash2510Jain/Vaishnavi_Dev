@@ -2,6 +2,7 @@
     <html>
         <head>
             <apex:stylesheet value="{!$Resource.BookingFormCSS}" />
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.css"/>
             <c:Libraries ></c:Libraries>
             <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
             <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
@@ -9,19 +10,12 @@
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>  -->
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
             <link href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" rel="stylesheet"/>
+            
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"/>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.js"/>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.6/semantic.js">
+            </script>
         </head>
-
-        <style>
-            .dropdown.dropdown-scroll .dropdown-menu {
-            max-height: 200px;
-            width: 60px;
-            overflow: auto;
-            }
-
-            .search-control {
-            padding: 5px 10px;
-            }
-        </style>
 
         <script>
             var ageGroup = JSON.parse('{!ageGroup}');
@@ -42,6 +36,7 @@
             var ethnicity = JSON.parse('{!ethnicity}');
             var flatType = JSON.parse('{!flatType}');
             var UserId = '{!UserId}';
+
 
 //             angular.module('number', [])
 //     .directive('number', function () {
@@ -132,6 +127,9 @@
                 $scope.showGRE = false;
                 $scope.showSalesManager = false;
                 $scope.listOfLocation = [];
+                $scope.listOfChannelPartner = [];
+                $scope.selectedId;
+                $scope.visit.Channel_Partner__c = "";
 
                 $scope.getLocationList = function(){
                     debugger;
@@ -152,12 +150,96 @@
                         debugger;
                         if(event.status && result){
                             debugger;
-                            $scope.projectId = result;
+                            $scope.projectId = result.Project__c;
+                            $scope.projectName = result.Project__r.Name;
                             $scope.$apply();
+                            $scope.getBudgetAndUnitOfProject();
                         }
                     })
                 }
                 $scope.getProjectsData();
+
+                $scope.budgetValue = [];
+                $scope.unitValue = [];
+                $scope.getBudgetAndUnitOfProject = function(){
+                    debugger;
+                    siteVisitFormController.getBudgetAndUnitOfProject($scope.projectName,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.budgetValue = result.Budget__c.split(',');
+                            // for(i=0;i<$scope.budgetValue.length;i++){
+                            //     if($scope.budgetValue[i].includes("&lt;")){
+                            //         $scope.budgetValue[i] = $scope.budgetValue[i].replace(/&lt;/g, "<");
+                            //     }
+                            //     if($scope.budgetValue[i].includes("&gt;")){
+                            //         $scope.budgetValue[i] = $scope.budgetValue[i].replace(/&gt;/g, ">");
+                            //     }
+                            // }
+                            $scope.unitValue = result.Unit__c.split(',');
+                            $scope.$apply();
+                        }
+                    })
+                }
+
+
+                $scope.getSalesManager = function(){
+                    debugger;
+                    siteVisitFormController.getSalesManager(function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.listOfSalesManager = result;
+                            $scope.$apply();
+                        }
+                    })
+                }
+                $scope.getSalesManager();
+
+                $scope.getChannelPartners = function(){
+                    debugger;
+                    siteVisitFormController.getChannelPartners(function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            debugger;
+                            $scope.listOfChannelPartner = result;
+                            $scope.$apply();
+                        }
+                    })
+                }
+                $scope.getChannelPartners();
+
+                $scope.searchLead2 = function(){
+                    debugger;
+                    siteVisitFormController.searchLead($scope.searchValue,$scope.projectId,function(result,event){
+                        debugger;
+                        if(event.status && result){
+                            if(result.leadRec != null){
+                                console.log('success....');
+                                $scope.leadDetails = result.leadRec;
+                                $scope.$apply();
+                            }else{
+                                console.log('success....');
+                                $scope.oppDetails = result.oppRec;
+                                $scope.oppId = result.oppRec.Id;
+                                $scope.siteVisitList = result.visitList;
+                                if($scope.siteVisitList.length > 0){
+                                    for(var i=0; i<$scope.siteVisitList.length;i++){
+                                        debugger;
+                                        if($scope.siteVisitList[i].Actual_visit_date__c != null){
+                                            $scope.siteVisitList[i].Actual_visit_date__c = new Date($scope.siteVisitList[i].Actual_visit_date__c);
+                                        }
+                                    }
+                                }
+                                $scope.$apply();
+                            }
+                            
+                        }else{
+                        }
+                        $scope.getleadDet();
+						$scope.$apply();
+                    })
+                }
 
                 $scope.searchLead = function(){
                     debugger;
@@ -240,6 +322,7 @@
                        if(event.status && result){
                             debugger;
                             $scope.leadId = result;
+                            $scope.$apply();
                             swal({
                                 icon: 'success',
                                 title: 'success',
@@ -352,6 +435,7 @@
 
                 $scope.OnClickcreateVisit = function(){
                     debugger;
+                    $scope.searchLead2();
                     if($scope.oppDetails != undefined){
                         if($scope.oppDetails.Project__c == $scope.projectId){
                             $scope.lengthofVisit = $scope.siteVisitList.length;
@@ -368,15 +452,25 @@
                             $scope.days = Math.ceil(timeDiff / (1000 * 3600 * 24));
                             $scope.latestVisitId = $scope.siteVisitList[$scope.lengthofVisit-1].Id;
                             if($scope.oppDetails.Stage__c == 'Lost'){
+                                if($scope.days < 30){
+                                    $scope.cloneOpportunityAndSV();
+                                    $scope.$apply();
+                                }else{
+                                    $scope.cloneOppForDiffProject();
+                                    $scope.$apply();
+                                }
+                            }else if($scope.days < 30){
+                                $scope.createCloneVisit();
+                                $scope.$apply();                       
+                            }else if($scope.days > 30){
                                 $scope.cloneOppForDiffProject();
-                            }else if($scope.days < 90){
-                            $scope.createCloneVisit();                       
-                            }else if($scope.days > 90){
-                                $scope.cloneOpportunityAndSV();
+                                $scope.$apply();
                             }
                         }else if($scope.oppDetails.Project__c != $scope.projectId){
                             $scope.cloneOppForDiffProject();
+                            $scope.$apply();
                         }
+                        $scope.$apply();
 
                     }else{
                         $scope.showVisitSection = true;
@@ -527,7 +621,7 @@
                     }else{
                         $scope.secondVisitRecord.Lead__c = $scope.leadId;
                     }
-                    siteVisitFormController.updateVisitRecord($scope.secondVisitRecord,function(result,event){
+                    siteVisitFormController.updateVisitRecord($scope.secondVisitRecord,null,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -551,10 +645,11 @@
 
                     $scope.thirdVisitRecord = {"Walkin_Source__c":$scope.visit.Walkin_Source__c,"Walkin_Sub_Source__c":$scope.visit.Walkin_Sub_Source__c,
                     "Projects__c":$scope.visit.Projects__c,"GR_Code__c":$scope.visit.GR_Code__c,"Channel_Partner_Not_registered__c":$scope.visit.Channel_Partner_Not_registered__c,
-                    "Firm_Name__c":$scope.visit.Firm_Name__c,"Channel_Partner_Name__c":$scope.visit.Channel_Partner_Name__c,"Apartment_No__c":$scope.visit.Apartment_No__c,
+                    "Firm_Name__c":$scope.visit.Firm_Name__c,"Apartment_No__c":$scope.visit.Apartment_No__c,
                     "Channel_Partner_Mobile_No__c":$scope.visit.Channel_Partner_Mobile_No__c,"RERA_No__c":$scope.visit.RERA_No__c,
                     "Channel_Partner_Email__c":$scope.visit.Channel_Partner_Email__c,"Referral_Name__c":$scope.visit.Referral_Name__c,
                     "Referral_Mobile_No__c":$scope.visit.Referral_Mobile_No__c};
+
 
                     $scope.thirdVisitRecord.Id = $scope.visitId;
 
@@ -563,7 +658,7 @@
                     }else{
                         $scope.thirdVisitRecord.Lead__c = $scope.leadId;
                     }
-                    siteVisitFormController.updateVisitRecord($scope.thirdVisitRecord,function(result,event){
+                    siteVisitFormController.updateVisitRecord($scope.thirdVisitRecord,$scope.visit.Channel_Partner__c,function(result,event){
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -781,27 +876,65 @@
             }
 
             })
+
+            .directive('soDropdown', ['$timeout', function($timeout) {
+    return {
+        restrict: 'E',
+        require: 'ngModel',
+        replace: true,
+        transclude: true,
+        template: function (el, atts) {
+            var itemName = 'dropdownItem';
+            var valueField = itemName + '.' + (atts.valueField || 'Id');
+            var textField = itemName + '.' + (atts.textField || 'Name');
+            return "<select class='ui search dropdown'>" +
+                "<div ng-transclude></div>" +
+                "   <option value='{{" + valueField + "}}' ng-repeat='" + itemName + " in " + atts.dropdownItems + " track by " + valueField + "'>" +
+                "       {{" + textField + "}}" +
+                "   </option>" +
+                "</select>";
+        },
+        link: function (scope, el, atts, ngModel) {
+            $(el).dropdown({
+                onChange: function (value, text, choice) {
+                    scope.$apply(function () {
+                        ngModel.$setViewValue(value);
+                    });
+                }
+            });
+            ngModel.$render = function () {
+                console.log('set value', el, ngModel, ngModel.$viewValue);
+                $timeout(function () {
+                    $(el).dropdown('set value', ngModel.$viewValue);
+                });
+                // $(el).dropdown('set value', ngModel.$viewValue);
+            };
+        }
+    };
+}]);
         </script>
 
         <div ng-app="visit_app" ng-controller="visit_ctrl" style="overflow-x: hidden;">
             <body>
-                <div class="header-siteVisit">
+                <!-- <div class="header-siteVisit">
                     <h3 class="header-text text-center">VAISHNAVI</h3>
-                </div>
+                </div> -->
                 <div class="row">
-                    <div class="col-md-4" style="padding-left: 4%;">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 float-end" style="padding-left: 15%;">
                         <apex:image url="{!$Resource.New}" />
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <h5 class="heading text-center"><b>VAISHNAVI 81 INFRASTRUCTURES LLP</b></h5>
                         <h5 class="heading-loc text-center">Yelahanka, Bengaluru</h5>
                     </div>
                     <div class="col-md-4" style="padding-right: 2%;">
                         <h6 class="header-address">#2/2,Waltaon Road Off Vittal Mallya Road<br/>
                             Bengaluru - 560 001<br/>
-                            <!-- +91 80 6696 6696<br/> -->
+                            +91 80 6696 6696<br/>
                             www.vaishnavilife.com</h6>
-                    </div>
+                    </div> -->
                 </div>
                 <hr class="border" />
 
@@ -816,7 +949,7 @@
                             </div>
                             <div class="col-md-7 mt-4">
                                 <button class="button" ng-click="searchLead()">Search</button>
-                                <button class="button" ng-click="createLead()"><i class="fa fa-plus"></i>  Create New Lead</button>
+                                <!-- <button class="button" ng-click="createLead()"><i class="fa fa-plus"></i>  Create New Lead</button> -->
                                 <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn || showConvertedLead" id="btnSubmit1" ng-click="OnClickcreateVisit()">Create Visit</button>
                                 <button class="button" id="btnPleaseWait1" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                             </div>
@@ -1073,9 +1206,12 @@
                                                         <label class="label">Locality:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <select class="form-control" aria-label="Default select example" ng-model="visit.Location__c">
+                                                        <so-dropdown ng-model="visit.Location__c" dropdown-items="listOfLocation">
+                                                            <option value='None'>None</option>
+                                                        </so-dropdown>
+                                                        <!-- <select class="form-control" aria-label="Default select example" ng-model="visit.Location__c">
                                                             <option ng-repeat="location in listOfLocation">{{location.Name}}</option>
-                                                        </select>
+                                                        </select> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -1210,11 +1346,11 @@
                                     <div class="col-md-12">
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Budget:</label>
+                                                <label class="label">Budget(in Lakhs):</label>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
-                                                    <div class="col-md-4 pt-3" ng-repeat="value in budget">
+                                                    <div class="col-md-4 pt-3" ng-repeat="value in budgetValue">
                                                         <input type="radio" ng-model="visit.Budget__c" ng-value="value" ng-change="changeOfBudget(value)" />
                                                         <label>{{value}}</label>
                                                     </div>
@@ -1223,11 +1359,11 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Area (Sq.Ft.):</label>
+                                                <label class="label">Unit Type:</label>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
-                                                    <div class="col-md-4 pt-3" ng-repeat="value in flatType">
+                                                    <div class="col-md-4 pt-3" ng-repeat="value in unitValue">
                                                         <input type="radio" ng-model="visit.Area__c" ng-value="value" ng-change="changeOfArea(value)" />
                                                         <label>{{value}}</label>
                                                     </div>
@@ -1236,7 +1372,7 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Construction Status:</label>
+                                                <label class="label">Project Completion <br/>Timeline:</label>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1417,10 +1553,13 @@
                                                 <div class="col-md-6">
                                                     <div class="row align-items-center mb-4">
                                                         <div class="col-md-4">
-                                                            <label class="label">Channel partner<br/>Name:</label>
+                                                            <label class="label">Channel Partner<br/>Name:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="text" class="form-control" ng-model="visit.Channel_Partner_Name__c" />
+                                                            <so-dropdown ng-model="visit.Channel_Partner__c" dropdown-items="listOfChannelPartner">
+                                                                <option value='None'>None</option>
+                                                            </so-dropdown>
+                                                            <!-- <input type="text" class="form-control" ng-model="visit.Channel_Partner_Name__c" /> -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1429,10 +1568,10 @@
                                                 <div class="col-md-6">
                                                     <div class="row align-items-center mb-4">
                                                         <div class="col-md-4">
-                                                            <label class="label">Mobile No.:</label>
+                                                            <label class="label">Email:</label>
                                                         </div>
                                                         <div class="col-md-8">
-                                                            <input type="tel" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
+                                                            <input type="email" class="form-control" ng-model="visit.Channel_Partner_Email__c"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1449,10 +1588,10 @@
                                             </div>
                                             <div class="row align-items-center mb-4">
                                                 <div class="col-md-2">
-                                                    <label class="label">Email:</label>
+                                                    <label class="label">Mobile No.:</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <input type="email" class="form-control" ng-model="visit.Channel_Partner_Email__c"/>
+                                                    <input type="tel" class="form-control" ng-model="visit.Channel_Partner_Mobile_No__c"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1585,10 +1724,13 @@
                                             <div class="col-md-6">
                                                 <div class="row align-items-center mb-4">
                                                     <div class="col-md-4">
-                                                        <label class="label">Sales <br/>Manager:</label>
+                                                        <label class="label">Attending Sales<br/>Manager:</label>
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="text" class="form-control" ng-model="visit.Sales_Manager__c" />
+                                                        <so-dropdown ng-model="visit.Sales_Manager__c" dropdown-items="listOfSalesManager">
+                                                            <option value='None'>None</option>
+                                                        </so-dropdown>
+                                                        <!-- <input type="text" class="form-control" ng-model="visit.Sales_Manager__c" /> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -1676,7 +1818,7 @@
 
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="button" class="button float-end" ng-click="saveGREDetails()">Save and Next</button>
+                                                <button type="button" class="button float-end" ng-click="saveGREDetails()">Submit</button>
                                                 <button type="button" class="cancelbutton float-end me-2" ng-click="showThird()">Back</button>
                                             </div>
                                         </div>

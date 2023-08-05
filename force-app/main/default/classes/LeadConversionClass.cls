@@ -24,6 +24,9 @@ public class LeadConversionClass {
                 accRecToInsert.Project_Completion_TimeLine__c = leadRec.Project_Completion_TimeLine__c;
                 accRecToInsert.Unit_Availability__c = leadRec.Unit_Availability__c;
                 
+                accRecToInsert.Pre_Sales_Team_Member__c = leadRec.Pre_Sales_Team_Member__c;
+                accRecToInsert.Sales_Team_Member__c = leadRec.Sales_Team_Member__c;
+                
                 accountListToInsert.add(accRecToInsert);
             }
             if(!accountListToInsert.isEmpty()){

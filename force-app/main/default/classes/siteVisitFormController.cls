@@ -41,12 +41,22 @@ public without sharing class siteVisitFormController {
     }
 
     @RemoteAction
-    public static string getProjectsData(string userId){
+    public static Project_GRE_Association__c getProjectsData(string userId){
         try{
-            string projectId = [Select Id,Project__c From Project_GRE_Association__c WHERE GRE__c =: userId].Project__c;
+            Project_GRE_Association__c projectId = [Select Id,Project__c,Project__r.Name From Project_GRE_Association__c WHERE GRE__c =: userId];
             return projectId;
         }catch(Exception e){
-            return e.getMessage()+e.getLineNumber();
+            return null;
+        }
+    }
+
+    @RemoteAction
+    public static Project_Config__c getBudgetAndUnitOfProject(string projectName){
+        try{
+            Project_Config__c projectsRecords = [SELECT Id,Name,Budget__c,Unit__c From Project_Config__c WHERE Name =: projectName];
+            return projectsRecords;
+        }catch(Exception e){
+            return null;
         }
     }
 
@@ -87,6 +97,7 @@ public without sharing class siteVisitFormController {
 
             system.debug('oppRecord ==> '+oppRecord);
             Opportunity__c clonedRecord = oppRecord.clone(false, false, false, false);
+            clonedRecord.Stage__c = 'SV Done';
             system.debug('clonedRecord ==> '+clonedRecord);
 
             insert clonedRecord;
@@ -128,6 +139,7 @@ public without sharing class siteVisitFormController {
             system.debug('oppRecord ==> '+oppRecord);
             Opportunity__c clonedRecord = oppRecord.clone(false, false, false, false);
             clonedRecord.Project__c = projectId;
+            clonedRecord.Stage__c = 'SV Done';
             system.debug('clonedRecord ==> '+clonedRecord);
 
             insert clonedRecord;
@@ -162,6 +174,7 @@ public without sharing class siteVisitFormController {
                     system.debug('Inside Is Converted TRUE.....');
                     List<Visit__C> relatedVisitRecords = new List<Visit__C>();
                     Map<Id, Opportunity__c> oppRecByOppIdMap  = new Map<Id, Opportunity__c>([Select Id,Email__c,Opportunity_Name__c,Phone__c,Project__c,Stage__c From Opportunity__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by createdDate Desc]);
+                    system.debug('oppRecByOppIdMap ==> '+oppRecByOppIdMap);
                     if(!oppRecByOppIdMap.isEmpty()){
                         for(Id oppId : oppRecByOppIdMap.keyset()){
                             if(oppRecByOppIdMap.get(oppId).Project__c == projectId){
@@ -169,12 +182,12 @@ public without sharing class siteVisitFormController {
                             }
                         }
                     }
-                    /*system.debug('opportunityIdByOpportunityRecordMap ==>>'+opportunityIdByOpportunityRecordMap);
-                    if(!opportunityIdByOpportunityRecordMap.isEmpty()){
+                    /*system.debug('opportunityIdByOpportunityRecordMap ==>>'+opportunityIdByOpportunityRecordMap);*/
+                    if(!oppRecByOppIdMap.isEmpty()){
                         relatedVisitRecords = [Select Id,Name__c,Project__r.Name,Actual_visit_date__c,Planned_visit_date__c,Visiting_With__c,Email__c,Mobile_No__c,
-                        Walkin_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : opportunityIdByOpportunityRecordMap.keyset() order by Actual_visit_date__c ASC];
-                    }*/
-                    leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, relatedVisitRecords, null);
+                        Walkin_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : oppRecByOppIdMap.keyset() order by Actual_visit_date__c ASC];
+                    }
+                    leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, relatedVisitRecords, oppRecByOppIdMap.values()[0]);
                     return leadAndSVwrapInstance;
                 }else{
                     // No lead or opportunity exists
@@ -235,11 +248,11 @@ public without sharing class siteVisitFormController {
         try{
             System.debug(' --- visitRecord:'+visitRecord);
             System.debug(' --- location:'+location);
-            if(location != null || location != ''){
-                Location__c locationrec = [Select Id,name From Location__c WHERE Name =: location];
+            if(!String.isBlank(location)){
+                List<Location__c> locationrec = [Select Id,name From Location__c WHERE Id =: location LIMIT 1];
                 system.debug('locationrec ==> '+locationrec);
-                if(locationrec != null){
-                    visitRecord.Location__c = locationrec.Id;
+                if(!locationrec.isEMpty()){
+                    visitRecord.Location__c = locationrec[0].Id;
                 }
                 system.debug('visitRecord.Location__c ==> '+visitRecord.Location__c);
             }
@@ -298,8 +311,16 @@ public without sharing class siteVisitFormController {
     }
     
     @RemoteAction
-    public static string updateVisitRecord(Visit__c visitRecord){
+    public static string updateVisitRecord(Visit__c visitRecord, string channelPartner){
         try{
+            if(!String.isBlank(channelPartner)){
+                List<Channel_Partner__c> channelPartnerList = [SELECT Id,Name FROM Channel_Partner__c WHERE Id =: channelPartner LIMIT 1];
+                if(!channelPartnerList.isEmpty()){
+                    if(channelPartnerList[0].Name != 'Un-registered CP'){
+                        visitRecord.Channel_Partner__c = channelPartner;
+                    }
+                }
+            }
             update visitRecord;
             return 'SUCCESS';
         }catch(Exception e){
@@ -310,6 +331,10 @@ public without sharing class siteVisitFormController {
     @RemoteAction
     public static string updateGREDetails(Visit__c visitRecord, Integer shour, Integer sMin){
         try{
+            if(visitRecord != null){
+                List<User> salesUserList = [SELECT Id,Name,Profile.Name FROM User WHERE Id =: visitRecord.Sales_Manager__c];
+                visitRecord.Sales_Manager__c = salesUserList[0].Name;
+            }
             // if(day == 0 && month==0 && year==0){
                 
             // }else{
@@ -348,6 +373,26 @@ public without sharing class siteVisitFormController {
         try{
             List<Location__c> locationList = [SELECT Id,Name From Location__c order by Name];
             return locationList;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    @RemoteAction
+    public static List<User> getSalesManager(){
+        try{
+            List<User> salesUserList = [SELECT Id,Name,Profile.Name FROM User WHERE Profile.Name = 'Sales Team'];
+            return salesUserList;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+    @RemoteAction
+    public static List<Channel_Partner__c> getChannelPartners(){
+        try{
+            List<Channel_Partner__c> channelPartnerList = [SELECT Id,Name FROM Channel_Partner__c ];
+            return channelPartnerList;
         }catch(Exception e){
             return null;
         }

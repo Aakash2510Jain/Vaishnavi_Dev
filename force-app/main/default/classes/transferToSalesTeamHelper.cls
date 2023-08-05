@@ -21,7 +21,7 @@ public without Sharing class transferToSalesTeamHelper {
         set<String> LeadIdList = new Set<String>();
         LeadIdList.add(leadId);
         String courseName = 'Manual sales Team';
-        RoundRobinLeadAssignment.assignLeadsToBDS(courseName, LeadIdList);
+        RoundRobinLeadAssignment.assignLeadsToBDS(courseName, LeadIdList,true);
         
     }
     

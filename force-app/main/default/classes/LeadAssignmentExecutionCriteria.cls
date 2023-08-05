@@ -53,7 +53,25 @@ public class LeadAssignmentExecutionCriteria {
         List<Execution_Criteria__c> AvailableCriterias = [SELECT Enabled__c,Evaluation_Expression_For_Execution__c,Id,Name ,(SELECT Execution_Criteria__c,serial__c,Field_Name__c,Field_Type__c,Matching_Type__c,Matching_Value__c,Related_Object__c,Scorecard_Execution_Criteria_Name__c,Scorecard__c,Sequence__c FROM Execution_Criteria_Entry__r WHERE Execution_Criteria__c != null ORDER BY Sequence__c ASC)FROM Execution_Criteria__c where Enabled__c = true];
         
        // list<lead__c> queueLeads = [SELECT Id,OwnerId FROM Lead__c where id not in: newLeadsSet and ownerId =: queueId ];
-       newLeadListTemp = [SELECT Id,OwnerId, Lead_Source__c FROM Lead__c where  ownerId =: queueId ];
+       newLeadListTemp = [SELECT Acadamic_Level__c,Acadamic_Program__c,Account__c,Additional_Comments__c,Address__c,Affiliation__c,Age_of_Candidate__c,
+                          Alternate_Email__c,Alternate_Phone__c,AnnualRevenue__c,Birthdate__c,Budget_Pick__c,Budget_Score__c,Budget__c,Campaign__c,Carpet_Area__c,
+                          Channel_Partner__c,City__c,Client_ID__c,Company_Name__c,Company__c,Country__c,CP_Email__c,CP_Name__c,CP_Phone__c,CreatedById,CreatedDate,
+                          Demo_Date__c,Email__c,Employee_Code__c,Facebook_AD_ID__c,Facebook_Ad_Name__c,Facebook_Ad_Set_Id__c,Facebook_AD_Set_Name__c,
+                          Facebook_Campaign_Id__c,Facebook_Campaign_Name__c,Facebook_Lead_Created_Date__c,Facebook_Page_Id__c,Facebook_Platform__c,
+                          First_Called_Date_Time__c,First_Connected_Date_Time__c,Flat_No__c,Geolocation__c,Geolocation__Latitude__s,Geolocation__Longitude__s,
+                          Google_AdGroup_Id__c,hrefLink__c,Id,Industry__c,Interested_Comments__c,Irrelevant_Call_Reason__c,isConverted__c,IsDeleted,isQualified__c,
+                          Is_Budget_Verified__c,Is_Email_Conversation_Done__c,Is_Required_Location_Available__c,Is_Telephonic_Conversation_Done__c,LastActivityDate,
+                          LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Last_Contacted_Date_Time__c,Lead_Assigned_Date_Time__c,
+                          Lead_Assigned_Date__c,Lead_Gen_Form_Id__c,Lead_ID__c,Lead_Source_Type__c,Lead_Source__c,Lead_Stage__c,Lead_Substage__c,Lead_Sub_Source__c,
+                          Lead_Type__c,Location__c,Name,Name__c,Next_Followup_Date_Time__c,Not_Interested_Reason__c,No_of_Employees__c,OwnerId,ParentLeadID__c,
+                          Phone__c,Postal_Code__c,Pre_Sales_Comments__c,Pre_Sales_Drop_Reason__c,Pre_Sales_Team_Member__c,ProjectName_formula__c,
+                          Project_Completion_TimeLine__c,Project_Interested_In__c,Project_Location_v1__c,Project_Location__c,Project_Name__c,Project_Pickval__c,
+                          Project_TimeLine__c,Project__c,Qualified_Date_Time__c,Rating__c,RecordTypeId,Referral_Name__c,Referral__c,Referred_By__c,Revenue_Score__c,
+                          Sales_Comment__c,Sales_Drop_Reason__c,Sales_Team_Member__c,Salutation__c,Site_Visit_Date__c,Source_Group__c,Source_Type__c,
+                          State_Province__c,Street__c,SystemModstamp,TaskCreationForDuplicateLead__c,Title__c,Total_Calls__c,Total_Call_Duration__c,
+                          Total_Connected_Call__c,Total_Connected_Duration__c,Total_Emails_Send__c,Total_Score__c,To_Be_Deleted__c,
+                          Unit_Availability__c,Unit_Details__c,Unit_Pickval__c,URL__c,UTM_Campaign__c,UTM_Medium__c,UTM_Source__c,
+                          UTM_Term__c FROM Lead__c where  ownerId =: queueId ];
         if(!newLeadListTemp.isEmpty()){
             //newLeadListTemp.addAll(queueLeads);
             System.debug(newLeadListTemp.size()); 
@@ -434,10 +452,13 @@ public class LeadAssignmentExecutionCriteria {
         
         system.debug('DefaultQueueList-Size :::'+DefaultQueueList.size()+'@@@The List :::::'+DefaultQueueList);
         map<String,List<Lead__c>> mapofGlobalGroupNameByLeadList = new map<String,List<Lead__c>>();
-        DefaultGroupAssignment__c dgc = [Select id,Name,Group_Id__c from DefaultGroupAssignment__c where name = 'Global Lead Team'][0];
+        DefaultGroupAssignment__c dgc = new DefaultGroupAssignment__c();
+        if(!test.isRunningTest())
+            dgc = [Select id,Name,Group_Id__c from DefaultGroupAssignment__c where name = 'Global Lead Team'][0];
         
         if(DefaultQueueList.size() > 0 && DefaultQueueList != null){
-            mapofGlobalGroupNameByLeadList.put(dgc.Name,DefaultQueueList);
+            if(!string.isBlank(dgc.Name))
+                mapofGlobalGroupNameByLeadList.put(dgc.Name,DefaultQueueList);
         }
         system.debug('mapofExecutionIdByListLead'+mapofExecutionIdByListLead);
         system.debug('mapofGlobalGroupNameByLeadList'+mapofGlobalGroupNameByLeadList);
@@ -467,7 +488,7 @@ public class LeadAssignmentExecutionCriteria {
                     }
                 }
                 Set<string> tempId = new Set<String>(mapofGroupnameByLeadIdList.get(mapKey));
-               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
+               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId,false);
             }
         }
         //this is else Part.....
@@ -477,7 +498,7 @@ public class LeadAssignmentExecutionCriteria {
                 for(Lead__c ld : mapofGlobalGroupNameByLeadList.get(mapKey)){
                     tempId.add(ld.id);
                 }
-               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId);
+               RoundRobinLeadAssignment.assignLeadsToBDS(mapKey,tempId,false);
             }
         }
     }

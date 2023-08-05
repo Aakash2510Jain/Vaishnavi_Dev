@@ -50,7 +50,9 @@ global class API_websiteLeadCreation {
             if(!String.isBlank((string)requestBodyMap.get('UTM_Term'))){
                 leadRecToInsert.UTM_Term__c = (string)requestBodyMap.get('UTM_Term');
             }
-
+            if(!String.isBlank((string)requestBodyMap.get('unit_details'))){
+                leadRecToInsert.Unit_Details__c = (string)requestBodyMap.get('unit_details');
+            }
             insert leadRecToInsert;
 
             responseData.success_code = '200';

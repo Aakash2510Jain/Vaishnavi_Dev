@@ -137,6 +137,42 @@ public with sharing class siteVisitFromControllerTest {
         
         // Visit__c existingvisitRecord = [SELECT Id,Name__c,Lead__c FROM Visit__c WHERE Lead__c =: leadRecord.Id];
     }
+    
+    @isTest
+    static void testgetChannelPartners(){
+
+        
+        siteVisitFormController.getChannelPartners();
+    }
+    
+    @isTest
+    static void testgetSalesManager(){
+        Profile profileId = [SELECT Id, Name FROM Profile WHERE Name = 'Standard User' LIMIT 1];
+        List<User> testUsers = new List<User>();
+        User usr = new User(LastName = 'LIVESTON1',
+                            FirstName='JASON1',
+                            Alias = 'jlive',
+                            Email = 'jason12.liveston1@asdf.com',
+                            Username = 'jason12.liveston1@asdf.com',
+                            ProfileId = profileId.id,
+                            TimeZoneSidKey = 'GMT',
+                            LanguageLocaleKey = 'en_US',
+                            EmailEncodingKey = 'UTF-8',
+                            LocaleSidKey = 'en_US'
+                           );
+
+        insert usr;
+        siteVisitFormController.getSalesManager();
+    }
+    
+    @isTest
+    static void testgetLocationList(){
+
+        Location__c locat = New Location__c();
+        locat.Name = 'testLoc';
+        insert locat;
+        siteVisitFormController.getLocationList();
+    }
 
     @isTest
     static void testinsertVisitRecord(){
@@ -198,12 +234,21 @@ public with sharing class siteVisitFromControllerTest {
         Integer visitday = 11;
         Integer visitmonth = 11;
 
+        Explorer_Configuration__c cpConfigs = new Explorer_Configuration__c();
+        cpConfigs.Name = 'Channel Partner';
+        cpConfigs.Folders__c = 'A,B';
+        insert cpConfigs;
+            
         Visit__c visitRec = New Visit__c();
         visitRec.Date_Of_Birth__c = Date.newInstance(year, month, day); 
         visitRec.Actual_visit_date__c = Date.newInstance(visityear, visitmonth, visitday);
         insert visitRec;
+        
+        Channel_Partner__c cp = New Channel_Partner__c();
+        cp.Name = 'Test CP';
+        insert cp;
 
-        siteVisitFormController.updateVisitRecord(visitRec);
+        siteVisitFormController.updateVisitRecord(visitRec,cp.Id);
     }
 
     @isTest

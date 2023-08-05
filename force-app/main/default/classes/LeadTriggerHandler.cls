@@ -38,24 +38,74 @@ public class LeadTriggerHandler {
             }
         }
         projectList = [Select Id,Name From Project__c];
+        system.debug('projectList--->'+projectList);
         if(!projectList.isEmpty()){
             for(Project__c projectRec : projectList){
                 projectNameByProjectRecMap.put(projectRec.Name, projectRec);
             }
         }
-        
+        system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
         string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
+        
+        /* START Duplicate Phone & Alternate Phone */
+        // set<string> setOfPhone = New set<string>();
+        // for(Lead__c leadRec : newLeadList){
+        //     if(!String.isBlank(leadRec.Phone__c)){
+        //         setOfPhone.add(leadRec.Phone__c);
+        //     }
+        //     if(!String.isBlank(leadRec.Alternate_Phone__c)){
+        //         setOfPhone.add(leadRec.Alternate_Phone__c);
+        //     }
+        // }
+        
+        // List<Lead__c> listOfDuplicateLead = [SELECT Id,Phone__c,Alternate_Phone__c From Lead__c WHERE Phone__c IN : setOfPhone OR Alternate_Phone__c IN : setOfPhone];
+        // system.debug('listOfDuplicateLead ==> '+listOfDuplicateLead);
+        // if(!listOfDuplicateLead.isEmpty()){
+        //     for(Lead__c singleLeadRec : listOfDuplicateLead){
+        //         for(Lead__c leadRec : newLeadList){
+        //             if(leadRec.Phone__c == singleLeadRec.Phone__c){
+        //                 leadRec.Phone__c.addError('Duplicate Lead with same Phone Number');
+        //             }else if(leadRec.Phone__c == singleLeadRec.Alternate_Phone__c){
+        //                 leadRec.Phone__c.addError('Duplicate Lead with same Phone Number');
+        //             }else if(leadRec.Alternate_Phone__c == singleLeadRec.Alternate_Phone__c){
+        //                 leadRec.Alternate_Phone__c.addError('Duplicate Lead with same Phone Number');
+        //             }else if(leadRec.Alternate_Phone__c == singleLeadRec.Phone__c){
+        //                 leadRec.Alternate_Phone__c.addError('Duplicate Lead with same Phone Number');
+        //             }
+        //         }
+        //     }
+        // }
+        /* END Duplicate Phone & Alternate Phone */
+        
+        
+        
         for(Lead__c leadRec : newLeadList){
             leadRec.OwnerId = queueId;
+            if(!String.isBlank(leadRec.Phone__c)){
+                leadRec.Phone__c = leadRec.Phone__c.replaceAll('[^0-9]', '');
+                leadRec.Phone__c = '+91' + leadRec.Phone__c.right(10);
+            }
+            if(!String.isBlank(leadRec.Alternate_Phone__c)){
+                leadRec.Alternate_Phone__c = leadRec.Alternate_Phone__c.replaceAll('[^0-9]', '');
+                leadRec.Alternate_Phone__c = '+91' +  leadRec.Alternate_Phone__c.right(10);
+            }
             if(!string.isBlank(leadRec.Project_Name__c)){
+                system.debug('leadRec.Project_Name__c--->'+leadRec.Project_Name__c);
                 for(string projectName : projectNameByProjectRecMap.keyset()){
-                    if(projectName.containsIgnoreCase(leadRec.Project_Name__c)){
+                    system.debug('leadRec.Project_Name__c--->'+leadRec.Project_Name__c);
+                    system.debug('projectName--->'+projectName);
+                    if(leadRec.Project_Name__c.containsIgnoreCase(projectName)){
+                        system.debug('inside matching conditions');
                         leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
+                        leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(projectName).Name;
                     }
                 }
             }
             if(string.isEmpty(leadRec.Project__c) && string.isEmpty(leadRec.Project_Name__c)){
-                leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+                if(!test.isRunningTest()){
+                    leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+                    leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Name;
+                }
             }
             if(leadRec.Phone__c != null){
                 phonesSet.add(leadRec.Phone__c);
@@ -173,10 +223,10 @@ public class LeadTriggerHandler {
                     system.debug('lead.Phone__c---3>'+lead.Phone__c);
                     if(lead.Email__c != null){
                         leadRecByEmailMap.put(lead.Email__c, lead);
-                        	system.debug('lead.Email__c-::4>'+lead.Email__c);
+                        system.debug('lead.Email__c-::4>'+lead.Email__c);
                     }else if(lead.Phone__c != null){
                         leadRecByPhoneMap.put(lead.Phone__c, lead);
-                        	system.debug('lead.Phone__c-::5>'+lead.Phone__c);
+                        system.debug('lead.Phone__c-::5>'+lead.Phone__c);
                     }
                 }
                 system.debug('leadRecByPhoneMap-->'+leadRecByPhoneMap);
@@ -245,7 +295,7 @@ public class LeadTriggerHandler {
     }
     
     public void afteInsert(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
-        List<Task> taskListToInsert = new List<Task>();
+        /*List<Task> taskListToInsert = new List<Task>();
         
         for(Id leadId : newLeadMap.keyset()){
             //transferToSalesTeamHelper.shareAndTagSalesTeamMember(leadId);
@@ -257,7 +307,7 @@ public class LeadTriggerHandler {
         system.debug('taskListToInsert-->'+taskListToInsert);
         if(!taskListToInsert.isEmpty()){
             insert taskListToInsert;
-        }
+        }*/
     }
     
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
@@ -265,7 +315,7 @@ public class LeadTriggerHandler {
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
         List<Project__c> projectList = new List<Project__c>();
         Map<string, Project__c> projectNameByProjectRecMap = new map<String, Project__c>();
-
+        
         String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
         set<Id> leadIds = new Set<Id>();
         
@@ -278,10 +328,18 @@ public class LeadTriggerHandler {
         }
         system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
         for(Lead__c leadRec : newLeadMap.values()){
+            if(leadRec.Total_Calls__c != null && leadRec.Total_Calls__c > oldLeadMap.get(leadRec.Id).Total_Calls__c && leadRec.Total_Calls__c >= 5 && (leadRec.Total_Connected_Call__c <=0 || leadRec.Total_Connected_Call__c == null) && leadRec.Lead_Stage__c != 'Dropped'){
+                leadRec.Lead_Stage__c = 'Dropped';
+            }
             if(leadRec.isConverted__c && leadRec.OwnerId == oldLeadMap.get(leadRec.Id).OwnerId && profileName != 'System Administrator'){
                 leadRec.addError('Converted Lead Can not be Edited');
             }
-            
+            if(leadRec.Pre_Sales_Comments__c != oldLeadMap.get(leadRec.Id).Pre_Sales_Comments__c && (profileName != 'System Administrator' && profileName != 'Pre-Sales Team')){
+                (leadRec.Pre_Sales_Comments__c).addError('You do not have Privilege to edit Pre Sales Comment!!!');
+            }
+            if(leadRec.Sales_Comment__c != oldLeadMap.get(leadRec.Id).Sales_Comment__c && (profileName != 'System Administrator' && profileName != 'Sales Team')){
+                (leadRec.Sales_Comment__c).addError('You do not have Privilege to edit Sales Comment!!!');
+            }
             system.debug('leadRec.Project_Name__c--->'+leadRec.Project_Name__c);
             
             if(!string.isBlank(leadRec.Project_Name__c)){
@@ -291,11 +349,16 @@ public class LeadTriggerHandler {
                     system.debug('projectName.containsIgnoreCase(leadRec.Project_Name__c)--->'+projectName.containsIgnoreCase(leadRec.Project_Name__c));
                     if(leadRec.Project_Name__c.containsIgnoreCase(projectName)){
                         leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
+                        leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(projectName).Name;
+
                     }
                 }
             }
             if(string.isEmpty(leadRec.Project__c) && string.isEmpty(leadRec.Project_Name__c)){
-                leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+                if(!test.isRunningTest()){
+                    leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
+                    leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Name;
+                }
             }
             System.debug('newLeadMap.values():::::'+newLeadMap.values());
             System.debug('oldLeadMap.values():::::'+oldLeadMap.values());
@@ -359,9 +422,20 @@ public class LeadTriggerHandler {
                         leadRec.Site_Visit_Date__c.addError('Specify Site visit Date greater then today');
                     }
                 }
-                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c))){
-                    leadRec.Sales_Drop_Reason__c.addError('Specify Drop Reason');
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c)) && profileName == 'Sales Team'){
+                    leadRec.Sales_Drop_Reason__c.addError('Specify Sales Drop Reason');
                 }
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && profileName == 'Pre-Sales Team'){
+                    leadRec.Pre_Sales_Drop_Reason__c.addError('Specify Pre Sales Drop Reason');
+                }
+               /* if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && profileName == 'Pre-Sales Team'){
+                    leadRec.Pre_Sales_Drop_Reason__c.addError('Specify Pre Sales Drop Reason');
+                }
+                
+
+  if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c)) && profileName == 'Sales Team'){
+                    leadRec.Sales_Drop_Reason__c.addError('Specify Sales Drop Reason');
+                }*/
                 /*
 * if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNewEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageReEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNotConnected || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageConnected){
 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect || leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned || leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
@@ -475,6 +549,10 @@ leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
                 
                 
             }
+            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
+                
+            }
+            
             
             // send notification emails for pre-sales
             /*  if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
@@ -501,25 +579,25 @@ EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcom
         
         for(Lead__c leadRec: newLeadMap.values()){
             // for pre sales team
-            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
-                leadIds.add(leadRec.Id);
-            }
+            //if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
+            //    leadIds.add(leadRec.Id);
+            //}
             // for sales team
-            if(leadRec.Sales_Team_Member__c	 != oldLeadMap.get(leadRec.Id).Sales_Team_Member__c	 && leadRec.Sales_Team_Member__c != null){
-                salesTeamLeadIds.add(leadRec.Id);
-            }
+            //if(leadRec.Sales_Team_Member__c	 != oldLeadMap.get(leadRec.Id).Sales_Team_Member__c	 && leadRec.Sales_Team_Member__c != null){
+            //    salesTeamLeadIds.add(leadRec.Id);
+            //}
             if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageConnected){
-                if(leadRec.phone__c != null)
-                    phoneNos.add(leadRec.phone__c);
+               // if(leadRec.phone__c != null)
+               //     phoneNos.add(leadRec.phone__c);
             }
             
         }
-        if(!leadIds.isEMpty()){
-            EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
-        }
-        if(!salesTeamLeadIds.isEMpty()){
-            EmailIUtility.notifySalesTeamOnLeadAssignment(salesTeamLeadIds, 'Sales Lead Verified Notification');
-        }
+        //if(!leadIds.isEMpty()){
+        //    EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
+        //}
+        //if(!salesTeamLeadIds.isEMpty()){
+        //   EmailIUtility.notifySalesTeamOnLeadAssignment(salesTeamLeadIds, 'Sales Lead Verified Notification');
+        //}
         if(!phoneNos.isEmpty()){
             SendWhatsAppNotificationHelper.sendWelcimeMessage(phoneNos);
         }

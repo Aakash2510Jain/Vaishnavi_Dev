@@ -38,6 +38,8 @@ public class AccountTriggerHelper {
                     opportunityRec.Lead_Source_Type__c = accountIdbyAccountMap.get(accountId).Source_Type__c;
                     opportunityRec.Email__c = accountIdbyAccountMap.get(accountId).Email__c;
                     opportunityRec.Phone__c = accountIdbyAccountMap.get(accountId).Phone;
+                    opportunityRec.Pre_Sales_Team_Member__c = accountIdbyAccountMap.get(accountId).Pre_Sales_Team_Member__c;
+                    opportunityRec.Sales_Team_Member__c = accountIdbyAccountMap.get(accountId).Sales_Team_Member__c;
                     if(accountIdbyAccountMap.get(accountId).Project__c != null){
                         opportunityRec.Project__c = accountIdbyAccountMap.get(accountId).Project__c;
                     }
