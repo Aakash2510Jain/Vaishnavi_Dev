@@ -295,31 +295,37 @@ public class LeadTriggerHandler {
     }
     
     public void afteInsert(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
-        /*List<Task> taskListToInsert = new List<Task>();
+        set<string> leadsEmailIds = new Set<String>();
         
-        for(Id leadId : newLeadMap.keyset()){
-            //transferToSalesTeamHelper.shareAndTagSalesTeamMember(leadId);
-            Task taskRecToInsert = new Task();
-            taskRecToInsert.whatId = leadId;
-            taskRecToInsert.Subject = ConstantClass.TaskSubjectForFollowUpLead;
-            taskListToInsert.add(taskRecToInsert);
+        for(Lead__C leadRec : newLeadMap.values()){
+            if(leadRec.Email__c != null){
+                leadsEmailIds.add(leadRec.Email__c);
+            }
         }
-        system.debug('taskListToInsert-->'+taskListToInsert);
-        if(!taskListToInsert.isEmpty()){
-            insert taskListToInsert;
-        }*/
+        if(!leadsEmailIds.isEmpty()){
+            // send email for new lead created
+            EmailIUtility.notifyCustomerForNewEnquiry(leadsEmailIds, 'New Enquiry');
+        }
+        
     }
     
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
+        set<Id> leadIds = new Set<Id>();
+        set<Id> droppedLeadIds = new Set<Id>();
+        set<Id> svProspectLeadIds = new Set<Id>();
+        set<Id> svPlannedLeadIds = new Set<Id>();
+        set<Id> leadIdsForFirstNotConnected = new Set<Id>();
+        set<Id> leadIdsForSixDayNotConnected = new Set<Id>();
+        set<Id> leadIdsForSevenDayNotConnected = new Set<Id>();
+        set<Id> leadIdsForFirstInvalidNumber = new Set<Id>();
         List<Task> taskListToInsertforFollowup = new List<Task>();
         List<Lead__c> convertedLeadRecordsList = new List<Lead__c>();
         List<Project__c> projectList = new List<Project__c>();
         Map<string, Project__c> projectNameByProjectRecMap = new map<String, Project__c>();
         
         String profileName = [Select Name from Profile where Id =: UserInfo.getProfileId()].Name;
-        set<Id> leadIds = new Set<Id>();
-        
         projectList = [Select Id,Name From Project__c];
+        
         system.debug('projectList--->'+projectList);
         if(!projectList.isEmpty()){
             for(Project__c projectRec : projectList){
@@ -350,7 +356,6 @@ public class LeadTriggerHandler {
                     if(leadRec.Project_Name__c.containsIgnoreCase(projectName)){
                         leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
                         leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(projectName).Name;
-
                     }
                 }
             }
@@ -414,9 +419,9 @@ public class LeadTriggerHandler {
                     leadRec.Next_Followup_Date_Time__c.addError('Specify Follow up Date greater then today');
                 }
             }
-            system.debug('leadRec.Lead_Stage__c--->'+leadRec.Lead_Stage__c);
-            system.debug('leadRec.Lead_Stage__c--->'+leadRec.Lead_Stage__c);
+            
             if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
+                
                 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
                     if(leadRec.Site_Visit_Date__c < system.now() ||leadRec.Site_Visit_Date__c == null){
                         leadRec.Site_Visit_Date__c.addError('Specify Site visit Date greater then today');
@@ -428,34 +433,15 @@ public class LeadTriggerHandler {
                 if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && profileName == 'Pre-Sales Team'){
                     leadRec.Pre_Sales_Drop_Reason__c.addError('Specify Pre Sales Drop Reason');
                 }
-               /* if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && profileName == 'Pre-Sales Team'){
-                    leadRec.Pre_Sales_Drop_Reason__c.addError('Specify Pre Sales Drop Reason');
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop){
+                    droppedLeadIds.add(leadRec.Id);
+                    if(leadRec.Drop_Date_TIme__c == null){
+                        leadRec.Drop_Date_TIme__c = system.now();
+                    }
                 }
-                
-
-  if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c)) && profileName == 'Sales Team'){
-                    leadRec.Sales_Drop_Reason__c.addError('Specify Sales Drop Reason');
-                }*/
-                /*
-* if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNewEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageReEnquiry || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageNotConnected || oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageConnected){
-if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect || leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned || leadRec.Lead_Stage__c == ConstantClass.LeadStageConverted){
-if(leadRec.Budget__c == null ||leadRec.Budget__c < 1){
-leadRec.Budget__c.addError('Specify Budget Value!!!');
-}
-if(leadRec.Project__c == null ){
-leadRec.Project__c.addError('Specify Project!!!');
-}
-if(leadRec.Unit_Details__c == null){
-leadRec.Unit_Details__c.addError('Specify Unit Details!!!');
-}
-if(leadRec.Location__c == null ){
-leadRec.Location__c.addError('Specify Location Value!!!');
-}
-if(leadRec.Project_TimeLine__c == null ){
-leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
-}
-}
-}*/
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageSVProspect){
+                    svProspectLeadIds.add(leadRec.Id);
+                }
             }
             if(leadRec.Lead_Source_Type__c != null && leadRec.Lead_Source_Type__c != oldLeadMap.get(leadRec.Id).Lead_Source_Type__c){
                 if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
@@ -546,30 +532,60 @@ leadRec.Project_TimeLine__c.addError('Specify Project Timeline!!!');
                     leadRec.Lead_Sub_Source__c = 'Others';
                     leadRec.Lead_Source__c = 'Others';
                 }
-                
-                
-            }
-            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
-                
             }
             
-            
-            // send notification emails for pre-sales
-            /*  if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
-leadIds.add(leadRec.Id);
-}*/
-            
+            if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Not_Connected_1_Day__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY)){
+                leadRec.Not_Connected_1_Day__c = true;
+                // send first not connected Reminder
+                leadIdsForFirstNotConnected.add(leadRec.Id);
+            }
+            if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_6_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 6){
+                leadRec.Not_Connected_6_Day__c = true;
+                // send sixth day not connected Reminder
+                leadIdsForSixDayNotConnected.add(leadRec.Id);
+            }
+             if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_7_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 7){
+                leadRec.Not_Connected_7_Day__c = true;
+                // send sixth day not connected Reminder
+                leadIdsForSevenDayNotConnected.add(leadRec.Id);
+            }
+            if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Invalid_No_Day_1__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_INVALIDNUMBER){
+                leadRec.Invalid_No_Day_1__c = true;
+                // send first not connected Reminder
+                leadIdsForFirstInvalidNumber.add(leadRec.Id);
+            }
+            if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
+                svPlannedLeadIds.add(leadRec.Id);
+            }
         }
-        /*if(!leadIds.isEMpty()){
-EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
-}
-*/
         if(!convertedLeadRecordsList.isEmpty()){
             LeadConversionClass.convertLead(convertedLeadRecordsList);
         }
         if(!taskListToInsertforFollowup.isEmpty()){
             insert taskListToInsertforFollowup;
         }
+        if(!leadIdsForFirstNotConnected.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstNotConnected, 'NOT CONNECTED Day 1');
+        }
+        if(!leadIdsForSixDayNotConnected.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSixDayNotConnected, 'NOT CONNECTED Day 6');
+        }
+        if(!leadIdsForSevenDayNotConnected.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSevenDayNotConnected, 'NOT CONNECTED Day 7');
+        }
+        if(!leadIdsForFirstInvalidNumber.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstInvalidNumber, 'INVALID NO Day 1');
+        }
+        if(!droppedLeadIds.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(droppedLeadIds, 'DROPPED NOTIFICATION');
+        }
+        if(!svProspectLeadIds.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(svProspectLeadIds, 'SV PROSPECT NOTIFICATION');
+        }
+        if(!svPlannedLeadIds.isEmpty()){
+            EmailIUtility.firstNotConnectedEmailToCustomer(svPlannedLeadIds, 'SV PLANNED NOTIFICATION');
+        }
+        
     }
     
     public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
@@ -578,92 +594,9 @@ EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcom
         set<String> phoneNos = new Set<String>();
         
         for(Lead__c leadRec: newLeadMap.values()){
-            // for pre sales team
-            //if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')){
-            //    leadIds.add(leadRec.Id);
-            //}
-            // for sales team
-            //if(leadRec.Sales_Team_Member__c	 != oldLeadMap.get(leadRec.Id).Sales_Team_Member__c	 && leadRec.Sales_Team_Member__c != null){
-            //    salesTeamLeadIds.add(leadRec.Id);
-            //}
-            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageConnected){
-               // if(leadRec.phone__c != null)
-               //     phoneNos.add(leadRec.phone__c);
-            }
-            
+            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
+            }           
         }
-        //if(!leadIds.isEMpty()){
-        //    EmailIUtility.notifyPreSalesTeamOnLeadAssignment(leadIDs, 'Pre-sales Team welcome email');
-        //}
-        //if(!salesTeamLeadIds.isEMpty()){
-        //   EmailIUtility.notifySalesTeamOnLeadAssignment(salesTeamLeadIds, 'Sales Lead Verified Notification');
-        //}
-        if(!phoneNos.isEmpty()){
-            SendWhatsAppNotificationHelper.sendWelcimeMessage(phoneNos);
-        }
-        
-        /* Map<Id, Lead__c> leadIdByLeadRecMap = new Map<Id, Lead__c>();
-List<Visit__c> visitListToInsert = new List<Visit__c>();
-
-for(Lead__c leadRec : newLeadMap.values()){
-if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c && leadRec.Lead_Stage__c == ConstantClass.LeadStageSVPlanned){
-leadIdByLeadRecMap.put(leadRec.Id, leadRec);
-}
-}
-if(!leadIdByLeadRecMap.isEmpty()){
-for(Lead__c leadRec: leadIdByLeadRecMap.values()){
-Visit__c visitRecToInsert = new Visit__c();
-visitRecToInsert.Lead__c = leadRec.id;
-visitRecToInsert.Planned_visit_date__c = leadRec.Site_Visit_Date__c;
-visitListToInsert.add(visitRecToInsert);
-}
-if(!visitListToInsert.isEmpty()){
-insert visitListToInsert;
-}
-}*/
-        
-        // updated by Vighnesh: Need to call whatsapp bulk api but currently bulk API is not available 
-        Map<string,string> leadIdWithNewStage = New Map<string,string>();
-        for(Lead__c leadRec: newLeadMap.values()){
-            if(leadRec.Lead_Stage__c != null && leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
-                leadIdWithNewStage.put(leadRec.Id,leadRec.Lead_Stage__c);
-            }
-        }
-        if(!leadIdWithNewStage.isEmpty()){
-            Map<string,string> stageXTemplate = New Map<string,string>();
-            Map<string,string> smsTemplateNameXstage = New Map<string,string>();
-            
-            List<Whatsapp_Template_Trigger_Config__c> wTemplates = [select name,Template_Name__c from Whatsapp_Template_Trigger_Config__c];
-            for(Whatsapp_Template_Trigger_Config__c templates:wTemplates){
-                stageXTemplate.put(templates.name,templates.Template_Name__c);
-                smsTemplateNameXstage.put(templates.Template_Name__c,templates.name);
-            }
-            List<SMS_Template__c> smsTemplates = [select name,Message__c from SMS_Template__c where name IN:smsTemplateNameXstage.KeySet()];
-            for(SMS_Template__c tempName: smsTemplates){
-                string stringTopass = utility.whatsappReplaceLineBreak(tempName.Message__c);
-                stageXTemplate.put(smsTemplateNameXstage.get(tempName.name), stringToPass);
-            }
-            System.debug('stageXTemplate---'+stageXTemplate);
-            List<messages__c> messagesToInsert = New List<Messages__c>();
-            for(string leadId:leadIdWithNewStage.keySet()){
-                // call whatsapp API in future method
-                string templateBody = stageXTemplate.get(newLeadMap.get(leadId).Lead_Stage__c);
-                system.debug(templateBody);
-                if(!string.isBlank(newLeadMap.get(leadId).Phone__c) && !string.isBlank(templateBody)){
-                    API_WhatsApp.sendWhatsappTemplateFuture(newLeadMap.get(leadId).Phone__c,templateBody);
-                    Messages__c newMessage = New Messages__c();
-                    newMessage.Message_Body__c = templateBody;
-                    newMessage.Message_Type__c = 'Sent';
-                    newMessage.Lead__c = leadId;
-                    messagesToInsert.add(newMessage);
-                }
-                
-            }
-            system.debug('messagesToInsert---'+messagesToInsert);
-            if(!messagesToInsert.isEmpty())
-                insert messagesToInsert;
-        }
-        
     }
     
 }

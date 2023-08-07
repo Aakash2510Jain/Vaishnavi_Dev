@@ -30,7 +30,12 @@ public without sharing class ConstantClass {
     public Static Final String CallTaskCustomerStatusNOT_ANSWERED = 'not_answered';
     public Static Final String CallTaskCustomerStatusNO_Answer = 'NoAnswer';
     public Static Final String CallTaskCallStatusFAIL = 'Fail';
-
-
+    
+    
+    public Static Final String LeadSubStage_SWITCHOFF = 'Switched Off';
+    public Static Final String LeadSubStage_NOTREACHABLE = 'Not reachable';
+    public Static Final String LeadSubStage_RINGNORESPONSE = 'Ringing no response';
+    public Static Final String LeadSubStage_BUSY = 'Busy';	
+    public Static Final String LeadSubStage_INVALIDNUMBER = 'Invalid Number';
     
 }
