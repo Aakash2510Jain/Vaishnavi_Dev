@@ -6,7 +6,11 @@ public without sharing class ConstantClass {
     public Static Final String errorForDuplicateLeadByPhone = 'Duplicate Lead by Phone Number!!!';
     public Static Final String errorForDuplicateLeadByEmail = 'Duplicate Lead by Email!!!';
     public Static Final String errorForPastFollowUpDate = 'Please fill Futuristic Date/Time !!!';
-    
+    public Static Final String FirstCallTAskAfterLeadAllocation = 'Make First Call Attempt within next 30 mins!!!';
+    public Static Final String SecondCallTAskAfterFirstNotConnect = 'Make Second Call Attempt within next 2 hours!!!';
+    public Static Final String thirdCallTAskAfterFirstNotConnect = 'Make Third Call Attempt within next 2 hours!!!';
+    public Static Final String forthCallTAskAfterFirstNotConnect = 'Make Fourth Call Attempt Tommorrow!!!';
+    public Static Final String fifthCallTAskAfterFirstNotConnect = 'Make Last Call Attempt Day After Tommorrow!!!';
     
     public Static Final String TaskSubjectForConnectedCall = 'connect';
     public Static Final String TaskSubjectForCalledCall = 'call';

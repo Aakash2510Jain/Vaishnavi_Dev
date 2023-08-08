@@ -311,6 +311,7 @@ public class LeadTriggerHandler {
     
     public void beforeUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         set<Id> leadIds = new Set<Id>();
+        set<id> allocatedLeadsId = new set<Id>();
         set<Id> droppedLeadIds = new Set<Id>();
         set<Id> svProspectLeadIds = new Set<Id>();
         set<Id> svPlannedLeadIds = new Set<Id>();
@@ -557,6 +558,12 @@ public class LeadTriggerHandler {
             if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
                 svPlannedLeadIds.add(leadRec.Id);
             }
+            if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
+                svPlannedLeadIds.add(leadRec.Id);
+            }
+            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
+                allocatedLeadsId.add(leadRec.id);
+            }  
         }
         if(!convertedLeadRecordsList.isEmpty()){
             LeadConversionClass.convertLead(convertedLeadRecordsList);
@@ -566,6 +573,21 @@ public class LeadTriggerHandler {
         }
         if(!leadIdsForFirstNotConnected.isEmpty()){
             EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstNotConnected, 'NOT CONNECTED Day 1');
+           
+            List<Task> taskListToInsert = new List<Task>();
+            
+            for(id leadId : leadIdsForFirstNotConnected){
+                Task taskRec = new Task();
+                taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+                taskRec.Id = leadId;
+                taskRec.ActivityDate = system.today();
+                taskrec.IsReminderSet = true;
+                taskrec.ReminderDateTime = System.now().addMinutes(25);
+                taskListToInsert.add(taskRec);
+            }
+            if(!taskListToInsert.isEmpty()){
+                insert taskListToInsert;
+            }
         }
         if(!leadIdsForSixDayNotConnected.isEmpty()){
             EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSixDayNotConnected, 'NOT CONNECTED Day 6');
@@ -582,10 +604,22 @@ public class LeadTriggerHandler {
         if(!svProspectLeadIds.isEmpty()){
             EmailIUtility.firstNotConnectedEmailToCustomer(svProspectLeadIds, 'SV PROSPECT NOTIFICATION');
         }
-        if(!svPlannedLeadIds.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(svPlannedLeadIds, 'SV PLANNED NOTIFICATION');
+        if(!allocatedLeadsId.isEmpty()){
+            List<Task> taskListToInsert = new List<Task>();
+            
+            for(id leadId : allocatedLeadsId){
+                Task taskRec = new Task();
+                taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+                taskRec.Id = leadId;
+                taskRec.ActivityDate = system.today();
+                taskrec.IsReminderSet = true;
+                taskrec.ReminderDateTime = System.now().addMinutes(30);
+                taskListToInsert.add(taskRec);
+            }
+            if(!taskListToInsert.isEmpty()){
+                insert taskListToInsert;
+            }
         }
-        
     }
     
     public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
