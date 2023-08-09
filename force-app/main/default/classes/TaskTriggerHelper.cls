@@ -175,7 +175,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                             if(leadRec.tasks[0].Conversation_Duration__c == 0){
                                 Task taskRec = new Task();
                                 taskRec.Subject = ConstantClass.SecondCallTAskAfterFirstNotConnect;
-                                taskRec.Id = leadRec.Id;
+                                taskRec.whatId = leadRec.Id;
                                 taskRec.ActivityDate = system.today();
                                 taskrec.IsReminderSet = true;
                                 taskrec.ReminderDateTime = System.now().addMinutes(115);
@@ -209,7 +209,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                         if(leadIdByNotConnectedTaskCount.get(leadId) == 2){
                             Task taskRec = new Task();
                             taskRec.Subject = ConstantClass.thirdCallTAskAfterFirstNotConnect;
-                            taskRec.Id = leadid;
+                            taskRec.whatId = leadid;
                             taskRec.ActivityDate = system.today();
                             taskrec.IsReminderSet = true;
                             taskrec.ReminderDateTime = System.now().addMinutes(115);
@@ -219,7 +219,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                         else if(leadIdByNotConnectedTaskCount.get(leadId) == 3){
                             Task taskRec = new Task();
                             taskRec.Subject = ConstantClass.forthCallTAskAfterFirstNotConnect;
-                            taskRec.Id = leadid;
+                            taskRec.whatId = leadid;
                             taskRec.ActivityDate = system.today().addDays(1);
                             taskrec.IsReminderSet = true;
                             Time timeInstance = Time.newInstance(11, 0, 0, 0);
@@ -230,7 +230,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                         else if(leadIdByNotConnectedTaskCount.get(leadId) == 4){
                             Task taskRec = new Task();
                             taskRec.Subject = ConstantClass.fifthCallTAskAfterFirstNotConnect;
-                            taskRec.Id = leadid;
+                            taskRec.whatId = leadid;
                             taskRec.ActivityDate = system.today().addDays(1);
                             taskrec.IsReminderSet = true;
                             Time timeInstance = Time.newInstance(11, 0, 0, 0);
@@ -248,7 +248,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                     if(!leadListToBeMarkedasDropped.isEmpty()){
                         update leadListToBeMarkedasDropped;
                     }
-                     if(!taskListToInsertAfterNotConnect.isEmpty()){
+                    if(!taskListToInsertAfterNotConnect.isEmpty()){
                         insert taskListToInsertAfterNotConnect;
                     }
                 }

@@ -76,11 +76,18 @@ public class LeadTriggerHandler {
         //     }
         // }
         /* END Duplicate Phone & Alternate Phone */
-        
+        List<Assignment_Group_Member__c> agmList = new List<Assignment_Group_Member__c>();
+        if(!test.isRunningTest()){
+            agmList = [Select Id,Group_Member__c,Name,Assignment_Id__c,Last_Sequence__c From Assignment_Group_Member__c where Assignment_Group__r.Name = 'Pre Sales' order by LastModifiedDate ASC limit 1];
+            agmList[0].Last_Sequence__c = system.now().getTime();
+            update agmList;
+        }
         
         
         for(Lead__c leadRec : newLeadList){
             leadRec.OwnerId = queueId;
+            if(!test.isRunningTest())
+                leadRec.Ownerid = agmList[0].Group_Member__c;
             if(!String.isBlank(leadRec.Phone__c)){
                 leadRec.Phone__c = leadRec.Phone__c.replaceAll('[^0-9]', '');
                 leadRec.Phone__c = '+91' + leadRec.Phone__c.right(10);
@@ -575,7 +582,7 @@ public class LeadTriggerHandler {
             EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstNotConnected, 'NOT CONNECTED Day 1');
            
             List<Task> taskListToInsert = new List<Task>();
-            
+           /* 
             for(id leadId : leadIdsForFirstNotConnected){
                 Task taskRec = new Task();
                 taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
@@ -587,7 +594,7 @@ public class LeadTriggerHandler {
             }
             if(!taskListToInsert.isEmpty()){
                 insert taskListToInsert;
-            }
+            }*/
         }
         if(!leadIdsForSixDayNotConnected.isEmpty()){
             EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSixDayNotConnected, 'NOT CONNECTED Day 6');
@@ -610,7 +617,7 @@ public class LeadTriggerHandler {
             for(id leadId : allocatedLeadsId){
                 Task taskRec = new Task();
                 taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
-                taskRec.Id = leadId;
+                taskRec.whatId = leadId;
                 taskRec.ActivityDate = system.today();
                 taskrec.IsReminderSet = true;
                 taskrec.ReminderDateTime = System.now().addMinutes(30);

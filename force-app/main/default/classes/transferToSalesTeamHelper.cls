@@ -20,7 +20,7 @@ public without Sharing class transferToSalesTeamHelper {
         transferToSalesTeamHelper.sendEmailToLead(leadId);*/
         set<String> LeadIdList = new Set<String>();
         LeadIdList.add(leadId);
-        String courseName = 'Manual sales Team';
+        String courseName = system.label.Sales_Team_Group;
         RoundRobinLeadAssignment.assignLeadsToBDS(courseName, LeadIdList,true);
         
     }
