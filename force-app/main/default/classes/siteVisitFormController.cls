@@ -7,7 +7,7 @@ public without sharing class siteVisitFormController {
     public static String constructionStatus {get;set;}
     public static String purposeOfBuying {get;set;}
     public static String walkinSource {get;set;}
-    public static String walkinSubSource {get;set;}
+    // public static String walkinSubSource {get;set;}
     public static String gender {get;set;}
     public static String facilitatedBy {get;set;}
     public static String classification {get;set;}
@@ -27,7 +27,7 @@ public without sharing class siteVisitFormController {
         constructionStatus = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Construction_Status__c'));
         purposeOfBuying = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Purpose_Of_Buying__c'));
         walkinSource = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Walkin_Source__c'));
-        walkinSubSource = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Walkin_Sub_Source__c'));
+        // walkinSubSource = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Walkin_Sub_Source__c'));
         gender = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Customer_Gender__c'));
         facilitatedBy = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Facilitated_By__c'));
         classification = JSON.serialize(UtilityPickListClass.getPicklistValues('Visit__c', 'Customer_Classicfication__c'));
@@ -65,7 +65,7 @@ public without sharing class siteVisitFormController {
         try{
             Visit__c visitRec = [Select Id,Form_No__c,Date_Of_Birth__c,Age_Group__c,Residential_Address__c,City__c,Pincode__c,Employment_Type__c,
             Company_Name__c,Industry__c,Office_Address__c,Office_PinCode__c,Actual_visit_date__c,Budget__c,Area__c,Construction_Status__c,Purpose_Of_Buying__c,
-            Walkin_Source__c,Walkin_Sub_Source__c,Projects__c,GR_Code__c,Channel_Partner_Not_registered__c,Firm_Name__c,Channel_Partner_Name__c,
+            Walkin_Source__c,Projects__c,GR_Code__c,Channel_Partner_Not_registered__c,Firm_Name__c,Channel_Partner_Name__c,
             Apartment_No__c,Channel_Partner_Mobile_No__c,RERA_No__c,Channel_Partner_Email__c,Referral_Name__c,Referral_Mobile_No__c,Sales_Manager__c,
             Facilitated_By__c,Customer_Time_In__c,Customer_Time_Out__c,Opportunities__c From Visit__c where Id =: visitId];
 
@@ -105,7 +105,7 @@ public without sharing class siteVisitFormController {
 
             Visit__c visitRec = [Select Id,Form_No__c,Date_Of_Birth__c,Age_Group__c,Residential_Address__c,City__c,Pincode__c,Employment_Type__c,
             Company_Name__c,Industry__c,Office_Address__c,Office_PinCode__c,Actual_visit_date__c,Budget__c,Area__c,Construction_Status__c,Purpose_Of_Buying__c,
-            Walkin_Source__c,Walkin_Sub_Source__c,Projects__c,GR_Code__c,Channel_Partner_Not_registered__c,Firm_Name__c,Channel_Partner_Name__c,
+            Walkin_Source__c,Projects__c,GR_Code__c,Channel_Partner_Not_registered__c,Firm_Name__c,Channel_Partner_Name__c,
             Apartment_No__c,Channel_Partner_Mobile_No__c,RERA_No__c,Channel_Partner_Email__c,Referral_Name__c,Referral_Mobile_No__c,Sales_Manager__c,
             Facilitated_By__c,Customer_Time_In__c,Customer_Time_Out__c,Opportunities__c From Visit__c where Id =: visitId];
 

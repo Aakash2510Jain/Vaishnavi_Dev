@@ -25,7 +25,6 @@
             var constructionStatus = JSON.parse('{!constructionStatus}');
             var purposeOfBuying = JSON.parse('{!purposeOfBuying}');
             var walkinSource = JSON.parse('{!walkinSource}');
-            var walkinSubSource = JSON.parse('{!walkinSubSource}');
             var gender = JSON.parse('{!gender}');
             var facilitatedBy = JSON.parse('{!facilitatedBy}');
             var classification = JSON.parse('{!classification}');
@@ -99,7 +98,6 @@
                 $scope.constructionStatus = constructionStatus;
                 $scope.purposeOfBuying = purposeOfBuying;
                 $scope.walkinSource = walkinSource;
-                $scope.walkinSubSource = walkinSubSource;
                 $scope.gender = gender;
                 $scope.facilitatedBy = facilitatedBy;
                 $scope.classification = classification;
@@ -130,6 +128,7 @@
                 $scope.listOfChannelPartner = [];
                 $scope.selectedId;
                 $scope.visit.Channel_Partner__c = "";
+                $scope.activationInputText = "";
 
                 $scope.getLocationList = function(){
                     debugger;
@@ -642,6 +641,9 @@
 
             $scope.savevisitDetails = function(){
                     debugger;
+                    if($scope.activationInputText != ""){
+                        $scope.visit.Walkin_Sub_Source__c = $scope.activationInputText;
+                    }
 
                     $scope.thirdVisitRecord = {"Walkin_Source__c":$scope.visit.Walkin_Source__c,"Walkin_Sub_Source__c":$scope.visit.Walkin_Sub_Source__c,
                     "Projects__c":$scope.visit.Projects__c,"GR_Code__c":$scope.visit.GR_Code__c,"Channel_Partner_Not_registered__c":$scope.visit.Channel_Partner_Not_registered__c,
@@ -800,6 +802,16 @@
             $scope.changeOfSubSource = function(value){
                 debugger;
                 $scope.visit.Walkin_Sub_Source__c = value;
+            }
+            $scope.changeOfActivation = function(){
+                debugger;
+                $('input[name=radioPurpose]').prop('checked',false);
+                // $scope.visit.Walkin_Sub_Source__c = null;
+            }
+
+            $scope.changeOfRadioActivation = function(){
+                debugger;
+                $('#activationText').val('');
             }
 
             $scope.showFirst = function(){
@@ -1494,16 +1506,257 @@
                                             </div>
                                         </div>
 
-                                        <div ng-show="visit.Walkin_Source__c == 'Portals'">
+                                        <!-- Walkin Source Social Media Ad -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Social Media Ad'">
                                             <div class="row align-items-center mb-4">
                                                 <div class="col-md-2">
                                                     <label class="label">Walkin Sub Source:</label>
                                                 </div>
                                                 <div class="col-md-10">
                                                     <div class="row">
-                                                        <div class="col-md-4 pt-3" ng-repeat="value in walkinSubSource">
-                                                            <input type="radio" ng-model="visit.Walkin_Sub_Source__c" ng-value="value" ng-change="changeOfSubSource(value)" />
-                                                            <label>{{value}}</label>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Facebook" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Facebook
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Instagram" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Instagram
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="LinkedIn" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                LinkedIn
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="YouTube" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                YouTube
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Walkin Source Google Ad -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Google Ad'">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-2">
+                                                    <label class="label">Walkin Sub Source:</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="row">
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Search Ad" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Search Ad
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Display Ad" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Display Ad
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Walkin Source Property Portal -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Property Portal'">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-2">
+                                                    <label class="label">Walkin Sub Source:</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="row">
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="99 acres" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                99 acres
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Housing" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Housing
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Commonfloor" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Commonfloor
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Magicbricks" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Magicbricks
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Roof & Floor" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                Roof and Floor
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Walkin Source Referral -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Referral'">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-2">
+                                                    <label class="label">Walkin Sub Source:</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="row">
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="V-Connect" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                V-Connect
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="V-Team" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                V-Team
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="V-Associates" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <label class="font-if ps-3">
+                                                                V-Associates
+                                                            </label>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div ng-show="visit.Walkin_Sub_Source__c == 'V-Team' || visit.Walkin_Sub_Source__c == 'V-Associates' || visit.Walkin_Sub_Source__c == 'V-Connect'">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h4 class="label">Please Specify:</h4>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Name:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="visit.Referral_Name__c"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Mobile No.:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <input type="tel" class="form-control" ng-model="visit.Referral_Mobile_No__c" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row" ng-show="visit.Walkin_Sub_Source__c == 'V-Connect'">
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Project:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="visit.Projects__c"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Apartment No.:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="visit.Apartment_No__c" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <!-- Walkin Source Activation -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Activation'">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-2">
+                                                    <label class="label">Walkin Sub Source:</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="row">
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="NPI" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c" ng-change="changeOfRadioActivation()"/>
+                                                            <label class="font-if ps-3">
+                                                                NPI
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="RWA" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c" ng-change="changeOfRadioActivation()"/>
+                                                            <label class="font-if ps-3">
+                                                                RWA
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Corporate" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c" ng-change="changeOfRadioActivation()"/>
+                                                            <label class="font-if ps-3">
+                                                                Corporate
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-check-input" type="radio" value="Mall" name="radioPurpose" ng-model="visit.Walkin_Sub_Source__c" ng-change="changeOfRadioActivation()"/>
+                                                            <label class="font-if ps-3">
+                                                                Mall
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-md-10">
+                                                            <div class="row">
+                                                                <div class="col-md-4 mt-3">
+                                                                    <input class="form-control" type="text" id="activationText" ng-model="activationInputText" ng-value="value" ng-change="changeOfActivation()"/>
+                                                                    <!-- <label class="font-if ps-3">
+                                                                        NPI
+                                                                    </label> -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Walkin Source Events & Expo -->
+                                        <div ng-show="visit.Walkin_Source__c == 'Events and Expo'">
+                                            <div class="row align-items-center mb-4">
+                                                <div class="col-md-2">
+                                                    <label class="label">Walkin Sub Source:</label>
+                                                </div>
+                                                <div class="col-md-10">
+                                                    <div class="row">
+                                                        <div class="col-md-4 mt-3">
+                                                            <input class="form-control" type="text" ng-model="visit.Walkin_Sub_Source__c"/>
+                                                            <!-- <label class="font-if ps-3">
+                                                                NPI
+                                                            </label> -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1516,40 +1769,7 @@
                                                     <h4 class="label">If-case of Channel Partner mention the following:</h4>
                                                 </div>
                                             </div>
-
-                                            <!-- <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="row align-items-center mb-4">
-                                                        <div class="col-md-4">
-                                                            <label class="label">GR Code:</label>
-                                                        </div>
-                                                        <div class="col-md-8">
-                                                            <input type="text" class="form-control" ng-model="visit.GR_Code__c"/>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="row align-items-center mb-4">
-                                                        <div class="col-md-4">
-                                                            <label class="label">Channel partner<br/>not registered:</label>
-                                                        </div>
-                                                        <div class="col-md-8">
-                                                            <input type="checkbox" class="" ng-model="visit.Channel_Partner_Not_registered__c" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> -->
                                             <div class="row">
-                                                <!-- <div class="col-md-6">
-                                                    <div class="row align-items-center mb-4">
-                                                        <div class="col-md-4">
-                                                            <label class="label">Firm Name:</label>
-                                                        </div>
-                                                        <div class="col-md-8">
-                                                            <input type="text" class="form-control" ng-model="visit.Firm_Name__c"/>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
                                                 <div class="col-md-6">
                                                     <div class="row align-items-center mb-4">
                                                         <div class="col-md-4">
@@ -1711,47 +1931,32 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="row">
-                                            <!-- <div class="col-md-6">
-                                                <div class="row align-items-center mb-4">
-                                                    <div class="col-md-4">
-                                                        <label class="label">Sourcing<br/>Manager:</label>
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        <input type="text" class="form-control" ng-model="visit.Sourcing_Manager__c"/>
+
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Attending Sales<br/>Manager:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <so-dropdown ng-model="visit.Sales_Manager__c" dropdown-items="listOfSalesManager">
+                                                                <option value='None'>None</option>
+                                                            </so-dropdown>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div> -->
-                                            <div class="col-md-6">
-                                                <div class="row align-items-center mb-4">
-                                                    <div class="col-md-4">
-                                                        <label class="label">Attending Sales<br/>Manager:</label>
+                                                <div class="col-md-6">
+                                                    <div class="row align-items-center mb-4">
+                                                        <div class="col-md-4">
+                                                            <label class="label">Assigned<br/>Manager:</label>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="leadDetails.Owner.Name" ng-disabled="true" />
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <so-dropdown ng-model="visit.Sales_Manager__c" dropdown-items="listOfSalesManager">
-                                                            <option value='None'>None</option>
-                                                        </so-dropdown>
-                                                        <!-- <input type="text" class="form-control" ng-model="visit.Sales_Manager__c" /> -->
-                                                    </div>
-                                                    <!--div class="col-md-4">
-                                                        <label class="label">Assigned Manager: </label>
-                                                    </div-->
                                                 </div>
-                                            </div>
                                         </div>
 
-                                        <!-- <div class="row align-items-center mb-4">
-                                            <div class="col-md-2">
-                                                <label class="label">Customer Gender:</label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                <div class="row">
-                                                    <div class="col-md-4 pt-3" ng-repeat="value in gender">
-                                                        <input type="radio" ng-model="visit.Customer_Gender__c" ng-value="value" ng-change="changeOfGender(value)" />
-                                                        <label>{{value}}</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
+
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
                                                 <label class="label">Facilitated By<br/>Pre-Sales:</label>

@@ -41,5 +41,12 @@ public without sharing class ConstantClass {
     public Static Final String LeadSubStage_RINGNORESPONSE = 'Ringing no response';
     public Static Final String LeadSubStage_BUSY = 'Busy';	
     public Static Final String LeadSubStage_INVALIDNUMBER = 'Invalid Number';
+
+    public Static Final String LeadSubStage_VASTU = 'Vaastu Compliance';	
+    public Static Final String LeadSubStage_LOCATION = 'Location';	
+    public Static Final String LeadSubStage_UNIT = 'Unit Availability';	
+    public Static Final String LeadSubStage_BUDGET = 'Budget';	
+    public Static Final String LeadSubStage_FLOORPLAN = 'Floor Plan  ';	
+    public Static Final String LeadSubStage_PROJECT = 'Project';	
     
 }

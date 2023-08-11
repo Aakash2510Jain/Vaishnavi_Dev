@@ -266,7 +266,7 @@ public class LeadTriggerHandler {
     }
     
     public void afteInsert(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
-        set<string> leadsEmailIds = new Set<String>();
+        set<Id> leadsEmailIds = new Set<Id>();
         
         for(Lead__C leadRec : newLeadMap.values()){
             if(leadRec.Email__c != null){
@@ -274,8 +274,8 @@ public class LeadTriggerHandler {
             }
         }
         if(!leadsEmailIds.isEmpty()){
-            // send email for new lead created
-            EmailIUtility.notifyCustomerForNewEnquiry(leadsEmailIds, 'New Enquiry');
+           // send email for new lead created
+            EmailIUtility.notifyCustomer(leadsEmailIds, 'New Enquiry');
         }
         
     }
@@ -376,6 +376,22 @@ public class LeadTriggerHandler {
                        leadRec.Lead_Stage__c = 'Drop';
                    }
                 if(leadRec.Lead_Substage__c == 'Interested' ){
+                    if(string.isBlank(leadRec.Project_Pickval__c)){
+                        leadRec.Project_Pickval__c.addError('Please fill Project');
+                    }
+                    if(string.isBlank(leadRec.Budget_Pick__c)){
+                        leadRec.Budget_Pick__c.addError('Please fill Budget');
+                    }
+                    if(string.isBlank(leadRec.Unit_Pickval__c)){
+                        leadRec.Unit_Pickval__c.addError('Please fill Unit');
+                    }
+                    if(string.isBlank(leadRec.Location__c)){
+                        leadRec.Location__c.addError('Please fill Project Location');
+                    }
+                    if(string.isBlank(leadRec.Project_TimeLine__c)){
+                        leadRec.Project_TimeLine__c.addError('Please fill Project Timeline');
+                    }
+                    
                     leadRec.Lead_Stage__c = ConstantClass.LeadStageSVProspect;
                 }
                 if(leadRec.Lead_Substage__c == 'Site Visit Planned' || leadRec.Lead_Substage__c == 'Site Visit Proposed'){
@@ -506,35 +522,35 @@ public class LeadTriggerHandler {
                 }
             }
             
-            if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Not_Connected_1_Day__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY)){
-                leadRec.Not_Connected_1_Day__c = true;
-                // send first not connected Reminder
-                leadIdsForFirstNotConnected.add(leadRec.Id);
-            }
-            if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_6_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 6){
-                leadRec.Not_Connected_6_Day__c = true;
-                // send sixth day not connected Reminder
-                leadIdsForSixDayNotConnected.add(leadRec.Id);
-            }
-             if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_7_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 7){
-                leadRec.Not_Connected_7_Day__c = true;
-                // send sixth day not connected Reminder
-                leadIdsForSevenDayNotConnected.add(leadRec.Id);
-            }
-            if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Invalid_No_Day_1__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_INVALIDNUMBER){
-                leadRec.Invalid_No_Day_1__c = true;
-                // send first not connected Reminder
-                leadIdsForFirstInvalidNumber.add(leadRec.Id);
-            }
-            if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
-                svPlannedLeadIds.add(leadRec.Id);
-            }
-            if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
-                svPlannedLeadIds.add(leadRec.Id);
-            }
-            if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
-                allocatedLeadsId.add(leadRec.id);
-            }  
+            // if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Not_Connected_1_Day__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY)){
+            //     leadRec.Not_Connected_1_Day__c = true;
+            //     // send first not connected Reminder
+            //     //leadIdsForFirstNotConnected.add(leadRec.Id);
+            // }
+            // if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_6_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 6){
+            //     leadRec.Not_Connected_6_Day__c = true;
+            //     // send sixth day not connected Reminder
+            //     //leadIdsForSixDayNotConnected.add(leadRec.Id);
+            // }
+            //  if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Not_Connected_7_Day__c == false && (leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_SWITCHOFF || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_NOTREACHABLE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUSY) && leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && ((leadRec.First_Called_Date_Time__c).date()).daysBetween(system.today()) == 7){
+            //     leadRec.Not_Connected_7_Day__c = true;
+            //     // send sixth day not connected Reminder
+            //     //leadIdsForSevenDayNotConnected.add(leadRec.Id);
+            // }
+            // if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c && leadRec.Invalid_No_Day_1__c == false && leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected && leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_INVALIDNUMBER){
+            //     //leadRec.Invalid_No_Day_1__c = true;
+            //     // send first not connected Reminder
+            //     //leadIdsForFirstInvalidNumber.add(leadRec.Id);
+            // }
+            // if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
+            //     svPlannedLeadIds.add(leadRec.Id);
+            // }
+            // if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c > system.today().addDays(-1)){
+            //     svPlannedLeadIds.add(leadRec.Id);
+            // }
+            // if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
+            //     allocatedLeadsId.add(leadRec.id);
+            // }  
         }
         if(!convertedLeadRecordsList.isEmpty()){
             LeadConversionClass.convertLead(convertedLeadRecordsList);
@@ -542,65 +558,108 @@ public class LeadTriggerHandler {
         if(!taskListToInsertforFollowup.isEmpty()){
             insert taskListToInsertforFollowup;
         }
-        if(!leadIdsForFirstNotConnected.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstNotConnected, 'NOT CONNECTED Day 1');
+        // if(!leadIdsForFirstNotConnected.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstNotConnected, 'NOT CONNECTED Day 1');
            
-            List<Task> taskListToInsert = new List<Task>();
-           /* 
-            for(id leadId : leadIdsForFirstNotConnected){
-                Task taskRec = new Task();
-                taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
-                taskRec.Id = leadId;
-                taskRec.ActivityDate = system.today();
-                taskrec.IsReminderSet = true;
-                taskrec.ReminderDateTime = System.now().addMinutes(25);
-                taskListToInsert.add(taskRec);
-            }
-            if(!taskListToInsert.isEmpty()){
-                insert taskListToInsert;
-            }*/
-        }
-        if(!leadIdsForSixDayNotConnected.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSixDayNotConnected, 'NOT CONNECTED Day 6');
-        }
-        if(!leadIdsForSevenDayNotConnected.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSevenDayNotConnected, 'NOT CONNECTED Day 7');
-        }
-        if(!leadIdsForFirstInvalidNumber.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstInvalidNumber, 'INVALID NO Day 1');
-        }
-        if(!droppedLeadIds.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(droppedLeadIds, 'DROPPED NOTIFICATION');
-        }
-        if(!svProspectLeadIds.isEmpty()){
-            EmailIUtility.firstNotConnectedEmailToCustomer(svProspectLeadIds, 'SV PROSPECT NOTIFICATION');
-        }
-        if(!allocatedLeadsId.isEmpty()){
-            List<Task> taskListToInsert = new List<Task>();
+        //     List<Task> taskListToInsert = new List<Task>();
+        //    /* 
+        //     for(id leadId : leadIdsForFirstNotConnected){
+        //         Task taskRec = new Task();
+        //         taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+        //         taskRec.Id = leadId;
+        //         taskRec.ActivityDate = system.today();
+        //         taskrec.IsReminderSet = true;
+        //         taskrec.ReminderDateTime = System.now().addMinutes(25);
+        //         taskListToInsert.add(taskRec);
+        //     }
+        //     if(!taskListToInsert.isEmpty()){
+        //         insert taskListToInsert;
+        //     }*/
+        // }
+        // if(!leadIdsForSixDayNotConnected.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSixDayNotConnected, 'NOT CONNECTED Day 6');
+        // }
+        // if(!leadIdsForSevenDayNotConnected.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForSevenDayNotConnected, 'NOT CONNECTED Day 7');
+        // }
+        // if(!leadIdsForFirstInvalidNumber.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(leadIdsForFirstInvalidNumber, 'INVALID NO Day 1');
+        // }
+        // if(!droppedLeadIds.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(droppedLeadIds, 'DROPPED NOTIFICATION');
+        // }
+        // if(!svProspectLeadIds.isEmpty()){
+        //     //EmailIUtility.firstNotConnectedEmailToCustomer(svProspectLeadIds, 'SV PROSPECT NOTIFICATION');
+        // }
+        // if(!allocatedLeadsId.isEmpty()){
+        //     List<Task> taskListToInsert = new List<Task>();
             
-            for(id leadId : allocatedLeadsId){
-                Task taskRec = new Task();
-                taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
-                taskRec.whatId = leadId;
-                taskRec.ActivityDate = system.today();
-                taskrec.IsReminderSet = true;
-                taskrec.ReminderDateTime = System.now().addMinutes(30);
-                taskListToInsert.add(taskRec);
-            }
-            if(!taskListToInsert.isEmpty()){
-                insert taskListToInsert;
-            }
-        }
+        //     for(id leadId : allocatedLeadsId){
+        //         Task taskRec = new Task();
+        //         taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+        //         taskRec.whatId = leadId;
+        //         taskRec.ActivityDate = system.today();
+        //         taskrec.IsReminderSet = true;
+        //         taskrec.ReminderDateTime = System.now().addMinutes(30);
+        //         taskListToInsert.add(taskRec);
+        //     }
+        //     if(!taskListToInsert.isEmpty()){
+        //         insert taskListToInsert;
+        //     }
+        // }
     }
     
     public void afterUpdate(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
-        set<Id> leadIds =  new Set<Id>();
-        set<Id> salesTeamLeadIds =  new Set<Id>();
-        set<String> phoneNos = new Set<String>();
+        set<Id> notConnectedLeadIds =  new Set<Id>();
+        set<Id> rnrLeadIds =  new Set<Id>();
+        set<Id> invalidNumberLeadIds =  new Set<Id>();
+        set<Id> droppedDueToComplaintLeadIds =  new Set<Id>();
+        set<Id> salesAssignedLeadIds =  new Set<Id>();
+        set<Id> siteVisitPlannedLeadIds = new Set<Id>();
         
         for(Lead__c leadRec: newLeadMap.values()){
             if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005') && string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G') ){
-            }           
+            }    
+            if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c ){
+                if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected){
+                    notConnectedLeadIds.add(leadRec.Id);
+                }
+            }
+            if(leadRec.Lead_Substage__c != oldLeadMap.get(leadRec.Id).Lead_Substage__c ){
+                if(leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_RINGNORESPONSE){
+                    rnrLeadIds.add(leadRec.Id);
+                }
+                if(leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_INVALIDNUMBER){
+                    invalidNumberLeadIds.add(leadRec.Id);
+                }
+                if(leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_VASTU || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_LOCATION || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_UNIT || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_BUDGET || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_FLOORPLAN || leadRec.Lead_Substage__c == ConstantClass.LeadSubStage_PROJECT){
+                    droppedDueToComplaintLeadIds.add(leadRec.Id);
+                }
+            }
+            if(leadRec.Sales_Team_Member__c != oldLeadMap.get(leadRec.Id).Sales_Team_Member__c && leadRec.Sales_Team_Member__c != null){
+                salesAssignedLeadIds.add(leadRec.Id);
+            }
+            if(leadRec.Site_Visit_Date__c != oldLeadMap.get(leadRec.Id).Site_Visit_Date__c && leadRec.Site_Visit_Date__c != null && leadRec.Site_Visit_Date__c >= system.today()){
+                siteVisitPlannedLeadIds.add(leadRec.Id);
+            }
+        }
+        if(!notConnectedLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(notConnectedLeadIds,'Not Connected Notification');
+        }
+        if(!rnrLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(rnrLeadIds,'RNR Dropped Lead');
+        }
+        if(!invalidNumberLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(invalidNumberLeadIds,'Invalid Number');
+        }
+        if(!droppedDueToComplaintLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(droppedDueToComplaintLeadIds,'Dropped due to Complaint');
+        }
+        if(!salesAssignedLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(salesAssignedLeadIds,'Notify Customer for Lead assigned to sales team');
+        }
+        if(!siteVisitPlannedLeadIds.isEmpty()){
+            EmailIUtility.notifyCustomer(siteVisitPlannedLeadIds,'Notify Customer for Site Visit Planned');
         }
     }
     
