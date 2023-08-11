@@ -12,33 +12,33 @@ public without sharing class SimilarLeadsHelper {
                 string whereClause = '';  
                 if(ld.Phone__c != null){
                     system.debug('if phone not null');
-                    whereClause += ' where ( Phone__c =\''+ld.Phone__c +'\' or Alternate_Phone__c ='+ ld.Phone__c +'\'';
+                    whereClause += ' where ( Phone__c =\''+ld.Phone__c +'\' or Alternate_Phone__c =\''+ ld.Phone__c +'\'';
                 }
                 system.debug('whereClause-->'+whereClause);
                 if(ld.Alternate_Phone__c != null){
                     system.debug('if alternate phone not null');
                     if(whereClause.contains('where')){                           
-                            whereClause += ' or Phone__c =\''+ld.Alternate_Phone__c +'\' or Alternate_Phone__c ='+ld.Alternate_Phone__c+'\'';
+                            whereClause += ' or Phone__c =\''+ld.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ld.Alternate_Phone__c+'\'';
                     }else{
-                        whereClause += ' where ( Phone__c =\''+ ld.Alternate_Phone__c +'\' or Alternate_Phone__c ='+ ld.Alternate_Phone__c+'\'';
+                        whereClause += ' where ( Phone__c =\''+ ld.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ ld.Alternate_Phone__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
                 if(ld.Email__c != null){
                      system.debug('if email not null');
                     if(whereClause.contains('where')){
-                        whereClause += ' or Email__c =\''+ld.Email__c +'\' or Alternate_Email__c ='+ld.Email__c+'\'';
+                        whereClause += ' or Email__c =\''+ld.Email__c +'\' or Alternate_Email__c =\''+ld.Email__c+'\'';
                     }else{
-                         whereClause += ' where ( Email__c =\''+ld.Email__c +'\' or Alternate_Email__c ='+'\'ld.Email__c'+'\'';
+                         whereClause += ' where ( Email__c =\''+ld.Email__c +'\' or Alternate_Email__c =\''+ld.Email__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
                 if(ld.Alternate_Email__c != null){
                      system.debug('if alternate email not null');
                     if(whereClause.contains('where')){
-                        whereClause += ' or Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c ='+ld.Alternate_Email__c +'\'';
+                        whereClause += ' or Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c =\''+ld.Alternate_Email__c +'\'';
                     }else{
-                         whereClause += ' where (Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c ='+ ld.Alternate_Email__c+'\'';
+                         whereClause += ' where (Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c =\''+ ld.Alternate_Email__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
