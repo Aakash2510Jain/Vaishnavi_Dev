@@ -83,13 +83,17 @@ public without sharing class  RoundRobinLeadAssignment{
                                     updateLeadList.add(ld); 
                                 }
                                 else if (preSalesToSalesTransfer == true) {
+                                    system.debug('ld.OwnerId-->'+ld.OwnerId);
                                     ld.Pre_Sales_Team_Member__c = ld.OwnerId;
+                                    system.debug('ld.Pre_Sales_Team_Member__c-->'+ld.Pre_Sales_Team_Member__c);
                                     ld.OwnerId = Id.valueOf(qMemberID);
+                                    system.debug('ld.OwnerId-->'+ld.OwnerId);
                                     ld.Sales_Team_Member__c = Id.valueOf(qMemberID);
                                     Lead__Share leadShareRec = new Lead__Share();
                                     leadShareRec.ParentId = ld.Id;
                                     leadShareRec.UserOrGroupId = Id.valueOf(ld.Pre_Sales_Team_Member__c);
-                                    leadShareRec.AccessLevel = 'VIEW';
+                                    leadShareRec.AccessLevel = 'Edit';
+                                    system.debug('leadShareRec--->'+leadShareRec);
                                     leadShareRecords.add(leadShareRec);
 
                                     if (ld.Sales_Team_Member__c != null) {

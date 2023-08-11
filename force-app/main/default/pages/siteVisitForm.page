@@ -1726,12 +1726,15 @@
                                                     <div class="col-md-4">
                                                         <label class="label">Attending Sales<br/>Manager:</label>
                                                     </div>
-                                                    <div class="col-md-8">
+                                                    <div class="col-md-4">
                                                         <so-dropdown ng-model="visit.Sales_Manager__c" dropdown-items="listOfSalesManager">
                                                             <option value='None'>None</option>
                                                         </so-dropdown>
                                                         <!-- <input type="text" class="form-control" ng-model="visit.Sales_Manager__c" /> -->
                                                     </div>
+                                                    <!--div class="col-md-4">
+                                                        <label class="label">Assigned Manager: </label>
+                                                    </div-->
                                                 </div>
                                             </div>
                                         </div>

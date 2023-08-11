@@ -157,7 +157,7 @@ public without sharing class siteVisitFormController {
             if(searchkey != null){
                 
                 string phonestring = '%' +searchkey;
-                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
+                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c,Owner.Name From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
                 system.debug('leadRec===>>'+leadList);
                 system.debug('leadList[0].isConverted__c ==>> '+leadList[0].isConverted__c);
                 if(!leadList.isEmpty() && leadList[0].isConverted__c == false){

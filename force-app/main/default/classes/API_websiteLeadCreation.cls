@@ -53,6 +53,14 @@ global class API_websiteLeadCreation {
             if(!String.isBlank((string)requestBodyMap.get('unit_details'))){
                 leadRecToInsert.Unit_Details__c = (string)requestBodyMap.get('unit_details');
             }
+            if(!String.isBlank((string)requestBodyMap.get('unit_details'))){
+                leadRecToInsert.Unit_Details__c = (string)requestBodyMap.get('unit_details');
+            }
+            if(!String.isBlank((string)requestBodyMap.get('source_type'))){
+                leadRecToInsert.Lead_Source_Type__c = (string)requestBodyMap.get('source_type');
+            }
+            leadRecToInsert.Lead_Sub_Source__c = 'Website';
+            leadRecToInsert.Lead_Source__c = 'Digital';
             insert leadRecToInsert;
 
             responseData.success_code = '200';

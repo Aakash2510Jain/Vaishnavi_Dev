@@ -16,12 +16,12 @@
                                     <div class="slds-col slds-size_3-of-4">
                                         <p class="slds-p-horizontal_small">Name : <b>{rec.Name__c}</b>
                                         </p>
-                                        <p class="slds-p-horizontal_small">Email : <b>{rec.Email__c}</b>
+                                        <p class="slds-p-horizontal_small">Source : <b>{rec.Lead_Source__c}</b>
                                         </p>
-                                        <p class="slds-p-horizontal_small">Phone : <b>{rec.Phone__c}</b>
+                                        <p class="slds-p-horizontal_small">Sub Source : <b>{rec.Lead_Sub_Source__c}</b>
                                         </p>
-                                        <p class="slds-p-horizontal_small">Source Type :
-                                            <b>{rec.Lead_Source_Type__c}</b></p>
+                                        <p class="slds-p-horizontal_small">Source Type : <b>{rec.Lead_Source_Type__c}</b></p>
+                                        <p class="slds-p-horizontal_small">Created Date : <b>{rec.CreatedDate}</b></p>
                                     </div>
                                 </div>
 
@@ -31,6 +31,7 @@
                             <br />
                         </div>
                     </template>
+                    
                 </div>
             </li>
         </ul>

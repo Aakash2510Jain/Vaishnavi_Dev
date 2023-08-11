@@ -47,47 +47,11 @@ public class LeadTriggerHandler {
         system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
         string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
         
-        /* START Duplicate Phone & Alternate Phone */
-        // set<string> setOfPhone = New set<string>();
-        // for(Lead__c leadRec : newLeadList){
-        //     if(!String.isBlank(leadRec.Phone__c)){
-        //         setOfPhone.add(leadRec.Phone__c);
-        //     }
-        //     if(!String.isBlank(leadRec.Alternate_Phone__c)){
-        //         setOfPhone.add(leadRec.Alternate_Phone__c);
-        //     }
-        // }
         
-        // List<Lead__c> listOfDuplicateLead = [SELECT Id,Phone__c,Alternate_Phone__c From Lead__c WHERE Phone__c IN : setOfPhone OR Alternate_Phone__c IN : setOfPhone];
-        // system.debug('listOfDuplicateLead ==> '+listOfDuplicateLead);
-        // if(!listOfDuplicateLead.isEmpty()){
-        //     for(Lead__c singleLeadRec : listOfDuplicateLead){
-        //         for(Lead__c leadRec : newLeadList){
-        //             if(leadRec.Phone__c == singleLeadRec.Phone__c){
-        //                 leadRec.Phone__c.addError('Duplicate Lead with same Phone Number');
-        //             }else if(leadRec.Phone__c == singleLeadRec.Alternate_Phone__c){
-        //                 leadRec.Phone__c.addError('Duplicate Lead with same Phone Number');
-        //             }else if(leadRec.Alternate_Phone__c == singleLeadRec.Alternate_Phone__c){
-        //                 leadRec.Alternate_Phone__c.addError('Duplicate Lead with same Phone Number');
-        //             }else if(leadRec.Alternate_Phone__c == singleLeadRec.Phone__c){
-        //                 leadRec.Alternate_Phone__c.addError('Duplicate Lead with same Phone Number');
-        //             }
-        //         }
-        //     }
-        // }
-        /* END Duplicate Phone & Alternate Phone */
-        List<Assignment_Group_Member__c> agmList = new List<Assignment_Group_Member__c>();
-        if(!test.isRunningTest()){
-            agmList = [Select Id,Group_Member__c,Name,Assignment_Id__c,Last_Sequence__c From Assignment_Group_Member__c where Assignment_Group__r.Name = 'Pre Sales' order by LastModifiedDate ASC limit 1];
-            agmList[0].Last_Sequence__c = system.now().getTime();
-            update agmList;
-        }
         
         
         for(Lead__c leadRec : newLeadList){
             leadRec.OwnerId = queueId;
-            if(!test.isRunningTest())
-                leadRec.Ownerid = agmList[0].Group_Member__c;
             if(!String.isBlank(leadRec.Phone__c)){
                 leadRec.Phone__c = leadRec.Phone__c.replaceAll('[^0-9]', '');
                 leadRec.Phone__c = '+91' + leadRec.Phone__c.right(10);
@@ -363,14 +327,14 @@ public class LeadTriggerHandler {
                     system.debug('projectName.containsIgnoreCase(leadRec.Project_Name__c)--->'+projectName.containsIgnoreCase(leadRec.Project_Name__c));
                     if(leadRec.Project_Name__c.containsIgnoreCase(projectName)){
                         leadRec.Project__c = projectNameByProjectRecMap.get(projectName).Id;
-                        leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(projectName).Name;
+                        //leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(projectName).Name;
                     }
                 }
             }
             if(string.isEmpty(leadRec.Project__c) && string.isEmpty(leadRec.Project_Name__c)){
                 if(!test.isRunningTest()){
                     leadRec.Project__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Id;
-                    leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Name;
+                    //leadRec.Project_Pickval__c = projectNameByProjectRecMap.get(system.label.Vaishnavi_Group_Project).Name;
                 }
             }
             System.debug('newLeadMap.values():::::'+newLeadMap.values());
