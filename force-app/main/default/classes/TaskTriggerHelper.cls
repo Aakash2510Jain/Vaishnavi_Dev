@@ -33,7 +33,7 @@ public class TaskTriggerHelper {
     }
     public void afterInsert(List<Task> newTaskList){
         try{
-            
+        
         } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
             HandleBusinessException.captureError('TaskTriggerHelper', 'After Task Insert', e, null);
@@ -260,6 +260,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                                 Lead__c leadRecToMarkDrop = new Lead__c();
                                 leadRecToMarkDrop.Id = leadid;
                                 leadRecToMarkDrop.Lead_Stage__c = ConstantClass.LeadStageDrop;
+                                leadRecToMarkDrop.Lead_Substage__c = 'Ringing no response';
                                 leadListToBeMarkedasDropped.add(leadRecToMarkDrop);
                             }
                         }
