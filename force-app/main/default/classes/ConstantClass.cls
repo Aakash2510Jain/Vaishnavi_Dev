@@ -21,7 +21,7 @@ public without sharing class ConstantClass {
     public Static Final String LeadStageConnected = 'Connected';
     public Static Final String LeadStageSVProspect = 'SV Prospect';
     public Static Final String LeadStageSVPlanned = 'SV Planned';
-    public Static Final String LeadStageDrop = 'Drop';
+    public Static Final String LeadStageDrop = 'Dropped';
     public Static Final String LeadStageConverted = 'Converted';
     public Static Final String newEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('New Enquiry').getRecordTypeId();
     public Static Final String ReEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('ReEnquiry').getRecordTypeId();

@@ -62,10 +62,10 @@ similarLeadWrap wrapInstance = new similarLeadWrap(similarLeads, similarOpportun
             else{
                 return null;
             }
-        }catch(Exception e){
-            System.debug(e.getMessage());
-            System.debug(e.getLineNumber());
-        }  
+        } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('SimilarLeadsHelper', 'getLeads', e, null);
+        }
         return null;
     } 
     /* public class similarLeadWrap{
@@ -93,8 +93,9 @@ this.opportunityListToBeReturned = opportunityListToBeReturned;
                 System.debug('lstPickvals Values  === :'+lstPickvals);
                 return lstPickvals;
             }            
-        }catch(Exception e){
-            System.debug('The Error ::'+e.getMessage() +' AND Error Line No :'+e.getLineNumber());
+       } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('SimilarLeadsHelper', 'getLeadSourceTypePickList', e, null);
         }
         return null;
     }
@@ -119,10 +120,10 @@ this.opportunityListToBeReturned = opportunityListToBeReturned;
                     return null;
                 }
             }   
-        }catch(Exception e){
-            System.debug(e.getMessage());
-            System.debug(e.getLineNumber());
-        }  
+         } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('SimilarLeadsHelper', 'getLeads2', e, null);
+        }
         return null;
     }
 }

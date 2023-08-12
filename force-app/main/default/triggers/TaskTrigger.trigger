@@ -6,12 +6,15 @@ trigger TaskTrigger on Task (before insert,before Update, after update,after ins
         TaskTriggerHelper handlerInstance = TaskTriggerHelper.getInstance();
         
         if(trigger.isBefore && trigger.isInsert){
-            handlerInstance.beforeInsert(trigger.new);
+           handlerInstance.beforeInsert(trigger.new);
         }
         if(trigger.isAfter && trigger.isInsert){
         }
         if(trigger.isBefore && trigger.isUpdate){
-            handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
+            //handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
+        }
+        if(trigger.isAfter && trigger.isUpdate){
+            handlerInstance.afterUpdate(trigger.newMap, trigger.oldMap);
         }
     }
 }

@@ -9,12 +9,17 @@ trigger LeadTrigger on Lead__c (before insert, after insert, before update,after
             handlerInstance.beforeInsert(trigger.new);
         }
         if(trigger.isAfter && trigger.isInsert){
+            
             system.debug('After lead Insert');
             handlerInstance.afteInsert(trigger.newMap, trigger.oldMap);
+            
+            //Lead Assignment
+           //LeadAssignmentExecutionCriteria.validateEntryCriteria();
             
             //delete duplicate leads	
             BatchToDeleteDuplicateLeads batchInstance = new BatchToDeleteDuplicateLeads();
             database.executeBatch(batchInstance);
+           
         }
         if(trigger.isBefore && trigger.isUpdate){
             handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);

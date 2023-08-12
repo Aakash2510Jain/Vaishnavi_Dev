@@ -177,14 +177,60 @@ public class EmailIUtility {
                     if(htmlBody.contains('{{!Lead.Name}'))
                         htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
                     if(htmlBody.contains('{!Lead.ProjectName}'))
-                        htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c);
+                        htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c != null ? leadRec.Project_Pickval__c : '');
                     if(htmlBody.contains('{!Lead.OwnerName}'))
                         htmlBody = htmlBody.replace('{!Lead.OwnerName}', string.valueOf(leadRec.owner.Name));
                     if(htmlBody.contains('{!Lead.OwnerEmail}'))
                         htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', string.valueOf(leadRec.Owner.Email));
                     if(htmlBody.contains('{!Lead.SVDate}'))
-                        htmlBody = htmlBody.replace('{!Lead.SVDate}', string.valueOf(leadRec.Site_Visit_Date__c));
+                        htmlBody = htmlBody.replace('{!Lead.SVDate}', string.valueOf(leadRec.Site_Visit_Date__c) != null ? leadRec.Project_Pickval__c : '');
                     
+                    mail.setSubject(subject);
+                    mail.setHtmlBody(htmlBody);
+                    mails.add(mail);
+                }
+                if(!mails.isEmpty()){
+                    Messaging.sendEmail(mails);
+                }
+            }
+        } catch (Exception e){
+            System.debug('Error Line==>' + e.getLineNumber() + 'Error Message==>' + e.getMessage());
+        }
+    }
+    public static void notifyVaishnaviTeam(set<id> leadIdsSet, String templateName){
+        try{
+            List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
+            EmailTemplate et = [Select id, Name, DeveloperName, Subject, Body, HtmlValue from EmailTemplate where name = :templateName];
+            List<Lead__C> leadListToNotify = [Select Id,Name__c,Project_Pickval__c,Phone__c,Lead_Source_Type__c,Site_Visit_Date__c,ProjectName_formula__c,Email__c,owner.Name,owner.Email from Lead__C where Id In : leadIdsSet and Email__c != null];
+            
+            if(!leadListToNotify.isEmpty()){
+                for(Lead__c leadRec : leadListToNotify){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                   
+                    List<String> recipients = new List<String>();
+                    recipients.add(leadRec.owner.Email);
+                    system.debug('recipients------' + recipients);
+                    mail.setToAddresses(recipients);
+                    mail.setReplyTo('test@email.com');
+                    mail.setSenderDisplayName('Vaishnavi');
+                    String subject = et.Subject;
+                    String htmlBody = et.HtmlValue;
+                    
+                    if(htmlBody.contains('{{!Lead.Name}'))
+                        htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
+                    if(htmlBody.contains('{!Lead.ProjectName}'))
+                        htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c != null ? leadRec.Project_Pickval__c : '');
+                    if(htmlBody.contains('{!Lead.OwnerName}'))
+                        htmlBody = htmlBody.replace('{!Lead.OwnerName}', string.valueOf(leadRec.owner.Name));
+                    if(htmlBody.contains('{!Lead.OwnerEmail}'))
+                        htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', string.valueOf(leadRec.Owner.Email));
+                    if(htmlBody.contains('{!Lead.Lead_Source_Type__c}'))
+                        htmlBody = htmlBody.replace('{!Lead.Lead_Source_Type__c}', string.valueOf(leadRec.Lead_Source_Type__c)  != null ? leadRec.Lead_Source_Type__c : '');
+                    if(htmlBody.contains('{!Lead.Phone}'))
+                        htmlBody = htmlBody.replace('{!Lead.Phone}', string.valueOf(leadRec.Phone__c)  != null ? leadRec.Phone__c : '');
+                    if(htmlBody.contains('{!Lead.Email__c}'))
+                        htmlBody = htmlBody.replace('{!Lead.Email__c}', string.valueOf(leadRec.Email__c) != null ? leadRec.Email__c : '');
+
                     mail.setSubject(subject);
                     mail.setHtmlBody(htmlBody);
                     mails.add(mail);
