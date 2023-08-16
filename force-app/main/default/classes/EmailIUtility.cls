@@ -151,8 +151,9 @@ public class EmailIUtility {
                     Messaging.sendEmail(mails);
                 }
             }
-        } catch (Exception e){
-            System.debug('Error Line==>' + e.getLineNumber() + 'Error Message==>' + e.getMessage());
+         } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('EmailUtility', 'firstNotConnectedEmailToCustomer', e, null);
         }
     }
      public static void notifyCustomer(set<id> leadIdsSet, String templateName){
@@ -190,11 +191,13 @@ public class EmailIUtility {
                     mails.add(mail);
                 }
                 if(!mails.isEmpty()){
+                    system.debug('mails-->'+mails);
                     Messaging.sendEmail(mails);
                 }
             }
         } catch (Exception e){
-            System.debug('Error Line==>' + e.getLineNumber() + 'Error Message==>' + e.getMessage());
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('EmailUtility', 'notifyCustomer', e, null);
         }
     }
     public static void notifyVaishnaviTeam(set<id> leadIdsSet, String templateName){
@@ -240,7 +243,8 @@ public class EmailIUtility {
                 }
             }
         } catch (Exception e){
-            System.debug('Error Line==>' + e.getLineNumber() + 'Error Message==>' + e.getMessage());
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('EmailUtility', 'notifyVaishnaviTeam', e, null);
         }
     }
 }

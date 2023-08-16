@@ -6,7 +6,7 @@ SObject_Trigger_Control__mdt triggerConfig = SObject_Trigger_Control__mdt.getIns
         SiteVisitTriggerHelper handlerInstance = SiteVisitTriggerHelper.getInstance();
         
         if(trigger.isAfter && trigger.isInsert){
-            handlerInstance.afterInsert(trigger.newMap, trigger.oldMap);
+            handlerInstance.afterInsert(trigger.newMap);
         }
     }
 }

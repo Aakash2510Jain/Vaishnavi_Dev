@@ -18,40 +18,40 @@ public without sharing class SimilarLeadsHelper {
                 if(ld.Alternate_Phone__c != null){
                     system.debug('if alternate phone not null');
                     if(whereClause.contains('where')){                           
-                            whereClause += ' or Phone__c =\''+ld.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ld.Alternate_Phone__c+'\'';
+                        whereClause += ' or Phone__c =\''+ld.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ld.Alternate_Phone__c+'\'';
                     }else{
                         whereClause += ' where ( Phone__c =\''+ ld.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ ld.Alternate_Phone__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
                 if(ld.Email__c != null){
-                     system.debug('if email not null');
+                    system.debug('if email not null');
                     if(whereClause.contains('where')){
                         whereClause += ' or Email__c =\''+ld.Email__c +'\' or Alternate_Email__c =\''+ld.Email__c+'\'';
                     }else{
-                         whereClause += ' where ( Email__c =\''+ld.Email__c +'\' or Alternate_Email__c =\''+ld.Email__c+'\'';
+                        whereClause += ' where ( Email__c =\''+ld.Email__c +'\' or Alternate_Email__c =\''+ld.Email__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
                 if(ld.Alternate_Email__c != null){
-                     system.debug('if alternate email not null');
+                    system.debug('if alternate email not null');
                     if(whereClause.contains('where')){
                         whereClause += ' or Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c =\''+ld.Alternate_Email__c +'\'';
                     }else{
-                         whereClause += ' where (Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c =\''+ ld.Alternate_Email__c+'\'';
+                        whereClause += ' where (Email__c =\''+ ld.Alternate_Email__c +'\' or Alternate_Email__c =\''+ ld.Alternate_Email__c+'\'';
                     }
                 }
                 system.debug('whereClause-->'+whereClause);
-                    
+                
                 if(!string.isBlank(whereClause)){
                     system.debug('Select Id,Name__c,Email__c,Phone__c,Source_Type__c, Lead_Source__c,Lead_Source_Type__c,Lead_Sub_Source__c,Project_Interested_In__c From Lead__c  '+whereClause+') AND Id != \''+recordId+'\' AND isConverted__c = false');
                     similarLeads = database.query('Select Id,Name__c,Email__c,Phone__c,Source_Type__c, Lead_Source__c,Lead_Source_Type__c,Lead_Sub_Source__c,Project_Interested_In__c,CreatedDate From Lead__c '+whereClause+') AND Id != \''+recordId+'\' AND isConverted__c = false');
                 }
                 system.debug('similarLeads-->'+similarLeads);
                 //similarLeads = [Select Id,Name__c,Email__c,Phone__c,Source_Type__c, Lead_Source__c,Lead_Source_Type__c,Lead_Sub_Source__c,Project_Interested_In__c From Lead__c 
-                                // where (Phone__c =: ld.Phone__c or Alternate_Phone__c =: ld.Phone__c or Phone__c =: ld.Alternate_Phone__c or Alternate_Phone__c =: ld.Alternate_Phone__c 
-                                //        or Email__c =: ld.Email__c or Alternate_Email__c =: ld.Email__c or Email__c =: ld.Alternate_Email__c or Alternate_Email__c =: ld.Alternate_Email__c)
-                                // AND Id !=:  recordId AND isConverted__c = false];
+                // where (Phone__c =: ld.Phone__c or Alternate_Phone__c =: ld.Phone__c or Phone__c =: ld.Alternate_Phone__c or Alternate_Phone__c =: ld.Alternate_Phone__c 
+                //        or Email__c =: ld.Email__c or Alternate_Email__c =: ld.Email__c or Email__c =: ld.Alternate_Email__c or Alternate_Email__c =: ld.Alternate_Email__c)
+                // AND Id !=:  recordId AND isConverted__c = false];
                 /*similarOpportunities = [Select Id,Opportunity_Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Source_Type__c,Lead_Sub_Source__c From Opportunity__c 
 where (Phone__c =: ld.Phone__c or Alternate_Phone__c =: ld.Phone__c or Phone__c =: ld.Alternate_Phone__c or Alternate_Phone__c =: ld.Alternate_Phone__c 
 or Email__c =: ld.Email__c or Alternate_Email__c =: ld.Email__c or Email__c =: ld.Alternate_Email__c or Alternate_Email__c =: ld.Alternate_Email__c)];
@@ -93,7 +93,7 @@ this.opportunityListToBeReturned = opportunityListToBeReturned;
                 System.debug('lstPickvals Values  === :'+lstPickvals);
                 return lstPickvals;
             }            
-       } catch (Exception e){
+        } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
             HandleBusinessException.captureError('SimilarLeadsHelper', 'getLeadSourceTypePickList', e, null);
         }
@@ -120,7 +120,7 @@ this.opportunityListToBeReturned = opportunityListToBeReturned;
                     return null;
                 }
             }   
-         } catch (Exception e){
+        } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
             HandleBusinessException.captureError('SimilarLeadsHelper', 'getLeads2', e, null);
         }

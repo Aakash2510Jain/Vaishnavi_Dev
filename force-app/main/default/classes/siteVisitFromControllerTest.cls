@@ -278,7 +278,7 @@ public with sharing class siteVisitFromControllerTest {
         siteVisitFormController.constructionStatus  = 'a';
         siteVisitFormController.purposeOfBuying  = 'a';
         siteVisitFormController.walkinSource  = 'a';
-        siteVisitFormController.walkinSubSource  = 'a';
+        // siteVisitFormController.walkinSubSource  = 'a';
         siteVisitFormController.gender  = 'a';
         siteVisitFormController.facilitatedBy  = 'a';
         siteVisitFormController.classification  = 'a';

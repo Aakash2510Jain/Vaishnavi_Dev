@@ -13,8 +13,10 @@ public class TaskTriggerHelper {
             Map<Id, Lead__c> leadIdbyLeadRecMap = new Map<Id, Lead__c>();
             
             for(Task taskRec : newTaskList){
-                if((Id.valueOf(taskRec.WhatId)).getSObjectType().getDescribe().getName() == 'Lead__c')
-                    relatedLeadIdsSet.add(taskRec.WhatId);
+                if(taskRec.WhatId != null){
+                    if((Id.valueOf(taskRec.WhatId)).getSObjectType().getDescribe().getName() == 'Lead__c')
+                        relatedLeadIdsSet.add(taskRec.WhatId);
+                }
             }
             if(!relatedLeadIdsSet.isEmpty()){
                 leadIdbyLeadRecMap = new Map<Id, Lead__c>([Select Id,Owner.Profile.name From Lead__c where Id in :relatedLeadIdsSet]);
@@ -177,7 +179,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                 Map<String,integer> leadIdByNotConnectedTaskCount = new Map<String, integer>();
                 
                 // get only call related tasks
-                List<Lead__c> leadList = [Select Id,Lead_Stage__c,Lead_Substage__c,(Select Id,Call_ID__c,Conversation_Duration__c,WhatId From Tasks where Call_ID__c != null) From Lead__c where id in : leadIdsSet and Lead_Stage__c = : ConstantClass.LeadStageNotConnected];
+                List<Lead__c> leadList = [Select Id,Lead_Stage__c,Lead_Substage__c,ownerId,(Select Id,Call_ID__c,Conversation_Duration__c,WhatId From Tasks where Call_ID__c != null) From Lead__c where id in : leadIdsSet and Lead_Stage__c = : ConstantClass.LeadStageNotConnected];
                 system.debug('leadList-->'+leadList);
                 if(!leadList.isEmpty()){
                     for(Lead__c leadRec : leadList){
@@ -192,6 +194,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                                     taskRec.whatId = leadRec.Id;
                                     taskRec.ActivityDate = system.today();
                                     taskrec.IsReminderSet = true;
+                                    taskrec.OwnerId = leadRec.ownerId;
                                     taskrec.ReminderDateTime = System.now().addMinutes(115);
                                     taskListToInsertAfterFirstNotConnect.add(taskRec);
                                 }
@@ -272,8 +275,10 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                             insert taskListToInsertAfterNotConnect;
                             system.debug('taskListToInsertAfterNotConnect-->'+taskListToInsertAfterNotConnect);
                         }
-                            if(!leadListToBeMarkedasDropped.isEmpty()){
+                        if(!leadListToBeMarkedasDropped.isEmpty()){
+                             system.debug('inside updating Task task');
                             update leadListToBeMarkedasDropped;
+                            system.debug('leadListToBeMarkedasDropped-->'+leadListToBeMarkedasDropped);
                         }
                     }
                 }
