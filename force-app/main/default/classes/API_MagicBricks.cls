@@ -51,6 +51,7 @@ global class API_MagicBricks {
                 String apiKey = params.get('api_key');
                 
                 Lead__c leadRecToInsert = new Lead__c();
+                leadRecToInsert.API_Body__c = String.ValueOf(requestBodyMap);
                 leadRecToInsert.Name__c = name;
                 leadRecToInsert.Phone__C = mobile;
                 leadRecToInsert.Lead_Source__c = 'DIGITAL';

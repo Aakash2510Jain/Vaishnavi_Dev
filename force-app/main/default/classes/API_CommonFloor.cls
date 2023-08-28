@@ -11,6 +11,7 @@ global class API_CommonFloor {
             system.debug('requestBodyMap---->'+requestBodyMap);
             
             Lead__c leadRecToInsert = new Lead__c();
+            leadRecToInsert.API_Body__c = String.ValueOf(requestBodyMap);
             leadRecToInsert.Name__c = (string)requestBodyMap.get('name');
             leadRecToInsert.Phone__C = (string)requestBodyMap.get('phone');
             leadRecToInsert.Lead_Source__c = 'DIGITAL';

@@ -6,7 +6,7 @@ public without sharing class ConstantClass {
     public Static Final String errorForDuplicateLeadByPhone = 'Duplicate Lead by Phone Number!!!';
     public Static Final String errorForDuplicateLeadByEmail = 'Duplicate Lead by Email!!!';
     public Static Final String errorForPastFollowUpDate = 'Please fill Futuristic Date/Time !!!';
-    public Static Final String FirstCallTAskAfterLeadAllocation = 'Make First Call Attempt within next 30 mins!!!';
+    public Static Final String FirstCallTAskAfterLeadAllocation = 'Make first call Attempt within next 30 mins!!!';
     public Static Final String SecondCallTAskAfterFirstNotConnect = 'Make Second Call Attempt within next 2 hours!!!';
     public Static Final String thirdCallTAskAfterFirstNotConnect = 'Make Third Call Attempt within next 2 hours!!!';
     public Static Final String forthCallTAskAfterFirstNotConnect = 'Make Fourth Call Attempt Tommorrow!!!';
@@ -48,5 +48,5 @@ public without sharing class ConstantClass {
     public Static Final String LeadSubStage_BUDGET = 'Budget';	
     public Static Final String LeadSubStage_FLOORPLAN = 'Floor Plan  ';	
     public Static Final String LeadSubStage_PROJECT = 'Project';	
-    
+    public Static Final String opportunitySubStage_FV_Followup = 'SV Follow-up';	
 }

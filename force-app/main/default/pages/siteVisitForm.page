@@ -82,6 +82,7 @@
                 $scope.subSource = ['99 Acres','Commonfloor','Housing','Magicbricks'];
                 $scope.residenceCity =['Bangalore','Others'];
                 $scope.today = new Date();
+                $scope.directWalkinOppId;
                 var dateTime = $scope.today.toLocaleString();
                 var parts = dateTime.split(', ');
                 var timeString = parts[1];
@@ -555,6 +556,7 @@
                     if($scope.oppId != null){
                         $scope.firstVisitRecord.Opportunities__c = $scope.oppId;
                         $scope.firstVisitRecord.Project__c = $scope.oppDetails.Project__c;
+                        // $scope.directWalkinOppId = 'opp';
                     }else{
                         $scope.firstVisitRecord.Lead__c = $scope.leadId;
                         $scope.firstVisitRecord.Project__c = $scope.leadRecord[0].Project__c;
@@ -586,7 +588,8 @@
                         }
                     })
                 }else{
-                    siteVisitFormController.insertVisitRecordUnderOpportunity($scope.firstVisitRecord,year,month,day,visityear,visitmonth,visitday,function(result,event){
+                    $scope.opportunityToInsert = {"Opportunity_Name__c":$scope.leadRecord[0].Name__c,"Phone__c":$scope.leadRecord[0].Phone__c,"Email__c":$scope.leadRecord[0].Email__c};
+                    siteVisitFormController.insertVisitRecordUnderOpportunity($scope.firstVisitRecord,$scope.opportunityToInsert,year,month,day,visityear,visitmonth,visitday,$scope.visit.Location__c,function(result,event){
                         debugger;
                         if(event.status && result){
                             debugger;
@@ -968,7 +971,7 @@
                             <div class="col-md-7 mt-4">
                                 <button class="button" ng-click="searchLead()">Search</button>
                                 <!-- <button class="button" ng-click="createLead()"><i class="fa fa-plus"></i>  Create New Lead</button> -->
-                                <button class="button" ng-show="showLeadDetails || showVisitAfterCreatn || showConvertedLead" id="btnSubmit1" ng-click="OnClickcreateVisit()">Create Visit</button>
+                                <button class="button" id="btnSubmit1" ng-click="OnClickcreateVisit()">Create Visit</button>
                                 <button class="button" id="btnPleaseWait1" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                             </div>
                         </div>

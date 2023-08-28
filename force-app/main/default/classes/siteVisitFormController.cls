@@ -246,6 +246,7 @@ public without sharing class siteVisitFormController {
     @RemoteAction
     public static string insertVisitRecord(Visit__c visitRecord, string leadId, Integer year, Integer month, Integer day, Integer visityear, Integer visitmonth, Integer visitday, string location){
         try{
+            system.debug('leadId ==> '+leadId);
             System.debug(' --- visitRecord:'+visitRecord);
             System.debug(' --- location:'+location);
             if(!String.isBlank(location)){
@@ -286,24 +287,52 @@ public without sharing class siteVisitFormController {
     }
 
     @RemoteAction
-    public static string insertVisitRecordUnderOpportunity(Visit__c visitRecord, Integer year, Integer month, Integer day, Integer visityear, Integer visitmonth, Integer visitday){
+    public static string insertVisitRecordUnderOpportunity(Visit__c visitRecord, Opportunity__c oppRecToInsert, Integer year, Integer month, Integer day, Integer visityear, Integer visitmonth, Integer visitday, string location){
         try{
             System.debug(' --- visitRecord:'+visitRecord);
-            if(day == 0 && month==0 && year==0){
+            if(visitRecord.Opportunities__c != null){
+                if(day == 0 && month==0 && year==0){
                 
+                }else{
+                    visitRecord.Date_Of_Birth__c = Date.newInstance(year, month, day); 
+                }
+                if(visitday == 0 && visitmonth==0 && visityear==0){
+    
+                }else{
+                    visitRecord.Actual_visit_date__c = Date.newInstance(visityear, visitmonth, visitday); 
+                }
+                if(visitRecord.Id != null){
+                    update visitRecord;
+                }else{
+                    insert visitRecord;
+                } 
             }else{
-                visitRecord.Date_Of_Birth__c = Date.newInstance(year, month, day); 
-            }
-            if(visitday == 0 && visitmonth==0 && visityear==0){
-
-            }else{
-                visitRecord.Actual_visit_date__c = Date.newInstance(visityear, visitmonth, visitday); 
-            }
-            if(visitRecord.Id != null){
-                update visitRecord;
-            }else{
-                insert visitRecord;
-            }            
+                if(oppRecToInsert != null){
+                    oppRecToInsert.Walkin_Source__c = 'Direct Walkin';
+                    insert oppRecToInsert;
+                    if(!String.isBlank(location)){
+                        List<Location__c> locationrec = [Select Id,name From Location__c WHERE Id =: location LIMIT 1];
+                        system.debug('locationrec ==> '+locationrec);
+                        if(!locationrec.isEMpty()){
+                            visitRecord.Location__c = locationrec[0].Id;
+                        }
+                        system.debug('visitRecord.Location__c ==> '+visitRecord.Location__c);
+                    }
+                    if(day == 0 && month==0 && year==0){
+                
+                    }else{
+                        visitRecord.Date_Of_Birth__c = Date.newInstance(year, month, day); 
+                    }
+                    if(visitday == 0 && visitmonth==0 && visityear==0){
+        
+                    }else{
+                        visitRecord.Actual_visit_date__c = Date.newInstance(visityear, visitmonth, visitday); 
+                    }
+                    visitRecord.Opportunities__c = oppRecToInsert.Id;
+                    visitRecord.Walkin_Source__c = 'Direct Walkin';
+                    insert visitRecord;
+                }
+            }         
             return visitRecord.Id;
         }catch(Exception e){
             return e.getMessage()+e.getLineNumber();

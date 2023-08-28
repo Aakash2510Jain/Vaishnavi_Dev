@@ -9,9 +9,10 @@ trigger TaskTrigger on Task (before insert,before Update, after update,after ins
            handlerInstance.beforeInsert(trigger.new);
         }
         if(trigger.isAfter && trigger.isInsert){
+            handlerInstance.afterInsert(trigger.new);
         }
         if(trigger.isBefore && trigger.isUpdate){
-            //handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
+            handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
         }
         if(trigger.isAfter && trigger.isUpdate){
             handlerInstance.afterUpdate(trigger.newMap, trigger.oldMap);

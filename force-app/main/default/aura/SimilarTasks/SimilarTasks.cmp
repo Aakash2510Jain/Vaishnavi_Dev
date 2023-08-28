@@ -1,0 +1,91 @@
+<aura:component controller="SimilarTasksHelper"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--Attribiute-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="taskListWithsimDomain" type="List" />
+    <aura:attribute name="showImage" type="boolean" default="false"/>
+    <aura:attribute name="taskSourcePickList" type="List"/>
+    <aura:attribute name="url" type="String" />
+    <!--Handler-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--Lightning Card-->
+    
+    <lightning:card >
+        <div style = "border-style: solid;margin :1%" >
+            <div style = "margin :1%" >
+                <aura:if  isTrue="{!v.taskListWithsimDomain.length > 0}">
+                    <div style="margin-bottom: 2%;margin-left: 4%;margin-top: 2%;">
+                        <lightning:button variant="destructive" disabled="true">Tasks With Re-Enquiry Subject ⬇️</lightning:button> 
+                        <br/>
+                    </div>
+                    <table aria-multiselectable="true" class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols" role="grid" aria-label="">
+                      
+                        <tbody>
+                            <aura:iteration items="{! v.taskListWithsimDomain }" var="task">
+                                <p class="rcorners2">
+                                <tr>
+                                    <!--td class="slds-cell_action-mode slds-grow slds-cell-wrap" role="gridcell">
+                                        <b>
+                                            {!task.task_Source__c}
+                                        </b> 
+                                    </td-->
+                                    <!--td class="slds-grow slds-cell-wrap"> 
+                                        <b>
+                                            {!task.task_Source_Type__c}
+                                        </b> 
+                                    </td-->
+                                    <!--td> 
+                                        <b>
+                                            {!task.task_Sub_Source__c}
+                                        </b> 
+                                    </td-->
+                                    <td class="slds-grow slds-cell-wrap" style=" padding-left: 26px; ">
+                                      <b style="font-size:18px;">
+                                        <p class="dinesh button5" style="text-transform:uppercase">{!task.Sub}</p> 
+                                        </b>
+                                        <b style="font-size:20px;">
+                                        <a target="_blank" href="{!$Site.CurrentSiteUrl+'/lightning/r/task__c/'+task.Id+'/view'}" tabindex="-1">
+                                            <span style=" padding-left: 6px; "> {!task.Status} </span >
+                                        </a> 
+                                        </b>
+                                        <br/>
+                                        <div style="margin-top: -18px;">
+                                         <b style=" color: rgb(1, 118, 211);font-size:16px; ">
+                                          <span style=" margin-left: 68px; ">Assigned To: {!task.Owner.Name}</span> 
+                                        </b> 
+                                        <br/>
+                                         <b style=" color: rgb(1, 118, 211);font-size:16px; ">
+                                          <span style=" margin-left: 68px; ">Due Date:  {!task.ActivityDate}</span>
+                                        </b>
+                                        </div>
+                                       
+                                    </td>
+                                    
+                                </tr>	
+                                
+                                </p>
+                                
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                    <aura:set attribute="else">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_2-of-8 LeftDiv">
+                                <img src="{!$Resource.CompanyLogo}" alt="User avatar" class="center"/>
+                            </div>
+                            <div class="slds-col slds-size_6-of-8 LeftDiv">
+                                <div style="margin-top: 13%;margin-left: 4%;">
+                                    <b>
+                                        No Task With Re-Enquiry Subject .. 😊😊
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if> 
+            </div>
+        </div>
+    </lightning:card>
+    
+    
+    <br/>
+</aura:component>

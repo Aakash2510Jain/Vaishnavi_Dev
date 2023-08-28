@@ -32,4 +32,13 @@ public class OpportunityTriggerHelper {
          
          
      }
+    
+    public void beforeUpdate(Map<Id, opportunity__c> newOpportunityMap, Map<Id, opportunity__c> oldOpportunityMap){
+        
+        for(Opportunity__C oppRecord : newOpportunityMap.values()){
+            if(oppRecord.Opportunity_SubStage__c != oldOpportunityMap.get(oppRecord.Id).Opportunity_SubStage__c && (oppRecord.Next_Followup_Date_Time__c == null || oppRecord.Next_Followup_Date_Time__c < system.now())){
+                oppRecord.Next_Followup_Date_Time__c.addError('Please specify future follow up date');
+            }
+        }     
+    }
 }

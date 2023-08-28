@@ -1,0 +1,43 @@
+<template>
+    <lightning-quick-action-panel class="field-title" header="Re-Enquiries ⬇">
+        <ul class="dynamic-text">
+            <li class="item">
+                <div class="app">
+                    <template for:each={recList} for:item="rec">
+                        <div key={rec.Id} class="cardClass">
+                            <div class="slds-card card-color slds-m-left_small">
+                                <div class="slds-grid" style="padding:2%; !important">
+
+                                    <div class="slds-col slds-size_1-of-4 slds-align_absolute-center">
+                                        <a href={rec.url}>
+                                            <p class="circle">{rec.Sub}</p>
+                                        </a>
+                                    </div>
+                                    <div class="slds-col slds-size_3-of-4">
+                                        <!--p class="slds-p-horizontal_small">Assigned To : <b>{rec.Owner.Name}</b>
+                                        </p-->
+                                        <p class="slds-p-horizontal_small">Lead Source : <b>{rec.Lead_Source__c}</b>
+                                        </p>
+                                        <p class="slds-p-horizontal_small">Lead Source Type :
+                                            <b>{rec.Lead_Source_Type__c}</b>
+                                        </p>
+                                        <p class="slds-p-horizontal_small">Lead Sub Source :
+                                            <b>{rec.Lead_Sub_Source__c}</b>
+                                        </p>
+                                        <p class="slds-p-horizontal_small">Created Date : <b>{rec.CreatedDateFmt}</b>
+                                        </p>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                            <br />
+                        </div>
+                    </template>
+
+                </div>
+            </li>
+        </ul>
+    </lightning-quick-action-panel>
+</template>

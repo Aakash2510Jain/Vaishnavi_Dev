@@ -14,7 +14,6 @@ public class LeadAssignmentExecutionCriteria {
         }*/
         
         Boolean IsLeadAssigned = False;
-        list<lead__c> newLeadListTemp 												= new list<lead__c>();
         list<lead__c> DefaultQueueList 												= new list<lead__c>();
         list<String> matchedCriterias 											= new list<String>();
         map<string,list<Lead__c>> mapofExecutionIdByListLead 						= new map<String,List<Lead__c>>();
@@ -51,9 +50,12 @@ public class LeadAssignmentExecutionCriteria {
         string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
         list<Default_Assignment_Group__mdt> defaultGroupName = [select id,Group_Name__c from Default_Assignment_Group__mdt];
         List<Execution_Criteria__c> AvailableCriterias = [SELECT Enabled__c,Evaluation_Expression_For_Execution__c,Id,Name ,(SELECT Execution_Criteria__c,serial__c,Field_Name__c,Field_Type__c,Matching_Type__c,Matching_Value__c,Related_Object__c,Scorecard_Execution_Criteria_Name__c,Scorecard__c,Sequence__c FROM Execution_Criteria_Entry__r WHERE Execution_Criteria__c != null ORDER BY Sequence__c ASC)FROM Execution_Criteria__c where Enabled__c = true];
+        string leadAssignmentQuery = [Select Id,Query__c From LeadAssignmentQuery__mdt].Query__c;
+        
+        list<lead__c> newLeadListTemp = database.query(leadAssignmentQuery);
         
        // list<lead__c> queueLeads = [SELECT Id,OwnerId FROM Lead__c where id not in: newLeadsSet and ownerId =: queueId ];
-       newLeadListTemp = [SELECT Acadamic_Level__c,Acadamic_Program__c,Account__c,Additional_Comments__c,Address__c,Affiliation__c,Age_of_Candidate__c,
+      /* newLeadListTemp = [SELECT Acadamic_Level__c,Acadamic_Program__c,Account__c,Additional_Comments__c,Address__c,Affiliation__c,Age_of_Candidate__c,
                           Alternate_Email__c,Alternate_Phone__c,AnnualRevenue__c,Birthdate__c,Budget_Pick__c,Budget_Score__c,Budget__c,Campaign__c,Carpet_Area__c,
                           Channel_Partner__c,City__c,Client_ID__c,Company_Name__c,Company__c,Country__c,CP_Email__c,CP_Name__c,CP_Phone__c,CreatedById,CreatedDate,
                           Demo_Date__c,Email__c,Employee_Code__c,Facebook_AD_ID__c,Facebook_Ad_Name__c,Facebook_Ad_Set_Id__c,Facebook_AD_Set_Name__c,
@@ -71,7 +73,8 @@ public class LeadAssignmentExecutionCriteria {
                           State_Province__c,Street__c,SystemModstamp,TaskCreationForDuplicateLead__c,Title__c,Total_Calls__c,Total_Call_Duration__c,
                           Total_Connected_Call__c,Total_Connected_Duration__c,Total_Emails_Send__c,Total_Score__c,To_Be_Deleted__c,
                           Unit_Availability__c,Unit_Details__c,Unit_Pickval__c,URL__c,UTM_Campaign__c,UTM_Medium__c,UTM_Source__c,
-                          UTM_Term__c FROM Lead__c where  ownerId =: queueId ];
+                          UTM_Term__c FROM Lead__c where  ownerId =: queueId order by createdDate Desc limit 1];
+*/
         if(!newLeadListTemp.isEmpty()){
             //newLeadListTemp.addAll(queueLeads);
             System.debug(newLeadListTemp.size()); 
@@ -454,7 +457,7 @@ public class LeadAssignmentExecutionCriteria {
         map<String,List<Lead__c>> mapofGlobalGroupNameByLeadList = new map<String,List<Lead__c>>();
         DefaultGroupAssignment__c dgc = new DefaultGroupAssignment__c();
         if(!test.isRunningTest())
-            dgc = [Select id,Name,Group_Id__c from DefaultGroupAssignment__c where name = 'Global Lead Team'][0];
+            dgc = [Select id,Name,Group_Id__c from DefaultGroupAssignment__c where name = 'Vaishnavi Group'][0];
         
         if(DefaultQueueList.size() > 0 && DefaultQueueList != null){
             if(!string.isBlank(dgc.Name))

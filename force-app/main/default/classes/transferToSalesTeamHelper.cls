@@ -1,33 +1,36 @@
 public without Sharing class transferToSalesTeamHelper {
     @auraEnabled
-    public static void shareAndTagSalesTeamMember(string leadId){
+    public static string shareAndTagSalesTeamMember(string leadId){
         system.debug('leadId--->'+leadId);
-        /*Assignment_Group_Member__c salesTeamMemberRecord = [Select Id,Group_Member__c,Last_Sequence__c From Assignment_Group_Member__c where Assignment_Group__c = 'a0A1m000003of4HEAQ' order by LastModifiedDate limit 1];  
-        salesTeamMemberRecord.Last_Sequence__c = 1;
-        update salesTeamMemberRecord;
+       
+        Lead__c leadRec = [Select Id,Project_Pickval__c,Budget_Pick__c,Unit_Pickval__c,Location__c,Project_TimeLine__c From Lead__c where Id =:leadId];
         
-        Lead__c leadRecToShareTOSalesTeam = new Lead__c();
-        leadRecToShareTOSalesTeam.Id = leadId;
-        leadRecToShareTOSalesTeam.Sales_Team_Member__c = salesTeamMemberRecord.Group_Member__c;
-        update leadRecToShareTOSalesTeam;
+        if(string.isBlank(leadRec.Project_Pickval__c)){
+          return 'Project is Empty';  
+        }
+        if(string.isBlank(leadRec.Budget_Pick__c)){
+          return 'Budget is Empty';  
+        }
+        if(string.isBlank(leadRec.Unit_Pickval__c)){
+          return 'Unit is Empty';  
+        }
+        if(string.isBlank(leadRec.Location__c)){
+          return 'Location is Empty';  
+        }
+        if(string.isBlank(leadRec.Project_TimeLine__c)){
+          return 'Timeline is Empty';  
+        }
         
-        Lead__Share leadShareRec = new Lead__Share();
-        leadShareRec.ParentId = leadId;
-        leadShareRec.UserOrGroupId = salesTeamMemberRecord.Group_Member__c;
-        leadShareRec.AccessLevel = 'EDIT';
-        insert leadShareRec;
-        
-        transferToSalesTeamHelper.sendEmailToLead(leadId);*/
         set<String> LeadIdList = new Set<String>();
         LeadIdList.add(leadId);
-        String courseName = system.label.Sales_Team_Group;
+        String courseName = 'Sales Team '+leadRec.Project_Pickval__c;
         RoundRobinLeadAssignment.assignLeadsToBDS(courseName, LeadIdList,true);
-        
+        return 'Success';
     }
     
     @AuraEnabled
     public static void sendEmailToLead(Id leadId){
-        EmailTemplate temp = [Select id,Subject,Body,HTMLValue from EmailTemplate where name = 'Lead Associate to Sales Team']; 
+        /*EmailTemplate temp = [Select id,Subject,Body,HTMLValue from EmailTemplate where name = 'Lead Associate to Sales Team']; 
         Lead__c leadRec = [Select Id,Email__c,Name__c From Lead__c Where Id =: leadId];
         
         List<Messaging.SingleEmailMessage> mailList = new List<Messaging.SingleEmailMessage>();
@@ -50,6 +53,6 @@ public without Sharing class transferToSalesTeamHelper {
         if(!mailList.isEmpty()){
             Messaging.sendEmail(mailList);
         }
-        
+        */
     }
 }

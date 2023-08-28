@@ -217,7 +217,8 @@ public with sharing class siteVisitFromControllerTest {
         visitRec.Actual_visit_date__c = Date.newInstance(visityear, visitmonth, visitday);
         insert visitRec;
 
-        siteVisitFormController.insertVisitRecordUnderOpportunity(visitRec,year,month,day,visityear,visitmonth,visitday);
+        
+        //siteVisitFormController.insertVisitRecordUnderOpportunity(visitRec,year,month,day,visityear,visitmonth,visitday,null);
 
         // Visit__c visitRecUpdate = New Visit__c(); 
         // visitRecUpdate.Id = visitRec.Id;

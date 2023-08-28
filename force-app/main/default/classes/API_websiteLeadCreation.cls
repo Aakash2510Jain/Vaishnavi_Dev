@@ -20,6 +20,7 @@ global class API_websiteLeadCreation {
             system.debug('requestBodyMap---->'+requestBodyMap);
 
             Lead__c leadRecToInsert = new Lead__c();
+            leadRecToInsert.API_Body__c = String.ValueOf(requestBodyMap);
             if(!String.isBlank((string)requestBodyMap.get('name'))){
                 leadRecToInsert.Name__c = (string)requestBodyMap.get('name');
             }

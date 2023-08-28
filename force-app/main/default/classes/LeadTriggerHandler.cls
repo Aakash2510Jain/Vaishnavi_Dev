@@ -20,6 +20,8 @@ public class LeadTriggerHandler {
             Map<Id, Lead__c> existingLeadIdByNewLeadRec = new map<id, Lead__c>();
             Set<String> phonesSet = new Set<String>();
             Set<String> emailsSet = new Set<String>();  
+            Set<String> altPhonesSet = new Set<String>();
+            Set<String> altEmailsSet = new Set<String>();
             List<Lead__c> existingLeadsList = new List<Lead__c>();
             List<Lead__c> existingLeadWithPhones = new List<Lead__c>();
             List<Lead__c> existingLeadWithEmails = new List<Lead__c>();
@@ -82,9 +84,16 @@ public class LeadTriggerHandler {
                 if(leadRec.Phone__c != null){
                     phonesSet.add(leadRec.Phone__c);
                 }
+                if(leadRec.Alternate_Phone__c != null){
+                    altPhonesSet.add(leadRec.Phone__c);
+                }
                 if(leadRec.Email__c != null)
                 {
                     emailsSet.add(leadRec.Email__c);
+                }
+                if(leadRec.Alternate_Email__c != null)
+                {
+                    altEmailsSet.add(leadRec.Email__c);
                 }
                 if(leadRec.Lead_Source_Type__c != null){
                     if(campaignSourceByCampaignRecMap.containsKey(leadRec.Lead_Source_Type__c))
@@ -185,8 +194,8 @@ public class LeadTriggerHandler {
                 }
             }
             
-            if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
-                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet ) AND isConverted__c = false];
+            if(!phonesSet.isEmpty() || !emailsSet.isEmpty() || !altEmailsSet.isEmpty() || !altPhonesSet.isEmpty()){
+                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet or Alternate_Phone__c IN: altPhonesSet or Alternate_Email__c IN: altEmailsSet) AND isConverted__c = false];
                 system.debug('existingLeadsList--01>'+existingLeadsList);
                 
                 if(!existingLeadsList.isEmpty()){
@@ -272,11 +281,12 @@ public class LeadTriggerHandler {
     
     public void afteInsert(Map<Id, Lead__c> newLeadMap, Map<Id, Lead__c> oldLeadMap){
         try{
+            system.debug('After Lead Insert .....');
             set<Id> leadsEmailIds = new Set<Id>();
             
             for(Lead__C leadRec : newLeadMap.values()){
                 if(leadRec.Email__c != null){
-                    leadsEmailIds.add(leadRec.Email__c);
+                    leadsEmailIds.add(leadRec.Id);
                 }
             }
             if(!leadsEmailIds.isEmpty()){
@@ -399,8 +409,8 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                        leadRec.Lead_Substage__c == 'Junk lead'|| leadRec.Lead_Substage__c == 'Just Enquiry'|| 
                        leadRec.Lead_Substage__c == 'Did not Show up for site visit'|| leadRec.Lead_Substage__c == 'Not Interested in Property' ||
                        leadRec.Lead_Substage__c == 'Budget' || leadRec.Lead_Substage__c == 'Location' || leadRec.Lead_Substage__c == 'Project Timeline' ||
-                       leadRec.Lead_Substage__c == 'Vaastu Compliance' || leadRec.Lead_Substage__c == 'Unit Availability'){ 
-                           leadRec.Lead_Stage__c = 'Dropped';
+                       leadRec.Lead_Substage__c == 'Vaastu Compliance' || leadRec.Lead_Substage__c == 'Unit Availability' || leadRec.Lead_Substage__c == 'Invalid Number'){ 
+                           leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                        }
                     system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
@@ -463,13 +473,13 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                     system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                     
-                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c)) && profileName == 'Sales Team'){
+                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Sales_Drop_Reason__c)) && (profileName == 'Sales Team' || profileName == 'System Administrator')){
                         leadRec.Sales_Drop_Reason__c.addError('Specify Sales Drop Reason');
                     }
                     system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                     
-                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && profileName == 'Pre-Sales Team'){
+                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageDrop && (leadRec.Pre_Sales_Drop_Reason__c == null || string.isEmpty(leadRec.Pre_Sales_Drop_Reason__c)) && (profileName == 'Pre-Sales Team'||profileName == 'System Administrator') ){
                         leadRec.Pre_Sales_Drop_Reason__c.addError('Specify Pre Sales Drop Reason');
                     }
                     system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
@@ -587,7 +597,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                 }
                 
                 if(oldLeadMap.get(leadRec.Id).Lead_Stage__c == ConstantClass.LeadStageDrop && leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c){
-                    leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
+                   // leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                 }
                 system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                 system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
@@ -616,9 +626,11 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
             set<Id> siteVisitPlannedLeadIds = new Set<Id>();
             set<Id> preSalesAssignedLeadIds = new Set<Id>();
             set<Id> salesAssignedInternalNotificationLeadIds =  new Set<Id>();
-            
+            List<Task> taskListToInsertFOrFirstConnect = new List<Task>();
+            Map<String,string> leadIdByLeadOwnerId = new Map<String, string>();
+
             for(Lead__c leadRec: newLeadMap.values()){
-                
+                leadIdByLeadOwnerId.put(leadRec.Id,leadRec.ownerId);
                 if(leadRec.OwnerId != oldLeadMap.get(leadRec.Id).OwnerId && (string.valueOf(leadRec.OwnerId)).startsWith('005')  ){
                     if(string.valueOf(oldLeadMap.get(leadRec.Id).OwnerId).startsWith('00G')){
                         //If lead is assigned to pre sales team
@@ -628,11 +640,11 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                     
                 }  
-                
+                if(leadRec.Total_Calls__c != oldLeadMap.get(leadRec.Id).Total_Calls__c && leadRec.Total_Calls__c > oldLeadMap.get(leadRec.Id).Total_Calls__c && leadRec.Total_Connected_Call__c != oldLeadMap.get(leadRec.Id).Total_Connected_Call__c){
+                    notConnectedLeadIds.add(leadRec.Id);
+                }
                 if(leadRec.Lead_Stage__c != oldLeadMap.get(leadRec.Id).Lead_Stage__c ){
-                    if(leadRec.Lead_Stage__c == ConstantClass.LeadStageNotConnected){
-                        notConnectedLeadIds.add(leadRec.Id);
-                    }
+                   
                     system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                     
@@ -666,13 +678,26 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                 }
             }
             if(!notConnectedLeadIds.isEmpty()){
-                EmailIUtility.notifyCustomer(notConnectedLeadIds,'Not Connected Notification');
+                EmailIUtility.notifyCustomer(notConnectedLeadIds,'RNR Notification to Customer');
             }
             if(!rnrLeadIds.isEmpty()){
                 EmailIUtility.notifyCustomer(rnrLeadIds,'RNR Dropped Lead');
             }
             if(!invalidNumberLeadIds.isEmpty()){
                 EmailIUtility.notifyCustomer(invalidNumberLeadIds,'Invalid Number');
+                List<Task> taskList = [Select Id,Status From Task where Status != 'Completed' and WhatId in : invalidNumberLeadIds];
+                if(!taskList.isEmpty()){
+                    List<Task> taskListToUpdate = new List<Task>();
+                    for(Task taskRec : taskList) {
+                        Task taskRecToMarkClosed = new Task();
+                        taskRecToMarkClosed.Id = taskRec.Id;
+                        taskRecToMarkClosed.Status = 'Completed';
+                        taskListToUpdate.add(taskRecToMarkClosed);
+                    }
+                    if(!taskListToUpdate.isEmpty()){
+                        update taskListToUpdate;
+                    }
+                }
             }
             if(!droppedDueToComplaintLeadIds.isEmpty()){
                 EmailIUtility.notifyCustomer(droppedDueToComplaintLeadIds,'Dropped due to Complaint');
@@ -685,9 +710,36 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
             }
             if(!preSalesAssignedLeadIds.isEmpty()){
                 EmailIUtility.notifyVaishnaviTeam(preSalesAssignedLeadIds,'New Lead Assigned to Pre-Sales Team');
+                for(Id leadId : preSalesAssignedLeadIds){
+                    Task taskRec = new Task();
+                    taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+                    taskRec.whatId = leadid;
+                    taskrec.OwnerId = leadIdByLeadOwnerId.get(leadid);
+                    taskRec.ActivityDate = system.today();
+                    taskrec.IsReminderSet = true;
+                    taskrec.ReminderDateTime = system.now().addMinutes(30);
+                    taskListToInsertFOrFirstConnect.add(taskRec);
+                }
+                if(!taskListToInsertFOrFirstConnect.isEmpty()){
+                    insert taskListToInsertFOrFirstConnect;
+                }
             }
+            
             if(!salesAssignedInternalNotificationLeadIds.isEmpty()){
-                EmailIUtility.notifyVaishnaviTeam(salesAssignedInternalNotificationLeadIds,'New Lead Assigned to Pre-Sales Team');
+                EmailIUtility.notifyVaishnaviTeam(salesAssignedInternalNotificationLeadIds,'New Lead Assigned to Sales Team');
+                for(Id leadId : salesAssignedInternalNotificationLeadIds){
+                    Task taskRec = new Task();
+                    taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;
+                    taskRec.whatId = leadid;
+                    taskrec.OwnerId = leadIdByLeadOwnerId.get(leadid);
+                    taskRec.ActivityDate = system.today();
+                    taskrec.IsReminderSet = true;
+                    taskrec.ReminderDateTime = system.now().addMinutes(30);
+                    taskListToInsertFOrFirstConnect.add(taskRec);
+                }
+                if(!taskListToInsertFOrFirstConnect.isEmpty()){
+                    insert taskListToInsertFOrFirstConnect;
+                }
             }
         } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());

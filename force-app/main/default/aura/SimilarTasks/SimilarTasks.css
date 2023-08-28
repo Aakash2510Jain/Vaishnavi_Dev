@@ -1,0 +1,74 @@
+.THIS .center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+
+.THIS .RightDiv {
+    background-color:#ECF3FE; 
+    border-radius:5px; 
+    font-size: 15px;
+    overflow-wrap: break-word; 
+    inline-size: 250px;
+    padding-left: 10px;
+    border: 2px solid #cee0fd;
+}
+
+.THIS Header {
+    font-weight: bold;
+    text-align: left;
+    font-size: large;
+}
+
+.THIS .LeftDiv {
+    font-size: 15px; 
+    text-align: left; 
+}
+
+.THIS .CenterDiv {
+    padding-right: 30px;
+    font-size: 15px;
+}
+
+.THIS .rcorners2 {
+  border-radius: 25px;
+  border: 2px solid #2173AD;
+ margin-bottom: 1rem;
+  height: 140px;  
+}
+
+.THIS .dinesh {
+  background-color: #078dea; /* Green */
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.THIS 
+.button5 {border-radius: 50%;}
+
+.THIS.circular-data-container {
+    width: 100px; /* Adjust width and height as per your requirements */
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f1f1f1; /* Set your desired background color */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media only screen and (max-width: 768px) {
+    /* Styles for screens up to 768px (tablets) */
+}
+
+
+@media only screen and (max-width: 480px) {
+    /* Styles for screens up to 480px (mobile devices) */
+}
