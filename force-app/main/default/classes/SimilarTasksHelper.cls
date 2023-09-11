@@ -7,43 +7,14 @@ public without sharing class SimilarTasksHelper {
         
         try{
             if(recordId != null){
-                //Task tskRec= [Select id,WhoId,Priority,WhatId,Status,Subject from Task where WhatId=:recordId];
-               // system.debug('tskRec--->'+tskRec);
                 string whereClause = '';  
-                    system.debug('if subject not null');
-                    whereClause += ' where ( Subject Like \''+ ConstantClass.TaskSubjectForDuplicateLead +'%\'';
+                system.debug('if subject not null');
+                whereClause += ' where ( Subject Like \''+ ConstantClass.TaskSubjectForDuplicateLead +'%\'';
                 system.debug('whereClause-->'+whereClause);
-                /*if(tskRec.Alternate_Phone__c != null){
-                    system.debug('if alternate phone not null');
-                    if(whereClause.contains('where')){                           
-                        whereClause += ' or Phone__c =\''+tskRec.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+tskRec.Alternate_Phone__c+'\'';
-                    }else{
-                        whereClause += ' where ( Phone__c =\''+ tskRec.Alternate_Phone__c +'\' or Alternate_Phone__c =\''+ tskRec.Alternate_Phone__c+'\'';
-                    }
-                }
-                system.debug('whereClause-->'+whereClause);
-                if(tskRec.Email__c != null){
-                    system.debug('if email not null');
-                    if(whereClause.contains('where')){
-                        whereClause += ' or Email__c =\''+tskRec.Email__c +'\' or Alternate_Email__c =\''+tskRec.Email__c+'\'';
-                    }else{
-                        whereClause += ' where ( Email__c =\''+tskRec.Email__c +'\' or Alternate_Email__c =\''+tskRec.Email__c+'\'';
-                    }
-                }
-                system.debug('whereClause-->'+whereClause);
-                if(tskRec.Alternate_Email__c != null){
-                    system.debug('if alternate email not null');
-                    if(whereClause.contains('where')){
-                        whereClause += ' or Email__c =\''+ tskRec.Alternate_Email__c +'\' or Alternate_Email__c =\''+tskRec.Alternate_Email__c +'\'';
-                    }else{
-                        whereClause += ' where (Email__c =\''+ tskRec.Alternate_Email__c +'\' or Alternate_Email__c =\''+ tskRec.Alternate_Email__c+'\'';
-                    }
-                }
-                system.debug('whereClause-->'+whereClause);*/
                 
                 if(!string.isBlank(whereClause)){
-                    system.debug('Select id,WhoId,Priority, Lead_Source__c, Lead_Source_Type__c, Lead_Sub_Source__c, CreatedDate, WhatId,ActivityDate,Owner.Name, Status,Subject,Type from Task  '+whereClause+') AND WhatId = \''+recordId+'\' AND Status != \'Completed\'');
-                    similarTasks = database.query('Select id,WhoId,Priority, Lead_Source__c, Lead_Source_Type__c, Lead_Sub_Source__c, CreatedDate,Modified_Created_Date__c, WhatId,ActivityDate,Owner.Name, Status,Subject,Type from Task  '+whereClause+') AND WhatId = \''+recordId+'\' AND Status != \'Completed\'');
+                    system.debug('Select id,WhoId,Priority, Lead_Source__c, Lead_Source_Type__c, Lead_Sub_Source__c, CreatedDate, WhatId,ActivityDate,Owner.Name, Status,Subject,Type from Task  '+whereClause+') AND WhatId = \''+recordId);
+                    similarTasks = database.query('Select id,WhoId,Priority, Lead_Source__c, Lead_Source_Type__c, Lead_Sub_Source__c, CreatedDate,Modified_Created_Date__c, WhatId,ActivityDate,Owner.Name, Status,Subject,Type from Task  '+whereClause+') AND WhatId = \''+recordId+'\'');
                 }
                 system.debug('similarTasks-->'+similarTasks);
                 return similarTasks;
@@ -57,14 +28,6 @@ public without sharing class SimilarTasksHelper {
         }
         return null;
     } 
-    /* public class similarLeadWrap{
-public List<lead__c> leadListToBeReturned;
-public List<opportunity__c> opportunityListToBeReturned;
-public similarLeadWrap(List<lead__c> leadListToBeReturned, List<opportunity__c> opportunityListToBeReturned){
-this.leadListToBeReturned = leadListToBeReturned;
-this.opportunityListToBeReturned = opportunityListToBeReturned;
-}
-}*/
     @AuraEnabled
     Public Static List<String> getLeadSourceTypePickList(String ObjectApi_name,String FietskRec_name){
         try{

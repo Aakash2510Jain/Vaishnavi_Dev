@@ -363,6 +363,15 @@ public without sharing class siteVisitFormController {
             if(visitRecord != null){
                 List<User> salesUserList = [SELECT Id,Name,Profile.Name FROM User WHERE Id =: visitRecord.Sales_Manager__c];
                 visitRecord.Sales_Manager__c = salesUserList[0].Name;
+                visitRecord.OwnerId = salesUserList[0].Id;
+
+                Visit__c visitRec = [SELECT Id,Opportunities__c,Opportunities__r.OwnerId FROM Visit__c WHERE Id=: visitRecord.Id];
+                if(!String.isBlank(visitRec.Opportunities__c)){
+                    Opportunity__c oppRecToUpdate = New Opportunity__c();
+                    oppRecToUpdate.Id = visitRec.Opportunities__c;
+                    oppRecToUpdate.OwnerId = salesUserList[0].Id;
+                    update oppRecToUpdate;
+                }
             }
             // if(day == 0 && month==0 && year==0){
                 

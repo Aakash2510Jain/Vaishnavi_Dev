@@ -568,8 +568,12 @@
 
 
                     if($scope.leadId != undefined){
+                        $("#btnSubmit2").hide();
+                        $("#btnPleaseWait2").show();
                         siteVisitFormController.insertVisitRecord($scope.firstVisitRecord,$scope.leadId,year,month,day,visityear,visitmonth,visitday,$scope.visit.Location__c,function(result,event){
                         debugger;
+                        $("#btnSubmit2").show();
+                        $("#btnPleaseWait2").hide();
                         if(event.status && result){
                             debugger;
                             $scope.visitId = result;
@@ -589,7 +593,11 @@
                     })
                 }else{
                     $scope.opportunityToInsert = {"Opportunity_Name__c":$scope.leadRecord[0].Name__c,"Phone__c":$scope.leadRecord[0].Phone__c,"Email__c":$scope.leadRecord[0].Email__c};
+                    $("#btnSubmit2").hide();
+                    $("#btnPleaseWait2").show();
                     siteVisitFormController.insertVisitRecordUnderOpportunity($scope.firstVisitRecord,$scope.opportunityToInsert,year,month,day,visityear,visitmonth,visitday,$scope.visit.Location__c,function(result,event){
+                        $("#btnSubmit2").show();
+                        $("#btnPleaseWait2").hide();
                         debugger;
                         if(event.status && result){
                             debugger;
@@ -625,7 +633,11 @@
                     }else{
                         $scope.secondVisitRecord.Lead__c = $scope.leadId;
                     }
+                    $("#btnSubmit3").hide();
+                    $("#btnPleaseWait3").show();
                     siteVisitFormController.updateVisitRecord($scope.secondVisitRecord,null,function(result,event){
+                    $("#btnSubmit3").show();
+                    $("#btnPleaseWait3").hide();
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -665,7 +677,11 @@
                     }else{
                         $scope.thirdVisitRecord.Lead__c = $scope.leadId;
                     }
+                    $("#btnSubmit4").hide();
+                    $("#btnPleaseWait4").show();
                     siteVisitFormController.updateVisitRecord($scope.thirdVisitRecord,$scope.visit.Channel_Partner__c,function(result,event){
+                    $("#btnSubmit4").show();
+                    $("#btnPleaseWait4").hide();
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -724,7 +740,11 @@
                     }else{
                         $scope.forthVisitRecord.Lead__c = $scope.leadId;
                     }
+                    $("#btnSubmit4").hide();
+                    $("#btnPleaseWait4").show();
                     siteVisitFormController.updateGREDetails($scope.forthVisitRecord,sHour,sMin,function(result,event){
+                    $("#btnSubmit4").show();
+                    $("#btnPleaseWait4").hide();
                     debugger;
                     if(event.status && result){
                         debugger;
@@ -1336,7 +1356,8 @@
                                     </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="button" class="button float-end" ng-click="saveCustomerDet()">Save and Next</button>
+                                                <button type="button" id="btnSubmit2" class="button float-end" ng-click="saveCustomerDet()">Save and Next</button>
+                                                <button class="button float-end" id="btnPleaseWait2" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1449,7 +1470,8 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="button" class="button float-end" ng-click="saveCustomerReq()">Save and Next</button>
+                                                <button type="button" id="btnSubmit3" class="button float-end" ng-click="saveCustomerReq()">Save and Next</button>
+                                                <button class="button float-end" id="btnPleaseWait3" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                                                 <button type="button" class="cancelbutton float-end me-2" ng-click="showFirst()">Back</button>
                                             </div>
                                         </div>
@@ -1911,7 +1933,8 @@
 
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="button" class="button float-end" ng-click="savevisitDetails()">Save and Next</button>
+                                                <button type="button" id="btnSubmit4" class="button float-end" ng-click="savevisitDetails()">Save and Next</button>
+                                                <button class="button float-end" id="btnPleaseWait4" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                                                 <button type="button" class="cancelbutton float-end me-2" ng-click="showSecond()">Back</button>
                                             </div>
                                         </div>
@@ -2065,7 +2088,8 @@
 
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="button" class="button float-end" ng-click="saveGREDetails()">Submit</button>
+                                                <button type="button" id="btnSubmit5" class="button float-end" ng-click="saveGREDetails()">Submit</button>
+                                                <button class="button float-end" id="btnPleaseWait5" style="text-align: center; display:none;"><i class="fa-solid fa-spinner fa-spin-pulse me-3"></i>Please Wait....</button>
                                                 <button type="button" class="cancelbutton float-end me-2" ng-click="showThird()">Back</button>
                                             </div>
                                         </div>

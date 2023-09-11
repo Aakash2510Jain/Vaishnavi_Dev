@@ -1,4 +1,4 @@
-public class EmailIUtility {
+public without sharing class EmailIUtility {
     public static void notifyPreSalesTeamOnLeadAssignment(set<Id> leadIDs, String templateName){
         try{
             List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
@@ -118,6 +118,8 @@ public class EmailIUtility {
             System.debug('Error Line==>' + e.getLineNumber() + 'Error Message==>' + e.getMessage());
         }
     }
+
+    /* Modified By Eshaa */
      public static void firstNotConnectedEmailToCustomer(set<id> leadIdsSet, String templateName){
         try{
             List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
@@ -137,15 +139,19 @@ public class EmailIUtility {
                     // mail.setSenderDisplayName('Vaishnavi');
                     String subject = et.Subject;
                     String htmlBody = et.HtmlValue;
-                    
-                    if(htmlBody.contains('{!Lead.OwnerFullName}'))
+
+                    if(!String.isBlank(leadRec.Owner.Name)){
                         htmlBody = htmlBody.replace('{!Lead.OwnerFullName}', leadRec.Owner.Name);
-                    if(htmlBody.contains('{!Lead.Name}'))
-                        htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name);
-                    if(htmlBody.contains('{!Lead.SVDate}'))
+                    }
+                    if(!String.isBlank(leadRec.Name__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
+                    }
+                    if(leadRec.Site_Visit_Date__c != null){
                         htmlBody = htmlBody.replace('{!Lead.SVDate}', string.valueOf(leadRec.Site_Visit_Date__c));
-                    if(htmlBody.contains('{!Lead.Project}'))
+                    }
+                    if(!String.isBlank(leadRec.ProjectName_formula__c)){
                         htmlBody = htmlBody.replace('{!Lead.Project}', leadRec.ProjectName_formula__c);
+                    }
                     
                     mail.setSubject(subject);
                     mail.setHtmlBody(htmlBody);
@@ -160,13 +166,18 @@ public class EmailIUtility {
             HandleBusinessException.captureError('EmailUtility', 'firstNotConnectedEmailToCustomer', e, null);
         }
     }
+
+    /* Modified By Eshaa */
      public static void notifyCustomer(set<id> leadIdsSet, String templateName){
         try{
             system.debug('leadIdsSet ==> '+leadIdsSet);
+            system.debug('templateName ==> '+templateName);
             List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
             EmailTemplate et = [Select id, Name, DeveloperName, Subject, Body, HtmlValue from EmailTemplate where name = :templateName];
+            system.debug('et ==> '+et);
             List<Lead__C> leadListToNotify = [Select Id,Name__c,Project_Pickval__c,Site_Visit_Date__c,ProjectName_formula__c,Email__c,owner.Name,owner.Email,owner.Phone from Lead__C where Id In : leadIdsSet and Email__c != null];
             Id orgWideEmailAddressId = [SELECT Id FROM OrgWideEmailAddress ].Id;
+            system.debug('orgWideEmailAddressId ==> '+orgWideEmailAddressId);
             
             if(!leadListToNotify.isEmpty()){
                 for(Lead__c leadRec : leadListToNotify){
@@ -181,20 +192,38 @@ public class EmailIUtility {
                     // mail.setSenderDisplayName('Vaishnavi');
                     String subject = et.Subject;
                     String htmlBody = et.HtmlValue;
+                    system.debug('Before HTML Body ----- '+htmlBody);
                     
-                    if(htmlBody.contains('{!Lead.Name}'))
+                    if(!String.isBlank(leadRec.Name__c)){
+                        
+                        system.debug('Inside Name --------'+htmlBody);
                         htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
-                    if(htmlBody.contains('{!Lead.ProjectName}'))
+                    }
+                    if(!String.isBlank(leadRec.Project_Pickval__c)){
+                        
                         htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c != null ? leadRec.Project_Pickval__c : '');
-                    if(htmlBody.contains('{!Lead.OwnerName}'))
+                        system.debug('Inside ProjectName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Name)){
+                        
                         htmlBody = htmlBody.replace('{!Lead.OwnerName}', string.valueOf(leadRec.owner.Name));
-                    if(htmlBody.contains('{!Lead.OwnerEmail}'))
+                        system.debug('Inside OwnerName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Email)){
+                        
                         htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', string.valueOf(leadRec.Owner.Email));
-                    if(htmlBody.contains('{!Lead.OwnerPhone}'))
-                        htmlBody = htmlBody.replace('{!Lead.OwnerPhone}', string.valueOf(leadRec.Owner.Phone)) != null ? string.valueOf(leadRec.Owner.Phone) : '';
+                        system.debug('Inside OwnerEmail --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Phone)){
+                        
+                        htmlBody = htmlBody.replace('{!Lead.OwnerPhone}', string.valueOf(leadRec.Owner.Phone));
+                        system.debug('Inside OwnerPhone --------'+htmlBody);
+                    }
                     
-                    if(htmlBody.contains('{!Lead.SVDate}'))
-                        htmlBody = htmlBody.replace('{!Lead.SVDate}', string.valueOf(leadRec.Site_Visit_Date__c) != null ? string.valueOf(leadRec.Site_Visit_Date__c) : '');
+                    if(leadRec.Site_Visit_Date__c != null){
+                        htmlBody = htmlBody.replace('{!Lead.SVDate}', string.valueOf(leadRec.Site_Visit_Date__c));
+                        system.debug('Inside SVDate --------'+htmlBody);
+                    }
                     system.debug('htmlBody ==> '+htmlBody);
                     mail.setSubject(subject);
                     mail.setHtmlBody(htmlBody);
@@ -210,6 +239,8 @@ public class EmailIUtility {
             HandleBusinessException.captureError('EmailUtility', 'notifyCustomer', e, null);
         }
     }
+
+    /* Modified By Eshaa */
     public static void notifyVaishnaviTeam(set<id> leadIdsSet, String templateName){
         try{
             List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
@@ -231,23 +262,39 @@ public class EmailIUtility {
                     // mail.setSenderDisplayName('Vaishnavi');
                     String subject = et.Subject;
                     String htmlBody = et.HtmlValue;
-                    
-                    if(htmlBody.contains('{{!Lead.Name}'))
+
+                    if(!String.isBlank(leadRec.Name__c)){
+                        system.debug('Inside Name --------'+htmlBody);
                         htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
-                    if(htmlBody.contains('{!Lead.ProjectName}'))
+                    }
+                    if(!String.isBlank(leadRec.Project_Pickval__c)){
                         htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c != null ? leadRec.Project_Pickval__c : '');
-                    if(htmlBody.contains('{!Lead.OwnerName}'))
+                        system.debug('Inside ProjectName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Name)){
                         htmlBody = htmlBody.replace('{!Lead.OwnerName}', string.valueOf(leadRec.owner.Name));
-                    if(htmlBody.contains('{!Lead.OwnerEmail}'))
+                        system.debug('Inside OwnerName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Email)){
                         htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', string.valueOf(leadRec.Owner.Email));
-                    if(htmlBody.contains('{!Lead.Lead_Source_Type__c}'))
-                        htmlBody = htmlBody.replace('{!Lead.Lead_Source_Type__c}', string.valueOf(leadRec.Lead_Source_Type__c)  != null ? leadRec.Lead_Source_Type__c : '');
-                    if(htmlBody.contains('{!Lead.Phone}'))
-                        htmlBody = htmlBody.replace('{!Lead.Phone}', string.valueOf(leadRec.Phone__c)  != null ? leadRec.Phone__c : '');
-                    if(htmlBody.contains('{!Lead.Email__c}'))
-                        htmlBody = htmlBody.replace('{!Lead.Email__c}', string.valueOf(leadRec.Email__c) != null ? leadRec.Email__c : '');
-                    if(htmlBody.contains('{!Lead.Link}'))
-                        htmlBody = htmlBody.replace('{!Lead.Link}', string.valueOf(leadRec.hrefLink__c	) != null ? leadRec.hrefLink__c	 : '');
+                        system.debug('Inside OwnerEmail --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Lead_Source_Type__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Lead_Source_Type__c}', string.valueOf(leadRec.Lead_Source_Type__c));
+                        system.debug('Inside LeadSourceType --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Phone__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Phone}', string.valueOf(leadRec.Phone__c));
+                        system.debug('Inside LeadPhone --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Email__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Email__c}', string.valueOf(leadRec.Email__c));
+                        system.debug('Inside LeadEmail --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.hrefLink__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Link}', string.valueOf(leadRec.hrefLink__c));
+                        system.debug('Inside LeadLink --------'+htmlBody);
+                    }
 
                     mail.setSubject(subject);
                     mail.setHtmlBody(htmlBody);

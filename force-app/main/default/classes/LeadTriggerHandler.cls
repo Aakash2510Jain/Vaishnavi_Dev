@@ -5,7 +5,7 @@
 * @modify date 20-05-2023 18:13:59
 * @desc [description]
 */
-public class LeadTriggerHandler {
+public without sharing class LeadTriggerHandler {
     static LeadTriggerHandler handlerInstance;
     
     public static LeadTriggerHandler getInstance(){
@@ -20,8 +20,6 @@ public class LeadTriggerHandler {
             Map<Id, Lead__c> existingLeadIdByNewLeadRec = new map<id, Lead__c>();
             Set<String> phonesSet = new Set<String>();
             Set<String> emailsSet = new Set<String>();  
-            Set<String> altPhonesSet = new Set<String>();
-            Set<String> altEmailsSet = new Set<String>();
             List<Lead__c> existingLeadsList = new List<Lead__c>();
             List<Lead__c> existingLeadWithPhones = new List<Lead__c>();
             List<Lead__c> existingLeadWithEmails = new List<Lead__c>();
@@ -85,7 +83,7 @@ public class LeadTriggerHandler {
                     phonesSet.add(leadRec.Phone__c);
                 }
                 if(leadRec.Alternate_Phone__c != null){
-                    altPhonesSet.add(leadRec.Phone__c);
+                    phonesSet.add(leadRec.Phone__c);
                 }
                 if(leadRec.Email__c != null)
                 {
@@ -93,7 +91,7 @@ public class LeadTriggerHandler {
                 }
                 if(leadRec.Alternate_Email__c != null)
                 {
-                    altEmailsSet.add(leadRec.Email__c);
+                    emailsSet.add(leadRec.Email__c);
                 }
                 if(leadRec.Lead_Source_Type__c != null){
                     if(campaignSourceByCampaignRecMap.containsKey(leadRec.Lead_Source_Type__c))
@@ -194,8 +192,8 @@ public class LeadTriggerHandler {
                 }
             }
             
-            if(!phonesSet.isEmpty() || !emailsSet.isEmpty() || !altEmailsSet.isEmpty() || !altPhonesSet.isEmpty()){
-                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet or Alternate_Phone__c IN: altPhonesSet or Alternate_Email__c IN: altEmailsSet) AND isConverted__c = false];
+            if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
+                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet ) AND isConverted__c = false];
                 system.debug('existingLeadsList--01>'+existingLeadsList);
                 
                 if(!existingLeadsList.isEmpty()){
@@ -205,14 +203,24 @@ public class LeadTriggerHandler {
                         if(lead.Email__c != null){
                             leadRecByEmailMap.put(lead.Email__c, lead);
                             system.debug('lead.Email__c-::4>'+lead.Email__c);
-                        }else if(lead.Phone__c != null){
+                        }
+                        if(lead.Phone__c != null){
                             leadRecByPhoneMap.put(lead.Phone__c, lead);
                             system.debug('lead.Phone__c-::5>'+lead.Phone__c);
+                        }
+                        if(lead.Alternate_email__c != null){
+                            leadRecByEmailMap.put(lead.Alternate_email__c, lead);
+                            system.debug('lead.Alternate_email__c-::5>'+lead.Alternate_email__c);
+                        }
+                        if(lead.Alternate_Phone__c != null){
+                            leadRecByPhoneMap.put(lead.Alternate_Phone__c, lead);
+                            system.debug('lead.Alternate_Phone__c-::5>'+lead.Alternate_Phone__c);
                         }
                     }
                     system.debug('leadRecByPhoneMap-->'+leadRecByPhoneMap);
                     system.debug('leadRecByEmailMap-->'+leadRecByEmailMap);
-                    if(!leadRecByPhoneMap.isEmpty() || !leadRecByEmailMap.isEmpty()){
+                   
+                    if(!leadRecByPhoneMap.isEmpty() || !leadRecByEmailMap.isEmpty() ){
                         for(Lead__c leadRec : newLeadList){
                             system.debug('lead.Email__c--->'+leadRec.Email__c);
                             system.debug('lead.Phone__c--->'+leadRec.Phone__c);
@@ -226,39 +234,38 @@ public class LeadTriggerHandler {
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
                                     }
-                                }else if(leadRec.Email__c != null){
-                                    system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
-                                    if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                        if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) > ConstantClass.TATForReEnquiryLead){
-                                            leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                            leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
-                                        }else{
-                                            leadRec.To_Be_Deleted__c = true;
-                                            existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id, leadRec);
-                                        }
-                                    }
-                                } 
+                                }  
                             }
-                            else if(leadRec.Email__c != null){
-                                system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
-                                if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
-                                    if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
+                            if(leadRec.Email__c != null){
+                                if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
                                         leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
                                         leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
-                                        existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id,leadRec);
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
                                     }
-                                }else if(leadRec.Email__c != null){
-                                    system.debug('leadRecByEmailMap.containsKey(leadRec.Email__c)--->'+leadRecByEmailMap.containsKey(leadRec.Email__c));
-                                    if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
-                                        if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
-                                            leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                            leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
-                                        }else{
-                                            leadRec.To_Be_Deleted__c = true;
-                                            existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
-                                        }
+                                }
+                            }
+                            if(leadRec.Alternate_Email__c != null){
+                                if(leadRecByEmailMap.containsKey(leadRec.Alternate_Email__c)){
+                                    if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Alternate_Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
+                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                    }else{
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Alternate_Email__c).Id,leadRec);
+                                    }
+                                }
+                            }
+                             if(leadRec.Alternate_Phone__c != null){
+                                if(leadRecByPhoneMap.containsKey(leadRec.Alternate_Phone__c)){
+                                    if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
+                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
+                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                    }else{
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).Id,leadRec);
                                     }
                                 }
                             }
@@ -328,6 +335,14 @@ public class LeadTriggerHandler {
             }
             system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
             for(Lead__c leadRec : newLeadMap.values()){
+                if(!String.isBlank(leadRec.Phone__c)){
+                    leadRec.Phone__c = leadRec.Phone__c.replaceAll('[^0-9]', '');
+                    leadRec.Phone__c = '+91' + leadRec.Phone__c.right(10);
+                }
+                if(!String.isBlank(leadRec.Alternate_Phone__c)){
+                    leadRec.Alternate_Phone__c = leadRec.Alternate_Phone__c.replaceAll('[^0-9]', '');
+                    leadRec.Alternate_Phone__c = '+91' +  leadRec.Alternate_Phone__c.right(10);
+                }
                 system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                 system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                 
@@ -504,7 +519,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                     system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                     
                 }
-                if(leadRec.Lead_Source_Type__c != null && leadRec.Lead_Source_Type__c != oldLeadMap.get(leadRec.Id).Lead_Source_Type__c){
+                if(leadRec.Lead_Source_Type__c != null ){
                     if(leadRec.Lead_Source_Type__c == 'Magazine' || leadRec.Lead_Source_Type__c == 'News Paper-Others' || leadRec.Lead_Source_Type__c == 'News Paper-TOI'){
                         leadRec.Lead_Sub_Source__c = 'Print';
                         leadRec.Lead_Source__c = 'ATL';
@@ -602,6 +617,9 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                 system.debug('leadRec.Lead_Stage__c-->'+leadRec.Lead_Stage__c);
                 system.debug('oldLeadMap.get(leadRec.Id).Lead_Stage__c-->'+oldLeadMap.get(leadRec.Id).Lead_Stage__c);
                 
+                if(oldLeadMap.get(leadRec.Id).Site_Visit_Date__c != leadRec.Site_Visit_Date__c && leadRec.Site_Visit_Date__c != null ){
+                    leadRec.Lead_Stage__c = ConstantClass.LeadStageSVPlanned;
+                }
             }
             if(!convertedLeadRecordsList.isEmpty()){
                 LeadConversionClass.convertLead(convertedLeadRecordsList);
