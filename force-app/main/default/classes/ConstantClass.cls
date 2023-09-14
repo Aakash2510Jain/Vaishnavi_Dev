@@ -26,7 +26,7 @@ public without sharing class ConstantClass {
     public Static Final String newEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('New Enquiry').getRecordTypeId();
     public Static Final String ReEnquiryLeadRT = Schema.SObjectType.Lead__c.getRecordTypeInfosByName().get('ReEnquiry').getRecordTypeId();
     public Static Final String convertedLeadQueue = [select Id from Group where  Type = 'Queue' AND NAME = 'Converted Leads Queue'].id;
-    public Static Final integer TATForReEnquiryLead = 45;
+    public Static Final integer TATForReEnquiryLead = 4;
     
     public Static Final String CallTaskAgentStatusANSWERED = 'answered';
     public Static Final String CallTaskCustomerStatusANSWERED = 'answered';

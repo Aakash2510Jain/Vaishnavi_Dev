@@ -25,6 +25,7 @@ public without sharing class LeadTriggerHandler {
             List<Lead__c> existingLeadWithEmails = new List<Lead__c>();
             List<Campaign> campaignList = new List<Campaign>();
             List<Project__c> projectList = new List<Project__c>();
+            List<Lead__c> leadListToBeUpdatedAsNewEnquiry = new List<Lead__c>();
             Map<String,Lead__c> leadRecByPhoneMap = new Map<String, Lead__c>();
             Map<String,Lead__c> leadRecByEmailMap = new Map<String, Lead__c>();
             Map<string, Campaign> campaignSourceByCampaignRecMap = new map<String, Campaign>();
@@ -47,9 +48,6 @@ public without sharing class LeadTriggerHandler {
             }
             system.debug('projectNameByProjectRecMap--->'+projectNameByProjectRecMap);
             string queueId = [SELECT Id, Type FROM Group WHERE Type = 'Queue' AND Name = 'Lead Default Queue' limit 1].Id;
-            
-            
-            
             
             for(Lead__c leadRec : newLeadList){
                 leadRec.OwnerId = queueId;
@@ -83,7 +81,7 @@ public without sharing class LeadTriggerHandler {
                     phonesSet.add(leadRec.Phone__c);
                 }
                 if(leadRec.Alternate_Phone__c != null){
-                    phonesSet.add(leadRec.Phone__c);
+                    phonesSet.add(leadRec.Alternate_Phone__c);
                 }
                 if(leadRec.Email__c != null)
                 {
@@ -91,12 +89,16 @@ public without sharing class LeadTriggerHandler {
                 }
                 if(leadRec.Alternate_Email__c != null)
                 {
-                    emailsSet.add(leadRec.Email__c);
+                    emailsSet.add(leadRec.Alternate_Email__c);
                 }
                 if(leadRec.Lead_Source_Type__c != null){
                     if(campaignSourceByCampaignRecMap.containsKey(leadRec.Lead_Source_Type__c))
                         leadRec.Campaign__c = campaignSourceByCampaignRecMap.get(leadRec.Lead_Source_Type__c).Id;
                 }
+                
+                system.debug('phonesSet--->'+phonesSet);
+                system.debug('emailsSet--->'+emailsSet);
+                
                 leadRec.RecordTypeId = ConstantClass.newEnquiryLeadRT;
                 
                 //handle source and subsource and source type
@@ -193,13 +195,17 @@ public without sharing class LeadTriggerHandler {
             }
             
             if(!phonesSet.isEmpty() || !emailsSet.isEmpty()){
-                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate From Lead__c where ( Phone__c In : phonesSet or Email__c In : emailsSet ) AND isConverted__c = false];
+                existingLeadsList = [Select Id,Phone__c,Email__c,createdDate,Alternate_email__c,Alternate_Phone__c From Lead__c where ( Phone__c In : phonesSet or Alternate_Phone__c in : phonesSet or Email__c In : emailsSet or Alternate_email__c in : emailsSet) AND isConverted__c = false];
                 system.debug('existingLeadsList--01>'+existingLeadsList);
                 
                 if(!existingLeadsList.isEmpty()){
                     for(Lead__c lead : existingLeadsList){
                         system.debug('lead.Email__c---02>'+lead.Email__c);
+                        system.debug('lead.Alternate_email__c---02>'+lead.Alternate_email__c);
                         system.debug('lead.Phone__c---3>'+lead.Phone__c);
+                        system.debug('lead.Alternate_Phone__c---3>'+lead.Alternate_Phone__c);
+                        
+                        
                         if(lead.Email__c != null){
                             leadRecByEmailMap.put(lead.Email__c, lead);
                             system.debug('lead.Email__c-::4>'+lead.Email__c);
@@ -222,14 +228,22 @@ public without sharing class LeadTriggerHandler {
                    
                     if(!leadRecByPhoneMap.isEmpty() || !leadRecByEmailMap.isEmpty() ){
                         for(Lead__c leadRec : newLeadList){
-                            system.debug('lead.Email__c--->'+leadRec.Email__c);
-                            system.debug('lead.Phone__c--->'+leadRec.Phone__c);
+                            
+                            system.debug('lead.Email__c---02>'+leadRec.Email__c);
+                            system.debug('lead.Alternate_email__c---02>'+leadRec.Alternate_email__c);
+                            system.debug('lead.Phone__c---3>'+leadRec.Phone__c);
+                            system.debug('lead.Alternate_Phone__c---3>'+leadRec.Alternate_Phone__c);
+                            
                             if(leadRec.Phone__c != null){
                                 system.debug('leadRecByPhoneMap.containsKey(leadRec.Phone__c)--->'+leadRecByPhoneMap.containsKey(leadRec.Phone__c));
                                 if(leadRecByPhoneMap.containsKey(leadRec.Phone__c)){
                                     if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
-                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                        leadRec.RecordTypeId  = ConstantClass.ReEnquiryLeadRT;
+                                        Lead__c leadRecToBeUpdatedAsNewEnquiry = new Lead__c();
+                                        leadRecToBeUpdatedAsNewEnquiry.Id = leadRecByPhoneMap.get(leadRec.Phone__c).id;
+                                        leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
+                                        leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
@@ -239,8 +253,12 @@ public without sharing class LeadTriggerHandler {
                             if(leadRec.Email__c != null){
                                 if(leadRecByEmailMap.containsKey(leadRec.Email__c)){
                                     if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
-                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                        Lead__c leadRecToBeUpdatedAsNewEnquiry = new Lead__c();
+                                        leadRecToBeUpdatedAsNewEnquiry.Id = leadRecByEmailMap.get(leadRec.Email__c).id;
+                                        leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
+                                        leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
@@ -250,8 +268,13 @@ public without sharing class LeadTriggerHandler {
                             if(leadRec.Alternate_Email__c != null){
                                 if(leadRecByEmailMap.containsKey(leadRec.Alternate_Email__c)){
                                     if(((system.now().getTime() - (leadRecByEmailMap.get(leadRec.Alternate_Email__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
-                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                        Lead__c leadRecToBeUpdatedAsNewEnquiry = new Lead__c();
+                                        leadRecToBeUpdatedAsNewEnquiry.Id = leadRecByEmailMap.get(leadRec.Alternate_Email__c).id;
+                                        leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
+                                        leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Alternate_Email__c).Id,leadRec);
+
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Alternate_Email__c).Id,leadRec);
@@ -261,8 +284,12 @@ public without sharing class LeadTriggerHandler {
                              if(leadRec.Alternate_Phone__c != null){
                                 if(leadRecByPhoneMap.containsKey(leadRec.Alternate_Phone__c)){
                                     if(((system.now().getTime() - (leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).createdDate).getTime())/(24*3600*1000)) >ConstantClass.TATForReEnquiryLead){
-                                        leadRec.Lead_Stage__c = ConstantClass.LeadStageReEnquiry;
-                                        leadRec.RecordTypeId =  ConstantClass.ReEnquiryLeadRT;
+                                        Lead__c leadRecToBeUpdatedAsNewEnquiry = new Lead__c();
+                                        leadRecToBeUpdatedAsNewEnquiry.Id = leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).id;
+                                        leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
+                                        leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
+                                        leadRec.To_Be_Deleted__c = true;
+                                        existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).Id,leadRec);
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).Id,leadRec);
@@ -275,7 +302,9 @@ public without sharing class LeadTriggerHandler {
                             system.debug('Calling method to Create Task');
                             createTaskForRenquiry.insertTask(existingLeadIdByNewLeadRec);
                         }
-                        
+                        if(!leadListToBeUpdatedAsNewEnquiry.isEmpty()){
+                            update leadListToBeUpdatedAsNewEnquiry;
+                        }
                     }
                     
                 }
@@ -298,7 +327,7 @@ public without sharing class LeadTriggerHandler {
             }
             if(!leadsEmailIds.isEmpty()){
                 // send email for new lead created
-                EmailIUtility.notifyCustomer(leadsEmailIds, 'New Enquiry');
+                //EmailIUtility.notifyCustomer(leadsEmailIds, 'New Enquiry');
             }
         } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
@@ -728,6 +757,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
             }
             if(!preSalesAssignedLeadIds.isEmpty()){
                 EmailIUtility.notifyVaishnaviTeam(preSalesAssignedLeadIds,'New Lead Assigned to Pre-Sales Team');
+                EmailIUtility.notifyCustomer(preSalesAssignedLeadIds, 'New Enquiry');
                 for(Id leadId : preSalesAssignedLeadIds){
                     Task taskRec = new Task();
                     taskRec.Subject = ConstantClass.FirstCallTAskAfterLeadAllocation;

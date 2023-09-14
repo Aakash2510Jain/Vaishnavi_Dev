@@ -8,11 +8,13 @@ global class AppendCountryCodeToOpportunitiesBatch implements Database.Batchable
     global void execute(Database.BatchableContext bc, List<Opportunity__c> opportunityList) {
         List<Opportunity__c> opportunitysToUpdate = new List<Opportunity__c>();
         for (Opportunity__c opportunity : opportunityList) {
-            if (opportunity.Phone__c != null && !opportunity.Phone__c.startsWith('+91')) {
-                opportunity.Phone__c = '+91' + opportunity.Phone__c;
+             if (opportunity.Phone__c != null) {
+                opportunity.Phone__c = opportunity.Phone__c.replaceAll('[^0-9]', '');
+                    opportunity.Phone__c = '+91' + opportunity.Phone__c.right(10);
             }
-            if (opportunity.Alternate_Phone__c != null && !opportunity.Alternate_Phone__c.startsWith('+91')) {
-                opportunity.Alternate_Phone__c = '+91' + opportunity.Alternate_Phone__c;
+            if (opportunity.Alternate_Phone__c != null) {
+                opportunity.Alternate_Phone__c = opportunity.Alternate_Phone__c.replaceAll('[^0-9]', '');
+                    opportunity.Alternate_Phone__c = '+91' + opportunity.Alternate_Phone__c.right(10);
             }
             opportunitysToUpdate.add(opportunity);
         }

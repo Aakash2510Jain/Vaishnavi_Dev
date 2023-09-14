@@ -61,6 +61,10 @@ public without sharing class  RoundRobinLeadAssignment{
                             currentRRid = LastRRid + 1;
                             System.debug('Inside 2  currentRRid'+currentRRid);
                         }
+                        else if(QueueNameToQmemberIdList.get(qName).size() == 1){
+                            
+                            
+                        }
                         else{
                             currentRRid = 1;
                             LastRRid = 0;

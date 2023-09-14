@@ -15,6 +15,8 @@ public class TaskTriggerHelper {
             Map<Id, Lead__c> leadIdbyLeadRecMap = new Map<Id, Lead__c>();
             
             for(Task taskRec : newTaskList){
+                system.debug('taskRec--->'+taskRec);
+                system.debug('taskRec--->'+taskRec.Id);
                 if(taskRec.WhatId != null){
                     if((Id.valueOf(taskRec.WhatId)).getSObjectType().getDescribe().getName() == 'Lead__c')
                         relatedLeadIdsSet.add(taskRec.WhatId);
@@ -48,7 +50,11 @@ public class TaskTriggerHelper {
             Set<Id> setOfLeadIds = new Set<Id>();
             List<Lead__c> leadList = new List<Lead__c>();
             List<Task> taskListToBeMarkedAsCompleted = new List<task>();
-            
+            for(Task taskRec : newTaskList){
+                system.debug('taskRec<--->'+taskRec);
+                system.debug('taskRec<--->'+taskRec.Id);
+                
+            }
             
         } catch (Exception e){
             system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
