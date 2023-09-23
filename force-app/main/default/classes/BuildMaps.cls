@@ -259,14 +259,23 @@ public without Sharing class BuildMaps{
     public static void makeAllMemberOOF(){
         try{
             list<Assignment_Group_Member__c> agmList = new list<Assignment_Group_Member__c>();
+            List<User_Tracking__c> userTrackingList = new List<User_Tracking__c>();
+            
             agmList = [select id, Out_Of_Office__c
                        from Assignment_Group_Member__c
                        where active__c = true and Out_Of_Office__c = false];
+            userTrackingList = [Select Id,Checkin_DateTime__c,Checkout_Datetime__c From User_Tracking__c where createdDate >= today ];
+            if (!userTrackingList.isEmpty()){
+                for (User_Tracking__c userTrackingRec : userTrackingList){
+                    userTrackingRec.Checkout_Datetime__c = system.now();
+                }
+            }
+            update userTrackingList;
             if (!agmList.isEmpty()){
                 for (Assignment_Group_Member__c agm : agmList){
                     agm.Out_Of_Office__c = true;
                 }
-
+                
                 update agmList;
             }
         } catch (Exception e){

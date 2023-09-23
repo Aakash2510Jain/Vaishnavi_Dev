@@ -7,7 +7,7 @@
 
 @RESTResource(urlMapping = '/websiteleadcreation/*')
 
-global class API_websiteLeadCreation {
+global without sharing class API_websiteLeadCreation {
     @HttpPost
     global static ResponseClass.ReponseWrapperforWebsiteLeadCreation createLeadFromWebsite(){
         ResponseClass.ReponseWrapperforWebsiteLeadCreation responseData = new ResponseClass.ReponseWrapperforWebsiteLeadCreation();

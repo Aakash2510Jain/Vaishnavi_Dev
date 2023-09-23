@@ -46,6 +46,8 @@ public without sharing class  RoundRobinLeadAssignment{
                     While(QueueNameToQmemberIdList != null && qMemberSize != null && QueueNameToQmemberIdList.get(qName) != null && isAssigned == false && qMemberSize <= QueueNameToQmemberIdList.get(qName).size()){
                         Integer currentRRid, LastRRid; 
                         String QnameAndRRid, qMemberID;
+                        System.debug('qNameToLastAssignedQmemberRRid ====> ' + qNameToLastAssignedQmemberRRid);
+                        System.debug('qNameToLastAssignedQmemberRRid.get(qName) ====> ' + qNameToLastAssignedQmemberRRid.get(qName));
                         if(qNameToLastAssignedQmemberRRid.get(qName) != null)
                             LastRRid = qNameToLastAssignedQmemberRRid.get(qName); 
                         System.debug('LastRRid-------+++++'+LastRRid);
@@ -174,7 +176,7 @@ public without sharing class  RoundRobinLeadAssignment{
         
     }
     
-    /**/
+    
     
     public static boolean assignmentConditionSatisfied(string qName,string qMemberID){
         system.debug('qName--- '+qName);

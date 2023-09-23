@@ -10,6 +10,7 @@ public class AGMTriggerHelper {
         Set<Id> forAGMGoingOFF = new Set<Id>();
         Set<Id> forAGMGoingON = new Set<Id>();
         List<Assignment_Group__c> assignmentGroupList = new List<Assignment_Group__c>();
+        List<Assignment_Group__c> assignmentGroupListToUpdate = new List<Assignment_Group__c>();
         List<Assignment_Group_Member__c> agmListToUpdate = new List<Assignment_Group_Member__c>();
         
         for(Assignment_Group_Member__c agmRec : newAGMMap.values()){
@@ -23,12 +24,13 @@ public class AGMTriggerHelper {
             }
         }
         if(!forAGMGoingOFF.isEmpty()){
-            assignmentGroupList = [Select Id,Last_Allocated_RRid__c,(Select Id,Out_Of_Office__c,Assignment_Id__c From Assignment_Group_Members__r ORDER BY Assignment_Id__c ASC) From Assignment_Group__c where Id In : forAGMGoingOFF];
+            assignmentGroupList = [Select Id,Last_Allocated_RRid__c,(Select Id,Out_Of_Office__c,Assignment_Id__c,Group_Member__r.Name From Assignment_Group_Members__r ORDER BY Out_Of_Office__c DESC) From Assignment_Group__c where Id In : forAGMGoingOFF];
             if(!assignmentGroupList.isEmpty()){
                 for(Assignment_Group__c AG : assignmentGroupList){
+                    
                     integer i = 1;
                     for(Assignment_Group_Member__c agmRec : AG.Assignment_Group_Members__r){
-                        
+                        system.debug('agmRec.Group_Member__r.Name--> '+agmRec.Group_Member__r.Name);
                         Assignment_Group_Member__c agmRecToUpdate = new Assignment_Group_Member__c();
                         agmRecToUpdate.id = agmRec.Id;
                         agmRecToUpdate.Assignment_Id__c = i;
@@ -40,11 +42,12 @@ public class AGMTriggerHelper {
             }
         }
         if(!forAGMGoingON.isEmpty()){
-            assignmentGroupList = [Select Id,Last_Allocated_RRid__c,(Select Id,Out_Of_Office__c,Assignment_Id__c From Assignment_Group_Members__r ORDER BY Assignment_Id__c DESC) From Assignment_Group__c where Id In : forAGMGoingON];
+            assignmentGroupList = [Select Id,Last_Allocated_RRid__c,(Select Id,Out_Of_Office__c,Assignment_Id__c,Group_Member__r.Name From Assignment_Group_Members__r ORDER BY Out_Of_Office__c ASC) From Assignment_Group__c where Id In : forAGMGoingON];
             if(!assignmentGroupList.isEmpty()){
                 for(Assignment_Group__c AG : assignmentGroupList){
                     integer i = 1;
                     for(Assignment_Group_Member__c agmRec : AG.Assignment_Group_Members__r){
+                        system.debug('agmRec.Group_Member__r.Name--> '+agmRec.Group_Member__r.Name);
                         Assignment_Group_Member__c agmRecToUpdate = new Assignment_Group_Member__c();
                         agmRecToUpdate.id = agmRec.Id;
                         agmRecToUpdate.Assignment_Id__c = i;

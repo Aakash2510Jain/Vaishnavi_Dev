@@ -16,6 +16,9 @@ public without sharing class LeadTriggerHandler {
     
     public void beforeInsert(List<Lead__c> newLeadList){
         try{
+            
+            string systemAdminUserId = [Select Id From User where Profile.name = 'System Administrator' limit 1].Id;
+            
             set<Id> leadIds = new Set<Id>();
             Map<Id, Lead__c> existingLeadIdByNewLeadRec = new map<id, Lead__c>();
             Set<String> phonesSet = new Set<String>();
@@ -243,9 +246,11 @@ public without sharing class LeadTriggerHandler {
                                         leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
                                         leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Phone__c).Id, leadRec);  
                                     }
                                 }  
@@ -258,9 +263,11 @@ public without sharing class LeadTriggerHandler {
                                         leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
                                         leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Email__c).Id,leadRec);
                                     }
                                 }
@@ -273,10 +280,12 @@ public without sharing class LeadTriggerHandler {
                                         leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
                                         leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Alternate_Email__c).Id,leadRec);
 
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByEmailMap.get(leadRec.Alternate_Email__c).Id,leadRec);
                                     }
                                 }
@@ -289,9 +298,11 @@ public without sharing class LeadTriggerHandler {
                                         leadRecToBeUpdatedAsNewEnquiry.Lead_Stage__c = ConstantClass.LeadStageNewEnquiry;
                                         leadListToBeUpdatedAsNewEnquiry.add(leadRecToBeUpdatedAsNewEnquiry);
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).Id,leadRec);
                                     }else{
                                         leadRec.To_Be_Deleted__c = true;
+                                        leadRec.Ownerid = systemAdminUserId;
                                         existingLeadIdByNewLeadRec.put(leadRecByPhoneMap.get(leadRec.Alternate_Phone__c).Id,leadRec);
                                     }
                                 }
@@ -751,6 +762,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
             }
             if(!salesAssignedLeadIds.isEmpty()){
                 EmailIUtility.notifyCustomer(salesAssignedLeadIds,'Notify Customer for Lead assigned to sales team');
+
             }
             if(!siteVisitPlannedLeadIds.isEmpty()){
                 EmailIUtility.notifyCustomer(siteVisitPlannedLeadIds,'Notify Customer for Site Visit Planned');
@@ -786,6 +798,7 @@ leadRec.Lead_Stage__c = ConstantClass.LeadStageDrop;
                     taskListToInsertFOrFirstConnect.add(taskRec);
                 }
                 if(!taskListToInsertFOrFirstConnect.isEmpty()){
+                    system.debug('taskListToInsertFOrFirstConnect--> '+taskListToInsertFOrFirstConnect);
                     insert taskListToInsertFOrFirstConnect;
                 }
             }

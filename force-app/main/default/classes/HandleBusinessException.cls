@@ -29,6 +29,9 @@ public without sharing class HandleBusinessException extends Exception {
   private static void insertError(Exception__c exceps){
         try{
             Database.SaveResult lsr = Database.insert(exceps, false);
+             if (lsr.isSuccess()) {
+                EmailIUtility.sendExceptions(exceps);
+            }
         }
         catch(DMLException dmlError){}
     }

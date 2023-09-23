@@ -961,10 +961,10 @@
                     <h3 class="header-text text-center">VAISHNAVI</h3>
                 </div> -->
                 <div class="row">
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4"></div>
-                    <div class="col-md-4 float-end" style="padding-left: 15%;">
-                        <apex:image url="{!$Resource.New}" />
+                    <!-- <div class="col-md-4"></div>
+                    <div class="col-md-4"></div> -->
+                    <div class="col-md-12 float-end">
+                        <apex:image url="{!$Resource.New}" Styleclass="float-end" />
                     </div>
                     <!-- <div class="col-md-4">
                         <h5 class="heading text-center"><b>VAISHNAVI 81 INFRASTRUCTURES LLP</b></h5>
@@ -1041,10 +1041,13 @@
                                 <label class="label pe-3 text-nowrap">Phone</label>
                                 <input type="tel" class="form-control" ng-model="oppDetails.Phone__c" ng-disabled="true" /> 
                             </div>
-                            <h5 class="row mt-3 heading text-center">
-                                Visit Records
-                            </h5>
-                            <table class="table mt-3">
+                            <div class="col-12">
+                                <h5 class="mt-3 heading">
+                                    Visit Records
+                                </h5>
+                            </div>
+                            <div class="table-responsive">
+                            	<table class="table mt-3">
                                 <tr>
                                     <th>S.No.</th>
                                     <th>Visit Date</th>
@@ -1066,6 +1069,7 @@
                                     <td>{{rec.Project__r.Name}}</td>
                                 </tr>
                             </table>
+                            </div>
                         </div>
 
                         <div ng-show="showCreateLead">

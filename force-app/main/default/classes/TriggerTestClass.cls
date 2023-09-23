@@ -11,4 +11,14 @@ public class TriggerTestClass {
         cp.CP_Name__c = 'Testing Channel Partner';
         insert cp;
     }   
+    @isTest(seeallData = true)
+    public static void testAfterUpdateAGM() {
+        Assignment_Group_Member__c agmRec = [Select Id,Active__c From Assignment_Group_Member__c limit 1];
+        if(agmRec.Active__c){
+            agmRec.Active__c = false;
+        }else{
+            agmRec.Active__c = true;
+        }
+        update agmRec;
+    }   
 }

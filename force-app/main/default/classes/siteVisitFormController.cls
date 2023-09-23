@@ -153,11 +153,12 @@ public without sharing class siteVisitFormController {
     public Static leadAndSVwrapper searchLead(string searchkey, string projectId){
         try{
             Map<Id, Opportunity__c> opportunityIdByOpportunityRecordMap = New Map<Id, Opportunity__c>();
+            system.debug('searchkey--->'+searchkey);
            // set<Id> oppId = New Set<Id>();
             if(searchkey != null){
                 
                 string phonestring = '%' +searchkey;
-                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c,Owner.Name From Lead__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
+                List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c,Owner.Name From Lead__c where Email__c =:searchkey or Alternate_Email__c =:searchkey OR Phone__c LIKE :phonestring OR Alternate_Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
                 system.debug('leadRec===>>'+leadList);
                 system.debug('leadList[0].isConverted__c ==>> '+leadList[0].isConverted__c);
                 if(!leadList.isEmpty() && leadList[0].isConverted__c == false){

@@ -108,8 +108,10 @@ public class TaskTriggerHelper {
                     system.debug('taskrec.WhatId--->'+taskrec.WhatId);
                     leadIdsSet.add(taskrec.WhatId);
                 }
-                if((Id.valueOf(taskRec.WhatId)).getSObjectType().getDescribe().getName() == 'Lead__c' && taskRec.Call_ID__c != null){
-                    setOfCalledLeadIds.add(taskRec.WhatId);
+                if(taskRec.WhatId != null){
+                    if((Id.valueOf(taskRec.WhatId)).getSObjectType().getDescribe().getName() == 'Lead__c' && taskRec.Call_ID__c != null){
+                        setOfCalledLeadIds.add(taskRec.WhatId);
+                    }
                 }
             }
             system.debug('leadIdsSet-->'+leadIdsSet);
