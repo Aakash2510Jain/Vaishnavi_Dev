@@ -177,8 +177,8 @@ public without sharing class siteVisitFormController {
                     }
                     /*system.debug('opportunityIdByOpportunityRecordMap ==>>'+opportunityIdByOpportunityRecordMap);*/
                     if(!oppRecByOppIdMap.isEmpty()){
-                        relatedVisitRecords = [Select Id,Name__c,Project__r.Name,Actual_visit_date__c,Planned_visit_date__c,Visiting_With__c,Email__c,Mobile_No__c,
-                        Walkin_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : oppRecByOppIdMap.keyset() order by Actual_visit_date__c ASC];
+                        relatedVisitRecords = [Select Id,Name__c,Project__r.Name,Visit_Type__c,Actual_visit_date__c,Planned_visit_date__c,Visiting_With__c,Email__c,Mobile_No__c,
+                        Walkin_Source__c,Walkin_Sub_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : oppRecByOppIdMap.keyset() order by Actual_visit_date__c ASC];
                     }
                     leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, relatedVisitRecords, oppRecByOppIdMap.values()[0]);
                     return leadAndSVwrapInstance;
@@ -357,6 +357,7 @@ public without sharing class siteVisitFormController {
                 List<User> salesUserList = [SELECT Id,Name,Profile.Name FROM User WHERE Id =: visitRecord.Sales_Manager__c];
                 visitRecord.Sales_Manager__c = salesUserList[0].Name;
                 visitRecord.OwnerId = salesUserList[0].Id;
+                visitRecord.Attending_Sales_Manager__c = salesUserList[0].Id;
 
                 Visit__c visitRec = [SELECT Id,Opportunities__c,Opportunities__r.OwnerId FROM Visit__c WHERE Id=: visitRecord.Id];
                 if(!String.isBlank(visitRec.Opportunities__c)){

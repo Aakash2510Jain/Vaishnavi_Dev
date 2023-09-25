@@ -246,6 +246,7 @@
                     debugger;
                     siteVisitFormController.searchLead($scope.searchValue,$scope.projectId,function(result,event){
                         debugger;
+                        $scope.showVisitSection = false;
                         if(event.status && result){
                             if(result.leadRec != null){
                                 console.log('success....');
@@ -254,6 +255,7 @@
                                 $scope.showLeadDetails = true;
                                 $scope.errorMsg = false;
                                 $scope.showCreateLead = false;
+                                $scope.showConvertedLead = false;
                                 $scope.$apply();
                             }else{
                                 console.log('success....');
@@ -508,6 +510,11 @@
                         swal('info','Date of Birth cannot be future date.','info');
                             return;
                     }
+                    if($scope.visit.Employment_Type__c == undefined || $scope.visit.Employment_Type__c == ""){
+                            debugger;
+                            swal('info','Please select Employment Type.','info');
+                            return;
+                    }
                     if($scope.visit.Employment_Type__c == 'Salaried' || $scope.visit.Employment_Type__c == 'Business' || $scope.visit.Employment_Type__c == 'Professional'){
                         if($scope.visit.Company_Name__c == undefined || $scope.visit.Company_Name__c == ""){
                             debugger;
@@ -532,7 +539,7 @@
                     }
 
                     $scope.firstVisitRecord = {"Id":$scope.visit.Id,"Form_No__c":$scope.visit.Form_No__c,"Date_Of_Birth__c":$scope.visit.Date_Of_Birth__c,"Age_Group__c":$scope.visit.Age_Group__c,
-                    "Residential_Address__c":$scope.visit.Residential_Address__c,"City__c":$scope.visit.City__c,
+                    "Residential_Address__c":$scope.visit.Residential_Address__c,"City__c":$scope.visit.City__c,"Name__c":$scope.leadRecord[0].Name__c,"Email__c":$scope.leadRecord[0].Email__c,"Phone__c":$scope.leadRecord[0].Phone__c,
                     "Pincode__c":$scope.visit.Pincode__c,"Employment_Type__c":$scope.visit.Employment_Type__c,"Company_Name__c":$scope.visit.Company_Name__c,
                     "Industry__c":$scope.visit.Industry__c,"Office_Address__c":$scope.visit.Office_Address__c,"Office_PinCode__c":$scope.visit.Office_PinCode__c,
                     "Actual_visit_date__c":$scope.today,"Alternate_Phone__c":$scope.visit.Alternate_Phone__c,"Project__c":$scope.leadRecord[0].Project__c,
@@ -622,6 +629,27 @@
 
             $scope.saveCustomerReq = function(){
                     debugger;
+
+                    if($scope.visit.Budget__c == undefined || $scope.visit.Budget__c == ""){
+                        debugger;
+                        swal('info','Please select Budget.','info');
+                        return;
+                    }
+                    if($scope.visit.Area__c == undefined || $scope.visit.Area__c == ""){
+                        debugger;
+                        swal('info','Please select Unit Type.','info');
+                        return;
+                    }
+                    if($scope.visit.Construction_Status__c == undefined || $scope.visit.Construction_Status__c == ""){
+                        debugger;
+                        swal('info','Please select Project Completion Timeline.','info');
+                        return;
+                    }
+                    if($scope.visit.Purpose_Of_Buying__c == undefined || $scope.visit.Purpose_Of_Buying__c == ""){
+                        debugger;
+                        swal('info','Please select Purpose Of Buying.','info');
+                        return;
+                    }
 
                     $scope.secondVisitRecord = {"Budget__c":$scope.visit.Budget__c,"Area__c":$scope.visit.Area__c,
                     "Construction_Status__c":$scope.visit.Construction_Status__c,"Purpose_Of_Buying__c":$scope.visit.Purpose_Of_Buying__c};
@@ -1050,23 +1078,23 @@
                             	<table class="table mt-3">
                                 <tr>
                                     <th>S.No.</th>
+                                    <th>Visit Type</th>
                                     <th>Visit Date</th>
+                                    <th>Project</th>
                                     <th>Walkin Source</th>
+                                    <th>Walkin Sub Source</th>
                                     <th>Channel Partner Name</th>
                                     <th>Referral Name</th>
-                                    <th>GRE Email</th>
-                                    <th>Budget</th>
-                                    <th>Project</th>
                                 </tr>
                                 <tr ng-repeat="rec in siteVisitList">
                                     <td>{{$index+1}}</td>
+                                    <td>{{rec.Visit_Type__c}}</td>
                                     <td>{{rec.Actual_visit_date__c | date:'dd-MM-yyyy'}}</td>
+                                    <td>{{rec.Project__r.Name}}</td>
                                     <td>{{rec.Walkin_Source__c}}</td>
+                                    <td>{{rec.Walkin_Sub_Source__c}}</td>
                                     <td>{{rec.Channel_Partner_Name__c}}</td>
                                     <td>{{rec.Referral_Name__c}}</td>
-                                    <td>{{rec.GRE_Email__c}}</td>
-                                    <td>{{rec.Budget__c}}</td>
-                                    <td>{{rec.Project__r.Name}}</td>
                                 </tr>
                             </table>
                             </div>
@@ -1301,7 +1329,7 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Employment Type:</label>
+                                                <label class="label">Employment Type:</label><span class="required-asterisk" style="color:red;">*</span>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1422,7 +1450,7 @@
                                     <div class="col-md-12">
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Budget(in Lakhs):</label>
+                                                <label class="label">Budget(in Lakhs):</label><span class="required-asterisk" style="color:red;">*</span>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1435,7 +1463,7 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Unit Type:</label>
+                                                <label class="label">Unit Type:</label><span class="required-asterisk" style="color:red;">*</span>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1448,7 +1476,7 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Project Completion <br/>Timeline:</label>
+                                                <label class="label">Project Completion <br/>Timeline:</label><span class="required-asterisk" style="color:red;">*</span>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">
@@ -1461,7 +1489,7 @@
                                         </div>
                                         <div class="row align-items-center mb-4">
                                             <div class="col-md-2">
-                                                <label class="label">Purpose Of Buying:</label>
+                                                <label class="label">Purpose Of Buying:</label><span class="required-asterisk" style="color:red;">*</span>
                                             </div>
                                             <div class="col-md-10">
                                                 <div class="row">

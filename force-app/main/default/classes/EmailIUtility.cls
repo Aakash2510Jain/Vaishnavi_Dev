@@ -309,6 +309,74 @@ public without sharing class EmailIUtility {
             HandleBusinessException.captureError('EmailUtility', 'notifyVaishnaviTeam', e, null);
         }
     }
+      /*public static void notifyVaishnaviTeamForSV(set<id> siteVisitIds, String templateName){
+        try{
+            List<Messaging.SingleEmailMessage> mails = new List<Messaging.SingleEmailMessage>();
+            EmailTemplate et = [Select id, Name, DeveloperName, Subject, Body, HtmlValue from EmailTemplate where name = :templateName];
+            List<Visit__c> siteVisitList = [Select Id,Name__c,Name,Opportunities__r.owner.Email,Opportunities__r.owner.Name,SV_Link__c from Visit__c where Id In : siteVisitIds];
+            Id orgWideEmailAddressId = [SELECT Id FROM OrgWideEmailAddress ].Id;
+            system.debug('orgWideEmailAddressId ==> '+orgWideEmailAddressId);
+            
+            if(!siteVisitList.isEmpty()){
+                for(Visit__c visitRec : siteVisitList){
+                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                    mail.setOrgWideEmailAddressId(orgWideEmailAddressId);
+                   
+                    List<String> recipients = new List<String>();
+                    recipients.add(visitRec.Opportunities__r.owner.Email);
+                    system.debug('recipients------' + recipients);
+                    mail.setToAddresses(recipients);
+                    // mail.setReplyTo('test@email.com');
+                    // mail.setSenderDisplayName('Vaishnavi');
+                    String subject = et.Subject;
+                    String htmlBody = et.HtmlValue;
+
+                    if(!String.isBlank(Opportunities__r.owner.Name)){
+                        system.debug('Inside Name --------'+htmlBody);
+                        htmlBody = htmlBody.replace('{!Lead.Name}', leadRec.Name__c);
+                    }
+                    if(!String.isBlank(leadRec.Project_Pickval__c)){
+                        htmlBody = htmlBody.replace('{!Lead.ProjectName}', leadRec.Project_Pickval__c != null ? leadRec.Project_Pickval__c : '');
+                        system.debug('Inside ProjectName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Name)){
+                        htmlBody = htmlBody.replace('{!Lead.OwnerName}', string.valueOf(leadRec.owner.Name));
+                        system.debug('Inside OwnerName --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.owner.Email)){
+                        htmlBody = htmlBody.replace('{!Lead.OwnerEmail}', string.valueOf(leadRec.Owner.Email));
+                        system.debug('Inside OwnerEmail --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Lead_Source_Type__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Lead_Source_Type__c}', string.valueOf(leadRec.Lead_Source_Type__c));
+                        system.debug('Inside LeadSourceType --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Phone__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Phone}', string.valueOf(leadRec.Phone__c));
+                        system.debug('Inside LeadPhone --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.Email__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Email__c}', string.valueOf(leadRec.Email__c));
+                        system.debug('Inside LeadEmail --------'+htmlBody);
+                    }
+                    if(!String.isBlank(leadRec.hrefLink__c)){
+                        htmlBody = htmlBody.replace('{!Lead.Link}', string.valueOf(leadRec.hrefLink__c));
+                        system.debug('Inside LeadLink --------'+htmlBody);
+                    }
+
+                    mail.setSubject(subject);
+                    mail.setHtmlBody(htmlBody);
+                    mails.add(mail);
+                }
+                if(!mails.isEmpty()){
+                    Messaging.sendEmail(mails);
+                }
+            }
+        } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('EmailUtility', 'notifyVaishnaviTeam', e, null);
+        }
+    }*/
      public static void sendExceptions(Exception__c exceps){
         //Error Template
         try{
