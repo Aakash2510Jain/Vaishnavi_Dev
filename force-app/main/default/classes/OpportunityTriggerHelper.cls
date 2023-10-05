@@ -35,10 +35,33 @@ public class OpportunityTriggerHelper {
     
     public void beforeUpdate(Map<Id, opportunity__c> newOpportunityMap, Map<Id, opportunity__c> oldOpportunityMap){
         
+        List<opportunity__c> oppListToUpdate = New List<opportunity__c>();
         for(Opportunity__C oppRecord : newOpportunityMap.values()){
             if(oppRecord.Opportunity_SubStage__c != oldOpportunityMap.get(oppRecord.Id).Opportunity_SubStage__c && (oppRecord.Next_Followup_Date_Time__c == null || oppRecord.Next_Followup_Date_Time__c < system.now())){
                 oppRecord.Next_Followup_Date_Time__c.addError('Please specify future follow up date');
             }
-        }     
+            if(!String.isBlank(oppRecord.Phone__c) && oppRecord.Phone__c != oldOpportunityMap.get(oppRecord.Id).Phone__c){
+                oppRecord.Phone__c = oppRecord.Phone__c.replaceAll('[^0-9]', '');
+                oppRecord.Phone__c = '+91' + oppRecord.Phone__c.right(10);
+            }
+            if(!String.isBlank(oppRecord.Alternate_Phone__c)  && oppRecord.Alternate_Phone__c != oldOpportunityMap.get(oppRecord.Id).Alternate_Phone__c){
+                oppRecord.Alternate_Phone__c = oppRecord.Alternate_Phone__c.replaceAll('[^0-9]', '');
+                oppRecord.Alternate_Phone__c = '+91' +  oppRecord.Alternate_Phone__c.right(10);
+            }
+        }  
+    }
+
+    public void beforeInsert(List<opportunity__c> newOppList){
+        system.debug('newOppList ===> '+newOppList);
+        for(Opportunity__C oppRecord : newOppList){
+            if(!String.isBlank(oppRecord.Phone__c)){
+                oppRecord.Phone__c = oppRecord.Phone__c.replaceAll('[^0-9]', '');
+                oppRecord.Phone__c = '+91' + oppRecord.Phone__c.right(10);
+            }
+            if(!String.isBlank(oppRecord.Alternate_Phone__c)){
+                oppRecord.Alternate_Phone__c = oppRecord.Alternate_Phone__c.replaceAll('[^0-9]', '');
+                oppRecord.Alternate_Phone__c = '+91' +  oppRecord.Alternate_Phone__c.right(10);
+            }
+        }
     }
 }

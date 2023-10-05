@@ -23,4 +23,21 @@ public class SiteVisitTriggerHelper {
             HandleBusinessException.captureError('SiteVisitTriggerHelper', 'After Site Visit Insert', e, null);
         }
     }
+    public void afterUpdate(Map<Id, Visit__c> newVisitmap, Map<Id, Visit__c> oldVisitmap){
+        try{
+            set<Id> setOfSiteVisits = new Set<Id>();
+            
+            for(Visit__c visitRec : newVisitmap.values()){
+                if(visitRec.Attending_Sales_Manager__c != null && visitRec.Attending_Sales_Manager__c != oldVisitmap.get(visitRec.Id).Attending_Sales_Manager__c){
+                    setOfSiteVisits.add(visitRec.Id);
+                }
+            }
+            if(!setOfSiteVisits.isEmpty()){
+                EmailIUtility.notifyVaishnaviTeamForSV(setOfSiteVisits,'New SV Done');
+            }
+        } catch (Exception e){
+            system.debug('ERROR :: ' + e.getMessage() + 'AT LINE NUMBER :: ' + e.getLineNumber());
+            HandleBusinessException.captureError('SiteVisitTriggerHelper', 'After Site Visit Insert', e, null);
+        }
+    }
 }

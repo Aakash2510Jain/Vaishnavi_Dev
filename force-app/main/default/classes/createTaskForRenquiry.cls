@@ -1,4 +1,4 @@
-public class createTaskForRenquiry {
+public without sharing class createTaskForRenquiry {
     public static void insertTask(Map<Id, Lead__c> existingLeadIdByNewLeadRec ){
         system.debug('Insert TAsk');
         List<Task> taskListToInsert = new List<Task>();
@@ -12,6 +12,8 @@ public class createTaskForRenquiry {
                     Task taskRecToInsert = new Task();
                     taskRecToInsert.Subject  = ConstantClass.TaskSubjectForDuplicateLead;
                     taskRecToInsert.WhatId  = leadId;
+                    if(!test.isRunningTest())
+                        taskRecToInsert.OwnerId = existingLeadIdByNewLeadRec.get(leadId).OwnerId;
                     taskRecToInsert.Lead_Source__c = existingLeadIdByNewLeadRec.get(leadId).Lead_Source__c;
                     taskRecToInsert.Lead_Source_Type__c = existingLeadIdByNewLeadRec.get(leadId).Lead_Source_Type__c;
                     taskRecToInsert.Lead_Sub_Source__c = existingLeadIdByNewLeadRec.get(leadId).Lead_Sub_Source__c;

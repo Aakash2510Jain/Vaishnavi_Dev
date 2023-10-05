@@ -152,7 +152,7 @@ public without sharing class siteVisitFormController {
                 string phonestring = '%' +searchkey;
                 List<Lead__c> leadList = [select id,Name__c,Email__c,Phone__c,Lead_Source__c,Lead_Sub_Source__c,Lead_Source_Type__c,isConverted__c,Project__c,Owner.Name From Lead__c where Email__c =:searchkey or Alternate_Email__c =:searchkey OR Phone__c LIKE :phonestring OR Alternate_Phone__c LIKE :phonestring order by lastModifiedDate Desc limit 1];
                 system.debug('leadRec===>>'+leadList);
-                system.debug('leadList[0].isConverted__c ==>> '+leadList[0].isConverted__c);
+                // system.debug('leadList[0].isConverted__c ==>> '+leadList[0].isConverted__c);
                 if(!leadList.isEmpty() && leadList[0].isConverted__c == false){
                     //Non -Converted Lead Already Exists
                     system.debug('Inside Is Converted FALSE.....');
@@ -184,8 +184,27 @@ public without sharing class siteVisitFormController {
                     return leadAndSVwrapInstance;
                 }else{
                     // No lead or opportunity exists
-                    leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, null, null);
+                    system.debug('Else Condition.....');
+
+                    List<Visit__C> relatedVisitRecords = new List<Visit__C>();
+                    Map<Id, Opportunity__c> oppRecByOppIdMap  = new Map<Id, Opportunity__c>([Select Id,Email__c,Opportunity_Name__c,Phone__c,Project__c,Stage__c From Opportunity__c where Email__c =:searchkey OR Phone__c LIKE :phonestring order by createdDate Desc]);
+                    system.debug('oppRecByOppIdMap ==> '+oppRecByOppIdMap);
+                    if(!oppRecByOppIdMap.isEmpty()){
+                        for(Id oppId : oppRecByOppIdMap.keyset()){
+                            if(oppRecByOppIdMap.get(oppId).Project__c == projectId){
+
+                            }
+                        }
+                    }
+                    /*system.debug('opportunityIdByOpportunityRecordMap ==>>'+opportunityIdByOpportunityRecordMap);*/
+                    if(!oppRecByOppIdMap.isEmpty()){
+                        relatedVisitRecords = [Select Id,Name__c,Project__r.Name,Visit_Type__c,Actual_visit_date__c,Planned_visit_date__c,Visiting_With__c,Email__c,Mobile_No__c,
+                        Walkin_Source__c,Walkin_Sub_Source__c,Channel_Partner_Name__c,Referral_Name__c,GRE_Email__c,Budget__c From Visit__C where Opportunities__c in : oppRecByOppIdMap.keyset() order by Actual_visit_date__c ASC];
+                    }
+                    leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, relatedVisitRecords, oppRecByOppIdMap.values()[0]);
                     return leadAndSVwrapInstance;
+                    // leadAndSVwrapper leadAndSVwrapInstance = new leadAndSVwrapper(null, null, null);
+                    // return leadAndSVwrapInstance;
                 }
             }else{
                 return null;
@@ -242,6 +261,7 @@ public without sharing class siteVisitFormController {
             system.debug('leadId ==> '+leadId);
             System.debug(' --- visitRecord:'+visitRecord);
             System.debug(' --- location:'+location);
+            visitRecord.Visit_Type__c = 'First Visit';
             if(!String.isBlank(location)){
                 List<Location__c> locationrec = [Select Id,name From Location__c WHERE Id =: location LIMIT 1];
                 system.debug('locationrec ==> '+locationrec);

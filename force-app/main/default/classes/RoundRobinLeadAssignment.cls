@@ -44,7 +44,7 @@ public without sharing class  RoundRobinLeadAssignment{
                     system.debug('QueueNameToQmemberIdList::'+QueueNameToQmemberIdList);
                     system.debug('QueueNameToQmemberIdList.get(qName)::'+QueueNameToQmemberIdList.get(qName));
                     While(QueueNameToQmemberIdList != null && qMemberSize != null && QueueNameToQmemberIdList.get(qName) != null && isAssigned == false && qMemberSize <= QueueNameToQmemberIdList.get(qName).size()){
-                        Integer currentRRid, LastRRid; 
+                        Integer currentRRid , LastRRid; 
                         String QnameAndRRid, qMemberID;
                         System.debug('qNameToLastAssignedQmemberRRid ====> ' + qNameToLastAssignedQmemberRRid);
                         System.debug('qNameToLastAssignedQmemberRRid.get(qName) ====> ' + qNameToLastAssignedQmemberRRid.get(qName));
@@ -64,7 +64,7 @@ public without sharing class  RoundRobinLeadAssignment{
                             System.debug('Inside 2  currentRRid'+currentRRid);
                         }
                         else if(QueueNameToQmemberIdList.get(qName).size() == 1){
-                            
+                            currentRRid = 1;
                             
                         }
                         else{
@@ -72,6 +72,7 @@ public without sharing class  RoundRobinLeadAssignment{
                             LastRRid = 0;
                             System.debug('Inside 3  currentRRid'+currentRRid);
                         }
+                        system.debug('currentRRid--->'+currentRRid);
                         QnameAndRRid = qName + String.valueOf(currentRRid);
                         system.debug('QnameAndRRid::'+QnameAndRRid);
                         system.debug('QnameAndRRidToMemberIDMap::'+QnameAndRRidToMemberIDMap);

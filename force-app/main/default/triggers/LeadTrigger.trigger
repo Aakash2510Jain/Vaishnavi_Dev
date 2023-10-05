@@ -14,12 +14,15 @@ trigger LeadTrigger on Lead__c (before insert, after insert, before update,after
             handlerInstance.afteInsert(trigger.newMap, trigger.oldMap);
             
             //Lead Assignment
-           //LeadAssignmentExecutionCriteria.validateEntryCriteria();
+            //LeadAssignmentExecutionCriteria.validateEntryCriteria();
             
             //delete duplicate leads	
             BatchToDeleteDuplicateLeads batchInstance = new BatchToDeleteDuplicateLeads();
             database.executeBatch(batchInstance);
-           
+            
+            BatchToAssignIncomingLead batchInstance1 = new BatchToAssignIncomingLead();
+            database.executeBatch(batchInstance1);
+            
         }
         if(trigger.isBefore && trigger.isUpdate){
             handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);

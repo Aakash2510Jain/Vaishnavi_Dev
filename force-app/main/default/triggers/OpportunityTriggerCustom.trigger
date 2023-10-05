@@ -1,4 +1,4 @@
-trigger OpportunityTriggerCustom on Opportunity__c (after insert,before update) {
+trigger OpportunityTriggerCustom on Opportunity__c (after insert,before update, before insert) {
     SObject_Trigger_Control__mdt triggerConfig = SObject_Trigger_Control__mdt.getInstance('Opportunity');
     system.debug('triggerConfig:: ' + triggerConfig);
     
@@ -10,6 +10,10 @@ trigger OpportunityTriggerCustom on Opportunity__c (after insert,before update) 
         }
         if(trigger.isbefore && trigger.isUpdate){
             handlerInstance.beforeUpdate(trigger.newMap, trigger.oldMap);
+        }
+        if(trigger.isBefore && trigger.isInsert){
+            system.debug('Inside Before Insert.....');
+            handlerInstance.beforeInsert(trigger.new);
         }
     }
 }
